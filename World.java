@@ -1,12 +1,13 @@
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 /**
  * Represents the world where actors interact.
  * This class extends JPanel and implements ActionListener.
- * 
+ *
  * @author Knivier
  */
 public class World extends JPanel implements ActionListener {
@@ -16,9 +17,9 @@ public class World extends JPanel implements ActionListener {
     /**
      * Constructs a new World with the specified dimensions and cell size.
      *
-     * @param width     The width of the world (number of cells).
-     * @param height    The height of the world (number of cells).
-     * @param cellSize  The size of each cell in pixels.
+     * @param width    The width of the world (number of cells).
+     * @param height   The height of the world (number of cells).
+     * @param cellSize The size of each cell in pixels.
      */
     public World(int width, int height, int cellSize) {
         setPreferredSize(new Dimension(width * cellSize, height * cellSize));

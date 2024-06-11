@@ -1,4 +1,4 @@
-import java.awt.Rectangle;
+import java.awt.*;
 
 /**
  * Manages collision detection between actors in the world.
@@ -7,7 +7,7 @@ import java.awt.Rectangle;
  * @author Knivier
  */
 public class CollisionManager {
-    
+
     /**
      * Checks if two actors intersect.
      *
@@ -19,7 +19,7 @@ public class CollisionManager {
         // Create bounding boxes for the two actors
         Rectangle r1 = new Rectangle(a.getX(), a.getY(), a.getImage().getImage().getWidth(null), a.getImage().getImage().getHeight(null));
         Rectangle r2 = new Rectangle(b.getX(), b.getY(), b.getImage().getImage().getWidth(null), b.getImage().getImage().getHeight(null));
-        
+
         // Check if the bounding boxes intersect
         return r1.intersects(r2);
     }
