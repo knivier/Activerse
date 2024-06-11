@@ -1,6 +1,6 @@
 /**
  * The base actor that extends the main Actor and can do more things
- * 
+ *
  * @author Knivier
  */
 public class MyActor extends Actor {

@@ -50,5 +50,6 @@ public class KeyboardInfo implements KeyListener {
      * @param e The KeyEvent object representing the key typed event.
      */
     @Override
-    public void keyTyped(KeyEvent e) {}
+    public void keyTyped(KeyEvent e) {
+    }
 }

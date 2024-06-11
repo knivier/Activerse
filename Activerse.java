@@ -1,4 +1,4 @@
-import javax.swing.JFrame;
+import javax.swing.*;
 
 /**
  * Provides utility methods to start and stop the Activerse application.
@@ -7,11 +7,11 @@ import javax.swing.JFrame;
  * @author Knivier
  */
 public class Activerse {
-    
+
     /**
      * Starts the Activerse application with the specified world.
      * Creates a JFrame and adds the world to it.
-     * 
+     *
      * @param world The world to start the application with.
      */
     public static void start(World world) {
@@ -22,10 +22,10 @@ public class Activerse {
         frame.setVisible(true); // Make the frame visible
         world.start(); // Start the world
     }
-    
+
     /**
      * Stops the Activerse application by stopping the specified world.
-     * 
+     *
      * @param world The world to stop.
      */
     public static void stop(World world) {

@@ -1,5 +1,4 @@
-import java.awt.Image;
-import java.awt.Toolkit;
+import java.awt.*;
 
 /**
  * Represents an image loader for loading images from files.
