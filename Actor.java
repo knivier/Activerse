@@ -1,4 +1,7 @@
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.geom.AffineTransform;
+
 
 /**
  * The base class for all actors in the world.
@@ -70,7 +73,19 @@ public abstract class Actor {
      */
     public void paint(Graphics g) {
         if (image != null) {
-            g.drawImage(image.getImage(), x, y, null);
+            Graphics2D g2d = (Graphics2D) g;
+            int width = image.getImage().getWidth(null);
+            int height = image.getImage().getHeight(null);
+
+            // Save the current transformation
+            AffineTransform old = g2d.getTransform();
+
+            // Rotate the image around its center
+            g2d.rotate(direction, x + width / 2, y + height / 2);
+            g2d.drawImage(image.getImage(), x, y, null);
+
+            // Restore the original transformation
+            g2d.setTransform(old);
         }
     }
 
@@ -154,5 +169,16 @@ public abstract class Actor {
             }
             act(); // Execute the next action after the delay
         }).start();
+    }
+
+    /**
+     * Checks if a specific key is currently pressed.
+     *
+     * @param key The character representing the key to check.
+     * @return true if the key is currently pressed, false otherwise.
+     */
+    public boolean keyIsDown(char key) {
+        int keyCode = KeyEvent.getExtendedKeyCodeForChar(key);
+        return KeyboardInfo.isKeyDown(keyCode);
     }
 }

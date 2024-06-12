@@ -7,12 +7,16 @@ import java.util.ArrayList;
 /**
  * Represents the world where actors interact.
  * This class extends JPanel and implements ActionListener.
+ * The world has a fixed size and a black border, and can display a background image.
  *
  * @author Knivier
  */
 public class World extends JPanel implements ActionListener {
     private Timer timer; // Timer for updating the world
     private ArrayList<Actor> actors; // List of actors in the world
+    private final int width; // Width of the world in pixels
+    private final int height; // Height of the world in pixels
+    private Image backgroundImage; // Background image for the world
 
     /**
      * Constructs a new World with the specified dimensions and cell size.
@@ -22,10 +26,22 @@ public class World extends JPanel implements ActionListener {
      * @param cellSize The size of each cell in pixels.
      */
     public World(int width, int height, int cellSize) {
-        setPreferredSize(new Dimension(width * cellSize, height * cellSize));
+        this.width = width * cellSize;
+        this.height = height * cellSize;
+        setPreferredSize(new Dimension(this.width, this.height));
         setBackground(Color.WHITE);
+        setBorder(BorderFactory.createLineBorder(Color.BLACK)); // Add a black border
         actors = new ArrayList<>();
         timer = new Timer(50, this); // Create a timer with a delay of 50 milliseconds
+    }
+
+    /**
+     * Sets the background image for the world.
+     *
+     * @param imagePath The path to the background image file.
+     */
+    public void setBackgroundImage(String imagePath) {
+        backgroundImage = Toolkit.getDefaultToolkit().getImage(imagePath);
     }
 
     /**
@@ -65,15 +81,22 @@ public class World extends JPanel implements ActionListener {
     }
 
     /**
-     * Overrides the paintComponent method to paint all actors in the world.
+     * Overrides the paintComponent method to paint the background image and all actors in the world.
      *
      * @param g The Graphics object used for painting.
      */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+
+        // Draw the background image if it exists
+        if (backgroundImage != null) {
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        }
+
+        // Paint each actor in the world
         for (Actor actor : actors) {
-            actor.paint(g); // Paint each actor in the world
+            actor.paint(g);
         }
     }
 
@@ -88,5 +111,15 @@ public class World extends JPanel implements ActionListener {
             actor.act(); // Perform actions for each actor in the world
         }
         repaint(); // Repaint the world to reflect the changes
+    }
+
+    /**
+     * Overrides the getPreferredSize method to ensure the world has a fixed size.
+     *
+     * @return The preferred size of the world.
+     */
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(width, height);
     }
 }
