@@ -122,4 +122,13 @@ public class World extends JPanel implements ActionListener {
     public Dimension getPreferredSize() {
         return new Dimension(width, height);
     }
+
+    /**
+     * Returns the list of actors currently in the world.
+     *
+     * @return The list of actors.
+     */
+    public ArrayList<Actor> getActors() {
+        return actors;
+    }
 }
