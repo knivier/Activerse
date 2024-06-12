@@ -13,7 +13,11 @@ public class MyActor extends Actor {
     public void act() {
         // Move the player based on key presses
         if (keyIsDown('W')) {
+            if(keyIsDown('M')){
+                move(4);
+            }
             move(2); // Move forward
+
         }
         if (keyIsDown('S')) {
             move(-2); // Move backward

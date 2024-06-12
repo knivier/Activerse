@@ -2,15 +2,12 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 
-
 /**
  * The base class for all actors in the world.
- *
- * @author Knivier
  */
 public abstract class Actor {
     private int x, y;
-    private double direction; // Angle in radians
+    protected double direction; // Changed access to protected
     private World world;
     private ActiverseImage image;
 
@@ -90,18 +87,18 @@ public abstract class Actor {
     }
 
     /**
-     * Gets the world the actor belongs to.
+     * Gets the world that the actor belongs to.
      *
-     * @return The world the actor belongs to.
+     * @return The world that the actor belongs to.
      */
     public World getWorld() {
         return world;
     }
 
     /**
-     * Sets the world the actor belongs to.
+     * Sets the world that the actor belongs to.
      *
-     * @param world The world the actor belongs to.
+     * @param world The world that the actor belongs to.
      */
     public void setWorld(World world) {
         this.world = world;
