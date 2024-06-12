@@ -15,7 +15,7 @@ public class Activerse {
      * @param world The world to start the application with.
      */
     public static void start(World world) {
-        JFrame frame = new JFrame("Activerse Instance v1.0.2-beta");
+        JFrame frame = new JFrame("Activerse Instance v1.0.3-beta");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(world);
         KeyboardInfo keyboardInfo = new KeyboardInfo();
