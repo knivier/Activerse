@@ -19,5 +19,6 @@ public class MyWorld extends World {
 
         // Add a MyActor object to the world at the specified location (100, 100)
         addObject(new MyActor(), 100, 100);
+        //end
     }
 }
