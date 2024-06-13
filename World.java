@@ -2,7 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Represents the world where actors interact.
@@ -12,11 +13,11 @@ import java.util.ArrayList;
  * @author Knivier
  */
 public class World extends JPanel implements ActionListener {
-    private Timer timer; // Timer for updating the world
-    private ArrayList<Actor> actors; // List of actors in the world
-    private final int width; // Width of the world in pixels
-    private final int height; // Height of the world in pixels
-    private Image backgroundImage; // Background image for the world
+    private Timer timer;
+    private List<Actor> actors;
+    private final int fixedWidth;
+    private final int fixedHeight;
+    private Image backgroundImage;
 
     /**
      * Constructs a new World with the specified dimensions and cell size.
@@ -26,12 +27,12 @@ public class World extends JPanel implements ActionListener {
      * @param cellSize The size of each cell in pixels.
      */
     public World(int width, int height, int cellSize) {
-        this.width = width * cellSize;
-        this.height = height * cellSize;
-        setPreferredSize(new Dimension(this.width, this.height));
+        this.fixedWidth = width * cellSize;
+        this.fixedHeight = height * cellSize;
+        setPreferredSize(new Dimension(this.fixedWidth, this.fixedHeight));
         setBackground(Color.WHITE);
         setBorder(BorderFactory.createLineBorder(Color.BLACK)); // Add a black border
-        actors = new ArrayList<>();
+        actors = new CopyOnWriteArrayList<>(); // Use CopyOnWriteArrayList to avoid ConcurrentModificationException
         timer = new Timer(50, this); // Create a timer with a delay of 50 milliseconds
     }
 
@@ -91,7 +92,7 @@ public class World extends JPanel implements ActionListener {
 
         // Draw the background image if it exists
         if (backgroundImage != null) {
-            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+            g.drawImage(backgroundImage, 0, 0, fixedWidth, fixedHeight, this);
         }
 
         // Paint each actor in the world
@@ -114,21 +115,21 @@ public class World extends JPanel implements ActionListener {
     }
 
     /**
+     * Returns a list of actors in the world.
+     *
+     * @return A list of actors in the world.
+     */
+    public List<Actor> getActors() {
+        return actors;
+    }
+
+    /**
      * Overrides the getPreferredSize method to ensure the world has a fixed size.
      *
      * @return The preferred size of the world.
      */
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(width, height);
-    }
-
-    /**
-     * Returns the list of actors currently in the world.
-     *
-     * @return The list of actors.
-     */
-    public ArrayList<Actor> getActors() {
-        return actors;
+        return new Dimension(fixedWidth, fixedHeight);
     }
 }
