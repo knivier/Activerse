@@ -19,6 +19,11 @@ public class World extends JPanel implements ActionListener {
     private final int fixedHeight;
     private Image backgroundImage;
 
+    // Variables for showing text
+    private String displayText;
+    private int textX;
+    private int textY;
+
     /**
      * Constructs a new World with the specified dimensions and cell size.
      *
@@ -34,6 +39,9 @@ public class World extends JPanel implements ActionListener {
         setBorder(BorderFactory.createLineBorder(Color.BLACK)); // Add a black border
         actors = new CopyOnWriteArrayList<>(); // Use CopyOnWriteArrayList to avoid ConcurrentModificationException
         timer = new Timer(50, this); // Create a timer with a delay of 50 milliseconds
+
+        // Initialize text display variables
+        displayText = null;
     }
 
     /**
@@ -82,7 +90,20 @@ public class World extends JPanel implements ActionListener {
     }
 
     /**
-     * Overrides the paintComponent method to paint the background image and all actors in the world.
+     * Sets the text to be displayed at the specified location.
+     *
+     * @param x     The x-coordinate of the text's position.
+     * @param y     The y-coordinate of the text's position.
+     * @param text  The text to be displayed.
+     */
+    public void showText(int x, int y, String text) {
+        this.textX = x;
+        this.textY = y;
+        this.displayText = text;
+    }
+
+    /**
+     * Overrides the paintComponent method to paint the background image, all actors in the world, and the text.
      *
      * @param g The Graphics object used for painting.
      */
@@ -98,6 +119,12 @@ public class World extends JPanel implements ActionListener {
         // Paint each actor in the world
         for (Actor actor : actors) {
             actor.paint(g);
+        }
+
+        // Draw the text if it exists
+        if (displayText != null) {
+            g.setColor(Color.BLACK); // Set the text color to black
+            g.drawString(displayText, textX, textY); // Draw the text at the specified location
         }
     }
 
