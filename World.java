@@ -2,27 +2,32 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Represents the world where actors interact.
- * This class extends JPanel and implements ActionListener.
+ * This class extends JPanel and implements ActionListener, KeyListener.
  * The world has a fixed size and a black border, and can display a background image.
- *
- * @author Knivier
  */
-public class World extends JPanel implements ActionListener {
+public class World extends JPanel implements ActionListener, KeyListener {
     private Timer timer;
     private List<Actor> actors;
     private final int fixedWidth;
     private final int fixedHeight;
     private Image backgroundImage;
+    private List<String> loadedImages;
 
-    // Variables for showing text
+
     private String displayText;
     private int textX;
     private int textY;
+
+    private JButton debugButton;
+    private boolean debugMode = false;
 
     /**
      * Constructs a new World with the specified dimensions and cell size.
@@ -36,12 +41,27 @@ public class World extends JPanel implements ActionListener {
         this.fixedHeight = height * cellSize;
         setPreferredSize(new Dimension(this.fixedWidth, this.fixedHeight));
         setBackground(Color.WHITE);
-        setBorder(BorderFactory.createLineBorder(Color.BLACK)); // Add a black border
-        actors = new CopyOnWriteArrayList<>(); // Use CopyOnWriteArrayList to avoid ConcurrentModificationException
-        timer = new Timer(50, this); // Create a timer with a delay of 50 milliseconds
+        setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        actors = new CopyOnWriteArrayList<>();
+        loadedImages = new ArrayList<>();
+        timer = new Timer(50, this);
 
-        // Initialize text display variables
+
         displayText = null;
+
+        debugButton = new JButton("Debug");
+        debugButton.addActionListener(e -> {
+            debugMode = !debugMode;
+            requestFocusInWindow();
+            repaint();
+        });
+        setLayout(null);
+        int buttonWidth = 80;
+        debugButton.setBounds(this.fixedWidth - buttonWidth - 10, 10, buttonWidth, 30);
+        add(debugButton);
+        addKeyListener(this);
+        setFocusable(true);
+        requestFocusInWindow();
     }
 
     /**
@@ -51,6 +71,7 @@ public class World extends JPanel implements ActionListener {
      */
     public void setBackgroundImage(String imagePath) {
         backgroundImage = Toolkit.getDefaultToolkit().getImage(imagePath);
+        loadedImages.add(imagePath);
     }
 
     /**
@@ -61,9 +82,12 @@ public class World extends JPanel implements ActionListener {
      * @param y     The y-coordinate of the actor's position.
      */
     public void addObject(Actor actor, int x, int y) {
-        actor.setLocation(x, y); // Set the location of the actor
-        actor.setWorld(this); // Set the world of the actor
-        actors.add(actor); // Add the actor to the list of actors
+        actor.setLocation(x, y);
+        actor.setWorld(this);
+        actors.add(actor);
+        if (actor.getImage() != null) {
+            loadedImages.add(actor.getImage().getPath());
+        }
     }
 
     /**
@@ -72,21 +96,24 @@ public class World extends JPanel implements ActionListener {
      * @param actor The actor to remove from the world.
      */
     public void removeObject(Actor actor) {
-        actors.remove(actor); // Remove the actor from the list of actors
+        actors.remove(actor);
+        if (actor.getImage() != null) {
+            loadedImages.remove(actor.getImage().getPath());
+        }
     }
 
     /**
      * Starts the simulation by starting the timer.
      */
     public void start() {
-        timer.start(); // Start the timer
+        timer.start();
     }
 
     /**
      * Stops the simulation by stopping the timer.
      */
     public void stop() {
-        timer.stop(); // Stop the timer
+        timer.stop();
     }
 
     /**
@@ -111,21 +138,51 @@ public class World extends JPanel implements ActionListener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Draw the background image if it exists
         if (backgroundImage != null) {
             g.drawImage(backgroundImage, 0, 0, fixedWidth, fixedHeight, this);
         }
 
-        // Paint each actor in the world
         for (Actor actor : actors) {
             actor.paint(g);
         }
 
-        // Draw the text if it exists
         if (displayText != null) {
-            g.setColor(Color.BLACK); // Set the text color to black
-            g.drawString(displayText, textX, textY); // Draw the text at the specified location
+            g.setColor(Color.BLACK);
+            g.drawString(displayText, textX, textY);
         }
+
+        if (debugMode) {
+
+            drawDebugInfo(g);
+        }
+    }
+
+    private void drawDebugInfo(Graphics g) {
+        g.setColor(Color.BLACK);
+        int y = 50;
+
+        for (Actor actor : actors) {
+            String info = String.format("Actor at (%d, %d)", actor.getX(), actor.getY());
+            boolean isColliding = checkCollision(actor);
+            info += isColliding ? " - Colliding" : " - Not colliding";
+            g.drawString(info, 10, y);
+            y += 20;
+        }
+
+        StringBuilder imagesInfo = new StringBuilder("Loaded Images: ");
+        for (String imagePath : loadedImages) {
+            imagesInfo.append(imagePath).append(" ");
+        }
+        g.drawString(imagesInfo.toString(), 10, y);
+    }
+
+    private boolean checkCollision(Actor actor) {
+        for (Actor other : actors) {
+            if (actor != other && CollisionManager.intersects(actor, other)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -135,11 +192,39 @@ public class World extends JPanel implements ActionListener {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        for (Actor actor : actors) {
-            actor.act(); // Perform actions for each actor in the world
+        if (e.getSource() != debugButton) {
+            for (Actor actor : actors) {
+                actor.act();
+            }
+            repaint();
         }
-        repaint(); // Repaint the world to reflect the changes
     }
+
+    /**
+     * Handles key press events.
+     *
+     * @param e The KeyEvent object representing the key press event.
+     */
+    @Override
+    public void keyPressed(KeyEvent e) {
+        KeyboardInfo.keys[e.getKeyCode()] = true;
+    }
+
+    /**
+     * Handles key release events.
+     *
+     * @param e The KeyEvent object representing the key release event.
+     */
+    @Override
+    public void keyReleased(KeyEvent e) {
+        KeyboardInfo.keys[e.getKeyCode()] = false;
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        //nothing right now, but itll be updated later in the debug menu
+    }
+
 
     /**
      * Returns a list of actors in the world.

@@ -9,7 +9,7 @@ import java.awt.event.KeyListener;
  */
 public class KeyboardInfo implements KeyListener {
     // Array to store the state of each key
-    private static boolean[] keys = new boolean[256];
+    public static boolean[] keys = new boolean[256];
 
     /**
      * Checks if a specific key is currently pressed.
