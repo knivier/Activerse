@@ -1,3 +1,5 @@
+package ActiverseEngine;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -21,13 +23,14 @@ public class World extends JPanel implements ActionListener, KeyListener {
     private Image backgroundImage;
     private List<String> loadedImages;
 
-
     private String displayText;
     private int textX;
     private int textY;
 
     private JButton debugButton;
     private boolean debugMode = false;
+
+    private List<ActiverseSound> sounds;
 
     /**
      * Constructs a new World with the specified dimensions and cell size.
@@ -44,8 +47,8 @@ public class World extends JPanel implements ActionListener, KeyListener {
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
         actors = new CopyOnWriteArrayList<>();
         loadedImages = new ArrayList<>();
+        sounds = new ArrayList<>();
         timer = new Timer(50, this);
-
 
         displayText = null;
 
@@ -103,6 +106,15 @@ public class World extends JPanel implements ActionListener, KeyListener {
     }
 
     /**
+     * Adds a sound to the world.
+     *
+     * @param sound The sound to add to the world.
+     */
+    public void addSound(ActiverseSound sound) {
+        sounds.add(sound);
+    }
+
+    /**
      * Starts the simulation by starting the timer.
      */
     public void start() {
@@ -152,7 +164,6 @@ public class World extends JPanel implements ActionListener, KeyListener {
         }
 
         if (debugMode) {
-
             drawDebugInfo(g);
         }
     }
@@ -174,6 +185,16 @@ public class World extends JPanel implements ActionListener, KeyListener {
             imagesInfo.append(imagePath).append(" ");
         }
         g.drawString(imagesInfo.toString(), 10, y);
+
+        y += 20;
+        g.drawString("Playing Sounds:", 10, y);
+        y += 20;
+        for (ActiverseSound sound : sounds) {
+            if (sound.isPlaying()) {
+                g.drawString("Sound: " + sound.getFilename(), 10, y);
+                y += 20;
+            }
+        }
     }
 
     private boolean checkCollision(Actor actor) {
@@ -222,9 +243,8 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-        //nothing right now, but itll be updated later in the debug menu
+        // To be implemented if needed
     }
-
 
     /**
      * Returns a list of actors in the world.

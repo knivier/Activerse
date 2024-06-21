@@ -1,3 +1,4 @@
+package ActiverseEngine;
 import javax.swing.*;
 import java.awt.*;
 
@@ -16,7 +17,7 @@ public class Activerse {
      * @param world The world to start the application with.
      */
     public static void start(World world) {
-        frame = new JFrame("Activerse Instance v1.0.6-delta");
+        frame = new JFrame("Activerse Instance v1.0.7-delta");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(world, BorderLayout.CENTER); // Add world to content pane
         KeyboardInfo keyboardInfo = new KeyboardInfo();
