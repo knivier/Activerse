@@ -185,8 +185,9 @@ public class World extends JPanel implements ActionListener, KeyListener {
             imagesInfo.append(imagePath).append(" ");
         }
         g.drawString(imagesInfo.toString(), 10, y);
-
         y += 20;
+
+        // Display playing sounds
         g.drawString("Playing Sounds:", 10, y);
         y += 20;
         for (ActiverseSound sound : sounds) {
@@ -195,7 +196,23 @@ public class World extends JPanel implements ActionListener, KeyListener {
                 y += 20;
             }
         }
+
+        // Display current keys pressed
+        StringBuilder keysInfo = new StringBuilder("Current Keys: ");
+        boolean firstKey = true;
+        for (int i = 0; i < KeyboardInfo.keys.length; i++) {
+            if (KeyboardInfo.keys[i]) {
+                if (!firstKey) {
+                    keysInfo.append(", ");
+                }
+                keysInfo.append(KeyEvent.getKeyText(i));
+                firstKey = false;
+            }
+        }
+        g.drawString(keysInfo.toString(), 10, y);
     }
+
+
 
     private boolean checkCollision(Actor actor) {
         for (Actor other : actors) {
