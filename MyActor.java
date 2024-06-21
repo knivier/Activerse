@@ -1,3 +1,6 @@
+import ActiverseEngine.*;
+
+
 /**
  * The base actor that extends the main Actor and can do more things.
  *

@@ -1,3 +1,5 @@
+package ActiverseEngine;
+
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
@@ -5,11 +7,10 @@ import java.io.IOException;
 /**
  * Represents a sound player for playing audio files.
  * This class provides methods to load, play, and stop audio files.
- *
- * @author Knivier
  */
 public class ActiverseSound {
     private Clip clip;
+    private String filename;
 
     /**
      * Constructs a new ActiverseSound object with the specified audio file.
@@ -17,6 +18,7 @@ public class ActiverseSound {
      * @param filename The path to the audio file.
      */
     public ActiverseSound(String filename) {
+        this.filename = filename;
         try {
             // Load the audio file
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(filename));
@@ -46,5 +48,23 @@ public class ActiverseSound {
             // Stop playing
             clip.stop();
         }
+    }
+
+    /**
+     * Checks if the audio file is currently playing.
+     *
+     * @return true if the audio file is playing, false otherwise.
+     */
+    public boolean isPlaying() {
+        return clip != null && clip.isRunning();
+    }
+
+    /**
+     * Gets the filename of the audio file.
+     *
+     * @return The filename of the audio file.
+     */
+    public String getFilename() {
+        return filename;
     }
 }
