@@ -28,6 +28,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
     private int textY;
 
     private JButton debugButton;
+    private JButton terminateButton;
     private boolean debugMode = false;
 
     private List<ActiverseSound> sounds;
@@ -62,6 +63,17 @@ public class World extends JPanel implements ActionListener, KeyListener {
         int buttonWidth = 80;
         debugButton.setBounds(this.fixedWidth - buttonWidth - 10, 10, buttonWidth, 30);
         add(debugButton);
+
+        terminateButton = new JButton("End");
+        terminateButton.setFont(new Font("Arial", Font.PLAIN, 10));
+        terminateButton.setPreferredSize(new Dimension(60, 20));
+        terminateButton.setBounds(this.fixedWidth - buttonWidth - 10, 50, 60, 20);
+        terminateButton.addActionListener(e -> {
+            stop();
+            System.exit(0);
+        });
+        add(terminateButton);
+
         addKeyListener(this);
         setFocusable(true);
         requestFocusInWindow();
@@ -185,9 +197,8 @@ public class World extends JPanel implements ActionListener, KeyListener {
             imagesInfo.append(imagePath).append(" ");
         }
         g.drawString(imagesInfo.toString(), 10, y);
-        y += 20;
 
-        // Display playing sounds
+        y += 20;
         g.drawString("Playing Sounds:", 10, y);
         y += 20;
         for (ActiverseSound sound : sounds) {
@@ -197,22 +208,17 @@ public class World extends JPanel implements ActionListener, KeyListener {
             }
         }
 
-        // Display current keys pressed
-        StringBuilder keysInfo = new StringBuilder("Current Keys: ");
-        boolean firstKey = true;
+        y += 20;
+        g.drawString("Current Keys:", 10, y);
+        y += 20;
+        StringBuilder keysInfo = new StringBuilder();
         for (int i = 0; i < KeyboardInfo.keys.length; i++) {
             if (KeyboardInfo.keys[i]) {
-                if (!firstKey) {
-                    keysInfo.append(", ");
-                }
-                keysInfo.append(KeyEvent.getKeyText(i));
-                firstKey = false;
+                keysInfo.append(KeyEvent.getKeyText(i)).append(" ");
             }
         }
         g.drawString(keysInfo.toString(), 10, y);
     }
-
-
 
     private boolean checkCollision(Actor actor) {
         for (Actor other : actors) {
