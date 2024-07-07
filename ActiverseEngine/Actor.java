@@ -8,8 +8,8 @@ import java.awt.geom.AffineTransform;
  * The base class for all actors in the world.
  */
 public abstract class Actor {
-    private int x, y;
     protected double direction; // Changed access to protected
+    private int x, y;
     private World world;
     private ActiverseImage image;
 
