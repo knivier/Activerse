@@ -23,4 +23,10 @@ public class MyWorld extends World {
         addObject(new MyActor(), 100, 100);
         //end
     }
+    @Override
+    public void update() {
+        super.update();
+        //this method isnt needed unless you want custom game logic
+
+    }
 }

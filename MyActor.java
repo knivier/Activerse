@@ -26,10 +26,10 @@ public class MyActor extends Actor {
             move(-2); // Move backward
         }
         if (keyIsDown('A')) {
-            turn(-Math.PI / 16); // Turn left (22.5 degrees)
+            turn(-Math.PI / 64); // Turn left (22.5 degrees)
         }
         if (keyIsDown('D')) {
-            turn(Math.PI / 16); // Turn right (22.5 degrees)
+            turn(Math.PI / 64); // Turn right (22.5 degrees)
         }
     }
 }
