@@ -16,10 +16,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * The world has a fixed size and a black border, and can display a background image.
  */
 public class World extends JPanel implements ActionListener, KeyListener {
-    private Timer timer;
-    private List<Actor> actors;
     private final int fixedWidth;
     private final int fixedHeight;
+    private Timer timer;
+    private List<Actor> actors;
     private Image backgroundImage;
     private List<String> loadedImages;
 
@@ -143,9 +143,9 @@ public class World extends JPanel implements ActionListener, KeyListener {
     /**
      * Sets the text to be displayed at the specified location.
      *
-     * @param x     The x-coordinate of the text's position.
-     * @param y     The y-coordinate of the text's position.
-     * @param text  The text to be displayed.
+     * @param x    The x-coordinate of the text's position.
+     * @param y    The y-coordinate of the text's position.
+     * @param text The text to be displayed.
      */
     public void showText(int x, int y, String text) {
         this.textX = x;

@@ -1,4 +1,5 @@
 import ActiverseEngine.*;
+
 /**
  * Represents a custom world for the application.
  * This class extends the World class to customize the world's initialization.
