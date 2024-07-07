@@ -33,6 +33,11 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
     private List<ActiverseSound> sounds;
 
+    // FPS tracking variables
+    private int frames;
+    private int fps;
+    private long lastFpsTime;
+
     /**
      * Constructs a new World with the specified dimensions and cell size.
      *
@@ -49,7 +54,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
         actors = new CopyOnWriteArrayList<>();
         loadedImages = new ArrayList<>();
         sounds = new ArrayList<>();
-        timer = new Timer(50, this);
+        timer = new Timer(1000 / 60, this); // Adjusted timer for smoother FPS
 
         displayText = null;
 
@@ -77,6 +82,8 @@ public class World extends JPanel implements ActionListener, KeyListener {
         addKeyListener(this);
         setFocusable(true);
         requestFocusInWindow();
+
+        lastFpsTime = System.nanoTime();
     }
 
     /**
@@ -88,6 +95,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
         backgroundImage = Toolkit.getDefaultToolkit().getImage(imagePath);
         loadedImages.add(imagePath);
     }
+
     /**
      * Updates the state of the world.
      */
@@ -96,6 +104,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
             actor.act();
         }
     }
+
     /**
      * Adds an actor to the world at the specified position.
      *
@@ -191,6 +200,18 @@ public class World extends JPanel implements ActionListener, KeyListener {
         g.setColor(Color.BLACK);
         int y = 50;
 
+        // Calculate FPS
+        long now = System.nanoTime();
+        if (now - lastFpsTime >= 1_000_000_000) { // One second has passed
+            fps = frames;
+            frames = 0;
+            lastFpsTime = now;
+        }
+
+        // Display FPS
+        g.drawString("FPS: " + fps, 10, y);
+        y += 20;
+
         for (Actor actor : actors) {
             String info = String.format("Actor at (%d, %d)", actor.getX(), actor.getY());
             boolean isColliding = checkCollision(actor);
@@ -244,11 +265,10 @@ public class World extends JPanel implements ActionListener, KeyListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() != debugButton) {
-            for (Actor actor : actors) {
-                actor.act();
-            }
-            repaint();
+            update(); // Update game state
+            repaint(); // Render game
         }
+        frames++; // Increment frame count
     }
 
     /**
