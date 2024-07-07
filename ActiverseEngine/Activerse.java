@@ -10,24 +10,29 @@ import java.awt.*;
 public class Activerse {
     private static World currentWorld;
     private static JFrame frame;
+    private static GameLoop gameLoop;
 
     /**
      * Starts the Activerse application with the specified world.
-     * Creates a JFrame and adds the world to it.
      *
      * @param world The world to start the application with.
      */
     public static void start(World world) {
-        frame = new JFrame("Activerse Instance v1.0.7-delta");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.getContentPane().add(world, BorderLayout.CENTER); // Add world to content pane
-        KeyboardInfo keyboardInfo = new KeyboardInfo();
-        frame.addKeyListener(keyboardInfo);
-        frame.pack();
-        frame.setVisible(true);
-        frame.requestFocus();
-        world.start(); // Start the world
-        currentWorld = world; // Set current world
+        currentWorld = world;
+
+        // Initialize and start the game loop
+        gameLoop = new GameLoop(currentWorld);
+        new Thread(gameLoop).start();
+
+        // Set up the JFrame
+        SwingUtilities.invokeLater(() -> {
+            frame = new JFrame("Activerse Instance v1.0.7-delta");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.getContentPane().add(currentWorld, BorderLayout.CENTER);
+            frame.pack();
+            frame.setVisible(true);
+            currentWorld.start(); // Start the world
+        });
     }
 
     /**
@@ -37,13 +42,19 @@ public class Activerse {
      */
     public static void setWorld(World world) {
         if (currentWorld != null) {
-            currentWorld.stop();
+            stop(currentWorld); // Stop the current world
             frame.getContentPane().remove(currentWorld);
         }
         currentWorld = world;
         frame.getContentPane().add(currentWorld, BorderLayout.CENTER);
         frame.getContentPane().revalidate();
         frame.getContentPane().repaint();
+
+        // Update the game loop with the new world
+        if (gameLoop != null) {
+            gameLoop = new GameLoop(currentWorld);
+            new Thread(gameLoop).start();
+        }
         currentWorld.start();
     }
 
@@ -53,6 +64,8 @@ public class Activerse {
      * @param world The world to stop.
      */
     public static void stop(World world) {
-        world.stop(); // Stop the world
+        if (world != null) {
+            world.stop(); // Stop the world
+        }
     }
 }

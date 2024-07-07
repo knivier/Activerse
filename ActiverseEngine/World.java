@@ -88,7 +88,14 @@ public class World extends JPanel implements ActionListener, KeyListener {
         backgroundImage = Toolkit.getDefaultToolkit().getImage(imagePath);
         loadedImages.add(imagePath);
     }
-
+    /**
+     * Updates the state of the world.
+     */
+    public void update() {
+        for (Actor actor : actors) {
+            actor.act();
+        }
+    }
     /**
      * Adds an actor to the world at the specified position.
      *
