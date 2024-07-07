@@ -26,7 +26,7 @@ public class Activerse {
 
         // Set up the JFrame
         SwingUtilities.invokeLater(() -> {
-            frame = new JFrame("Activerse Instance v1.0.7-delta");
+            frame = new JFrame("Activerse Instance v1.0.9-delta");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.getContentPane().add(currentWorld, BorderLayout.CENTER);
             frame.pack();
