@@ -11,7 +11,6 @@ public class Activerse {
     private static World currentWorld;
     private static JFrame frame;
     private static GameLoop gameLoop;
-
     /**
      * Starts the Activerse application with the specified world.
      *
