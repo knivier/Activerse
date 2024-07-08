@@ -1,15 +1,32 @@
 package ActiverseEngine;
 
+import java.util.Properties;
+import java.io.IOException;
+
 /**
  * Represents the main game loop for updating and rendering the game.
  */
 public class GameLoop implements Runnable {
     private final World world;
-    private final int TARGET_FPS = 60;
-    private final long FRAME_TIME = 1000000000 / TARGET_FPS;
+    private int TARGET_FPS;
+    private final long FRAME_TIME;
 
     public GameLoop(World world) {
         this.world = world;
+        loadProperties();
+        FRAME_TIME = 1000000000 / TARGET_FPS;
+    }
+
+    private void loadProperties() {
+        Properties props = new Properties();
+        String propertiesFile = "Activerse.properties";
+        try {
+            props.load(getClass().getClassLoader().getResourceAsStream(propertiesFile));
+            TARGET_FPS = Integer.parseInt(props.getProperty("fps", "60"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            TARGET_FPS = 60; // Default value if loading fails
+        }
     }
 
     public void run() {

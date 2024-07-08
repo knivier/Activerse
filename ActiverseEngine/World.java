@@ -6,8 +6,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -38,6 +41,9 @@ public class World extends JPanel implements ActionListener, KeyListener {
     private int fps;
     private long lastFpsTime;
 
+    // Memory tracker
+    private MemoryTracker memoryTracker;
+
     /**
      * Constructs a new World with the specified dimensions and cell size.
      *
@@ -58,21 +64,33 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
         displayText = null;
 
-        debugButton = new JButton("Debug");
-        debugButton.addActionListener(e -> {
-            debugMode = !debugMode;
-            requestFocusInWindow();
-            repaint();
-        });
-        setLayout(null);
-        int buttonWidth = 80;
-        debugButton.setBounds(this.fixedWidth - buttonWidth - 10, 10, buttonWidth, 30);
-        add(debugButton);
+        // Initialize the memory tracker
+        memoryTracker = new MemoryTracker();
+
+        // Load properties from Activerse.properties
+        Properties props = loadProperties();
+
+        // Read show_debug property
+        boolean showDebug = Boolean.parseBoolean(props.getProperty("show_debug", "true"));
+
+        // Create debug button if show_debug is true
+        if (showDebug) {
+            debugButton = new JButton("Debug");
+            debugButton.addActionListener(e -> {
+                debugMode = !debugMode;
+                requestFocusInWindow();
+                repaint();
+            });
+            setLayout(null);
+            int buttonWidth = 80;
+            debugButton.setBounds(this.fixedWidth - buttonWidth - 10, 10, buttonWidth, 30);
+            add(debugButton);
+        }
 
         terminateButton = new JButton("End");
         terminateButton.setFont(new Font("Arial", Font.PLAIN, 10));
         terminateButton.setPreferredSize(new Dimension(60, 20));
-        terminateButton.setBounds(this.fixedWidth - buttonWidth - 10, 50, 60, 20);
+        terminateButton.setBounds(this.fixedWidth - 90, 50, 60, 20);
         terminateButton.addActionListener(e -> {
             stop();
             System.exit(0);
@@ -84,6 +102,26 @@ public class World extends JPanel implements ActionListener, KeyListener {
         requestFocusInWindow();
 
         lastFpsTime = System.nanoTime();
+    }
+
+    /**
+     * Loads properties from Activerse.properties file.
+     *
+     * @return Properties object containing loaded properties.
+     */
+    private Properties loadProperties() {
+        Properties props = new Properties();
+        try (InputStream inStream = getClass().getClassLoader().getResourceAsStream("Activerse.properties")) {
+            if (inStream != null) {
+                props.load(inStream);
+            } else {
+                System.err.println("Activerse.properties not found or could not be loaded.");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading Activerse.properties: " + e.getMessage());
+        }
+        return props;
     }
 
     /**
@@ -103,6 +141,8 @@ public class World extends JPanel implements ActionListener, KeyListener {
         for (Actor actor : actors) {
             actor.act();
         }
+        // Update memory tracker
+        memoryTracker.update();
     }
 
     /**
@@ -210,6 +250,10 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
         // Display FPS
         g.drawString("FPS: " + fps, 10, y);
+        y += 20;
+
+        // Display memory usage per second
+        g.drawString(memoryTracker.getMemoryUsagePerSecond(), 10, y);
         y += 20;
 
         for (Actor actor : actors) {
