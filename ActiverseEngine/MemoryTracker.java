@@ -12,21 +12,23 @@ public class MemoryTracker {
     private long lastTime;
     private long lastMemoryUsed;
     private double memoryUsedPerSecond;
-    private boolean fileWriting;
-    private int fps;
+    private boolean loggingEnabled;
+    private int targetFPS;
 
     public MemoryTracker() {
         loadProperties();
         lastTime = System.nanoTime();
         lastMemoryUsed = getMemoryUsed();
     }
-
+    public int getTargetFPS(){
+        return targetFPS;
+    }
     private void loadProperties() {
         Properties props = new Properties();
         try {
             props.load(getClass().getClassLoader().getResourceAsStream(propertiesFile));
-            fileWriting = Boolean.parseBoolean(props.getProperty("file_writing", "false"));
-            fps = Integer.parseInt(props.getProperty("fps", "60"));
+            loggingEnabled = Boolean.parseBoolean(props.getProperty("logging", "false"));
+            targetFPS = Integer.parseInt(props.getProperty("fps", "60"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -45,22 +47,22 @@ public class MemoryTracker {
             lastMemoryUsed = currentMemoryUsed;
             lastTime = now;
 
-            if (fileWriting) {
+            if (loggingEnabled) {
                 writeMemoryUsageToFile();
             }
         }
     }
 
     public String getMemoryUsagePerSecond() {
-        return String.format("MUPS: %.2f MB/sec", memoryUsedPerSecond);
+        return String.format("MPS: %.2f MB/sec", memoryUsedPerSecond);
     }
 
     private void writeMemoryUsageToFile() {
-        try (PrintWriter writer = new PrintWriter(new FileWriter("memory_usage.log", true))) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter("logs.log", true))) {
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             String formattedDateTime = now.format(formatter);
-            writer.println(formattedDateTime + " | " + String.format("%.2f", memoryUsedPerSecond));
+            writer.println(formattedDateTime + " | " + getMemoryUsagePerSecond() + " @ FPS: " + targetFPS);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -238,7 +238,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
             lastFpsTime = now;
         }
 
-        g.drawString("FPS: " + fps, 10, y);
+        g.drawString("FPS: " + fps + " @target " + memoryTracker.getTargetFPS(), 10, y);
         y += 20;
 
         g.drawString(memoryTracker.getMemoryUsagePerSecond(), 10, y);
