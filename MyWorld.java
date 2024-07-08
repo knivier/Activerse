@@ -1,8 +1,8 @@
 import ActiverseEngine.*;
 
 /**
- * Represents a custom world for the application.
- * This class extends the World class to customize the world's initialization.
+ * Represents the default world included with the package
+ * It's recommended to read the wiki when modifying
  *
  * @author Knivier
  */
@@ -13,20 +13,12 @@ public class MyWorld extends World {
      * Initializes the world, sets the background image, and adds a MyActor object to it.
      */
     public MyWorld() {
-        // Call the constructor of the superclass (World) with specified dimensions and cell size
-        super(400, 400, 1);
-
-        // Set the background image for the world
-        setBackgroundImage("world.png");
-
-        // Add a MyActor object to the world at the specified location (100, 100)
-        addObject(new MyActor(), 100, 100);
-        //end
+        super(600, 600, 1);
+        addObject(new Player(), 100, 100);
     }
-    @Override
-    public void update() {
-        super.update();
-        //this method isnt needed unless you want custom game logic
 
+    @Override
+    public void update() { // It's not recommended to modify this method unless you are advanced
+        super.update();
     }
 }
