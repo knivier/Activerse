@@ -8,8 +8,8 @@ import java.io.IOException;
  */
 public class GameLoop implements Runnable {
     private final World world;
-    private int TARGET_FPS;
     private final long FRAME_TIME;
+    private int TARGET_FPS;
 
     public GameLoop(World world) {
         this.world = world;
@@ -25,7 +25,7 @@ public class GameLoop implements Runnable {
             TARGET_FPS = Integer.parseInt(props.getProperty("fps", "60"));
         } catch (IOException e) {
             e.printStackTrace();
-            TARGET_FPS = 60; // Default value if loading fails
+            TARGET_FPS = 60;
         }
     }
 
@@ -49,14 +49,13 @@ public class GameLoop implements Runnable {
             render();
             frames++;
 
-            // FPS counter (optional)
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
                 frames = 0;
             }
 
             try {
-                Thread.sleep(1); // Adjust sleep time if needed
+                Thread.sleep(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -64,10 +63,10 @@ public class GameLoop implements Runnable {
     }
 
     private void update() {
-        world.update(); // Update game state
+        world.update();
     }
 
     private void render() {
-        world.repaint(); // Render game
+        world.repaint();
     }
 }

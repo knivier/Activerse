@@ -7,8 +7,8 @@ import java.awt.*;
  * This class provides methods to load an image and retrieve it.
  */
 public class ActiverseImage {
-    private Image image;
-    private String path; // Store the image path
+    private final Image image;
+    private final String path; // Store the image path
 
     /**
      * Constructs a new ActiverseImage object with the image loaded from the specified file.
@@ -16,9 +16,8 @@ public class ActiverseImage {
      * @param filename The path to the image file.
      */
     public ActiverseImage(String filename) {
-        // Load the image from the specified file
         image = Toolkit.getDefaultToolkit().getImage(filename);
-        path = filename; // Store the image path
+        path = filename;
     }
 
     /**
