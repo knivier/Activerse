@@ -9,8 +9,8 @@ import java.io.IOException;
  * This class provides methods to load, play, and stop audio files.
  */
 public class ActiverseSound {
+    private final String filename;
     private Clip clip;
-    private String filename;
 
     /**
      * Constructs a new ActiverseSound object with the specified audio file.
@@ -34,7 +34,6 @@ public class ActiverseSound {
      */
     public void play() {
         if (clip != null) {
-            // Set the frame position to the beginning and start playing
             clip.setFramePosition(0);
             clip.start();
         }
@@ -45,7 +44,6 @@ public class ActiverseSound {
      */
     public void stop() {
         if (clip != null) {
-            // Stop playing
             clip.stop();
         }
     }

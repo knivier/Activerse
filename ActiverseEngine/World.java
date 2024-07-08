@@ -21,28 +21,23 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class World extends JPanel implements ActionListener, KeyListener {
     private final int fixedWidth;
     private final int fixedHeight;
-    private Timer timer;
-    private List<Actor> actors;
+    private final Timer timer;
+    private final List<Actor> actors;
+    private final List<String> loadedImages;
+    private final JButton terminateButton;
+    private final List<ActiverseSound> sounds;
+    // Memory tracker
+    private final MemoryTracker memoryTracker;
     private Image backgroundImage;
-    private List<String> loadedImages;
-
     private String displayText;
     private int textX;
     private int textY;
-
     private JButton debugButton;
-    private JButton terminateButton;
     private boolean debugMode = false;
-
-    private List<ActiverseSound> sounds;
-
     // FPS tracking variables
     private int frames;
     private int fps;
     private long lastFpsTime;
-
-    // Memory tracker
-    private MemoryTracker memoryTracker;
 
     /**
      * Constructs a new World with the specified dimensions and cell size.
@@ -60,20 +55,16 @@ public class World extends JPanel implements ActionListener, KeyListener {
         actors = new CopyOnWriteArrayList<>();
         loadedImages = new ArrayList<>();
         sounds = new ArrayList<>();
-        timer = new Timer(1000 / 60, this); // Adjusted timer for smoother FPS
+        timer = new Timer(1000 / 60, this);
 
         displayText = null;
 
-        // Initialize the memory tracker
         memoryTracker = new MemoryTracker();
 
-        // Load properties from Activerse.properties
         Properties props = loadProperties();
 
-        // Read show_debug property
         boolean showDebug = Boolean.parseBoolean(props.getProperty("show_debug", "true"));
 
-        // Create debug button if show_debug is true
         if (showDebug) {
             debugButton = new JButton("Debug");
             debugButton.addActionListener(e -> {
@@ -141,7 +132,6 @@ public class World extends JPanel implements ActionListener, KeyListener {
         for (Actor actor : actors) {
             actor.act();
         }
-        // Update memory tracker
         memoryTracker.update();
     }
 
@@ -242,17 +232,15 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
         // Calculate FPS
         long now = System.nanoTime();
-        if (now - lastFpsTime >= 1_000_000_000) { // One second has passed
+        if (now - lastFpsTime >= 1_000_000_000) {
             fps = frames;
             frames = 0;
             lastFpsTime = now;
         }
 
-        // Display FPS
         g.drawString("FPS: " + fps, 10, y);
         y += 20;
 
-        // Display memory usage per second
         g.drawString(memoryTracker.getMemoryUsagePerSecond(), 10, y);
         y += 20;
 
@@ -309,10 +297,10 @@ public class World extends JPanel implements ActionListener, KeyListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() != debugButton) {
-            update(); // Update game state
-            repaint(); // Render game
+            update();
+            repaint();
         }
-        frames++; // Increment frame count
+        frames++;
     }
 
     /**

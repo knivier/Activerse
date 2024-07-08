@@ -8,11 +8,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
 public class MemoryTracker {
+    private final String propertiesFile = "Activerse.properties";
     private long lastTime;
     private long lastMemoryUsed;
     private double memoryUsedPerSecond;
     private boolean fileWriting;
-    private String propertiesFile = "Activerse.properties";
     private int fps;
 
     public MemoryTracker() {

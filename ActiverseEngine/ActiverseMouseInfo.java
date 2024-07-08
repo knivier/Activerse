@@ -15,7 +15,6 @@ public class ActiverseMouseInfo {
      * @return A Point object representing the coordinates of the mouse pointer.
      */
     public static Point getMouseLocation() {
-        // Get the current location of the mouse pointer using MouseInfo
         return MouseInfo.getPointerInfo().getLocation();
     }
 }
