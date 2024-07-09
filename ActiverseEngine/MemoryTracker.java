@@ -8,7 +8,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
 public class MemoryTracker {
-    private final String propertiesFile = "Activerse.properties";
     private long lastTime;
     private long lastMemoryUsed;
     private double memoryUsedPerSecond;
@@ -22,12 +21,15 @@ public class MemoryTracker {
         lastTime = System.nanoTime();
         lastMemoryUsed = getMemoryUsed();
     }
-    public int getTargetFPS(){
+
+    public int getTargetFPS() {
         return targetFPS;
     }
+
     private void loadProperties() {
         Properties props = new Properties();
         try {
+            String propertiesFile = "Activerse.properties";
             props.load(getClass().getClassLoader().getResourceAsStream(propertiesFile));
             loggingEnabled = Boolean.parseBoolean(props.getProperty("logging", "false"));
             targetFPS = Integer.parseInt(props.getProperty("fps", "60"));
@@ -64,9 +66,9 @@ public class MemoryTracker {
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             String formattedDateTime = now.format(formatter);
-            if(!newSessionNotified){
+            if (!newSessionNotified) {
                 writer.println("New Log Session @ " + formattedDateTime);
-                newSessionNotified=true;
+                newSessionNotified = true;
             }
             writer.println(logNum + " | " + formattedDateTime + " | " + getMemoryUsagePerSecond() + " @ FPS: " + World.getFPS() + " target@ " + targetFPS);
             logNum++;

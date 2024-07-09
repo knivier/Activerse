@@ -41,12 +41,30 @@ public abstract class Actor {
     }
 
     /**
+     * Sets the x-coordinate of the actor's location.
+     *
+     * @param x The x-coordinate to set.
+     */
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    /**
      * Gets the y-coordinate of the actor's location.
      *
      * @return The y-coordinate of the actor's location.
      */
     public int getY() {
         return y;
+    }
+
+    /**
+     * Sets the y-coordinate of the actor's location.
+     *
+     * @param y The y-coordinate to set.
+     */
+    public void setY(int y) {
+        this.y = y;
     }
 
     /**
@@ -232,23 +250,6 @@ public abstract class Actor {
      */
     public void setHeight(int height) {
         this.height = height;
-    }
-    /**
-     * Sets the x-coordinate of the actor's location.
-     *
-     * @param x The x-coordinate to set.
-     */
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    /**
-     * Sets the y-coordinate of the actor's location.
-     *
-     * @param y The y-coordinate to set.
-     */
-    public void setY(int y) {
-        this.y = y;
     }
 
 }
