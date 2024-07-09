@@ -14,6 +14,8 @@ public class MemoryTracker {
     private double memoryUsedPerSecond;
     private boolean loggingEnabled;
     private int targetFPS;
+    private boolean newSessionNotified = false;
+    private int logNum = 0;
 
     public MemoryTracker() {
         loadProperties();
@@ -54,7 +56,7 @@ public class MemoryTracker {
     }
 
     public String getMemoryUsagePerSecond() {
-        return String.format("MPS: %.2f MB/sec", memoryUsedPerSecond);
+        return String.format("MPS: %.2f MB/s", memoryUsedPerSecond);
     }
 
     private void writeMemoryUsageToFile() {
@@ -62,7 +64,12 @@ public class MemoryTracker {
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             String formattedDateTime = now.format(formatter);
-            writer.println(formattedDateTime + " | " + getMemoryUsagePerSecond() + " @ FPS: " + targetFPS);
+            if(!newSessionNotified){
+                writer.println("New Log Session @ " + formattedDateTime);
+                newSessionNotified=true;
+            }
+            writer.println(logNum + " | " + formattedDateTime + " | " + getMemoryUsagePerSecond() + " @ FPS: " + World.getFPS() + " target@ " + targetFPS);
+            logNum++;
         } catch (IOException e) {
             e.printStackTrace();
         }
