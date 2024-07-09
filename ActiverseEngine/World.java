@@ -19,6 +19,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * The world has a fixed size and a black border, and can display a background image.
  */
 public class World extends JPanel implements ActionListener, KeyListener {
+    private static int fps;
     private final int fixedWidth;
     private final int fixedHeight;
     private final Timer timer;
@@ -36,7 +37,6 @@ public class World extends JPanel implements ActionListener, KeyListener {
     private boolean debugMode = false;
     // FPS tracking variables
     private int frames;
-    private static int fps;
     private long lastFpsTime;
 
     /**
@@ -67,7 +67,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
         if (showDebug) {
             debugButton = new JButton("Debug");
-            debugButton.addActionListener(e -> {
+            debugButton.addActionListener(_ -> {
                 debugMode = !debugMode;
                 requestFocusInWindow();
                 repaint();
@@ -82,7 +82,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
         terminateButton.setFont(new Font("Arial", Font.PLAIN, 10));
         terminateButton.setPreferredSize(new Dimension(60, 20));
         terminateButton.setBounds(this.fixedWidth - 90, 50, 60, 20);
-        terminateButton.addActionListener(e -> {
+        terminateButton.addActionListener(_ -> {
             stop();
             System.exit(0);
         });
@@ -93,6 +93,10 @@ public class World extends JPanel implements ActionListener, KeyListener {
         requestFocusInWindow();
 
         lastFpsTime = System.nanoTime();
+    }
+
+    public static int getFPS() {
+        return fps;
     }
 
     /**
@@ -185,9 +189,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
     public void stop() {
         timer.stop();
     }
-    public static int getFPS(){
-        return fps;
-    }
+
     /**
      * Sets the text to be displayed at the specified location.
      *

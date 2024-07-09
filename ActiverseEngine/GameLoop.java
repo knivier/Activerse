@@ -1,7 +1,7 @@
 package ActiverseEngine;
 
-import java.util.Properties;
 import java.io.IOException;
+import java.util.Properties;
 
 /**
  * Represents the main game loop for updating and rendering the game.
