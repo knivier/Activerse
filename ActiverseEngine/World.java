@@ -36,7 +36,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
     private boolean debugMode = false;
     // FPS tracking variables
     private int frames;
-    private int fps;
+    private static int fps;
     private long lastFpsTime;
 
     /**
@@ -185,7 +185,9 @@ public class World extends JPanel implements ActionListener, KeyListener {
     public void stop() {
         timer.stop();
     }
-
+    public static int getFPS(){
+        return fps;
+    }
     /**
      * Sets the text to be displayed at the specified location.
      *
