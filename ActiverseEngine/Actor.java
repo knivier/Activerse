@@ -12,6 +12,8 @@ public abstract class Actor {
     private int x, y;
     private World world;
     private ActiverseImage image;
+    private double velocityX, velocityY;
+    private int height; // Added height field
 
     /**
      * Performs the actor's action.
@@ -177,4 +179,76 @@ public abstract class Actor {
         int keyCode = KeyEvent.getExtendedKeyCodeForChar(key);
         return KeyboardInfo.isKeyDown(keyCode);
     }
+
+    /**
+     * Gets the horizontal velocity of the actor.
+     *
+     * @return The horizontal velocity of the actor.
+     */
+    public double getVelocityX() {
+        return velocityX;
+    }
+
+    /**
+     * Sets the horizontal velocity of the actor.
+     *
+     * @param velocityX The horizontal velocity to set.
+     */
+    public void setVelocityX(double velocityX) {
+        this.velocityX = velocityX;
+    }
+
+    /**
+     * Gets the vertical velocity of the actor.
+     *
+     * @return The vertical velocity of the actor.
+     */
+    public double getVelocityY() {
+        return velocityY;
+    }
+
+    /**
+     * Sets the vertical velocity of the actor.
+     *
+     * @param velocityY The vertical velocity to set.
+     */
+    public void setVelocityY(double velocityY) {
+        this.velocityY = velocityY;
+    }
+
+    /**
+     * Gets the height of the actor.
+     *
+     * @return The height of the actor.
+     */
+    public int getHeight() {
+        return height;
+    }
+
+    /**
+     * Sets the height of the actor.
+     *
+     * @param height The height to set.
+     */
+    public void setHeight(int height) {
+        this.height = height;
+    }
+    /**
+     * Sets the x-coordinate of the actor's location.
+     *
+     * @param x The x-coordinate to set.
+     */
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    /**
+     * Sets the y-coordinate of the actor's location.
+     *
+     * @param y The y-coordinate to set.
+     */
+    public void setY(int y) {
+        this.y = y;
+    }
+
 }
