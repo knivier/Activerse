@@ -98,7 +98,7 @@ public abstract class Actor {
 
             AffineTransform old = g2d.getTransform();
 
-            g2d.rotate(direction, x + width / 2, y + height / 2);
+            g2d.rotate(direction, x + (double) width / 2, y + (double) height / 2);
             g2d.drawImage(image.getImage(), x, y, null);
 
             g2d.setTransform(old);

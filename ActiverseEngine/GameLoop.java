@@ -34,7 +34,6 @@ public class GameLoop implements Runnable {
         long timer = System.currentTimeMillis();
 
         double delta = 0;
-        int frames = 0;
 
         while (true) {
             long now = System.nanoTime();
@@ -47,11 +46,9 @@ public class GameLoop implements Runnable {
             }
 
             render();
-            frames++;
 
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
-                frames = 0;
             }
 
             try {
