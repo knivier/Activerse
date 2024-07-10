@@ -55,10 +55,17 @@ public class GameLoop implements Runnable {
             frames++;
             calculateFPS(now);
 
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            long frameTime = System.nanoTime() - lastTime;
+            long sleepTime = FRAME_TIME - frameTime;
+
+            if (sleepTime > 0) {
+                try {
+                    Thread.sleep(sleepTime / 1000000, (int) (sleepTime % 1000000));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Thread.yield();
             }
         }
     }
