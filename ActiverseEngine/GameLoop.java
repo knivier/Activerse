@@ -10,11 +10,15 @@ public class GameLoop implements Runnable {
     private final World world;
     private final long FRAME_TIME;
     private int TARGET_FPS;
+    private int frames;
+    private long lastFpsTime;
 
     public GameLoop(World world) {
         this.world = world;
         loadProperties();
         FRAME_TIME = 1000000000 / TARGET_FPS;
+        frames = 0;
+        lastFpsTime = System.nanoTime();
     }
 
     private void loadProperties() {
@@ -29,6 +33,7 @@ public class GameLoop implements Runnable {
         }
     }
 
+    @Override
     public void run() {
         long lastTime = System.nanoTime();
         long timer = System.currentTimeMillis();
@@ -47,9 +52,8 @@ public class GameLoop implements Runnable {
 
             render();
 
-            if (System.currentTimeMillis() - timer > 1000) {
-                timer += 1000;
-            }
+            frames++;
+            calculateFPS(now);
 
             try {
                 Thread.sleep(1);
@@ -65,5 +69,13 @@ public class GameLoop implements Runnable {
 
     private void render() {
         world.repaint();
+    }
+
+    private void calculateFPS(long now) {
+        if (now - lastFpsTime >= 1_000_000_000) {
+            World.setFPS(frames);
+            frames = 0;
+            lastFpsTime = now;
+        }
     }
 }
