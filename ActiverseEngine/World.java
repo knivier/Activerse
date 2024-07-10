@@ -8,7 +8,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -27,7 +26,6 @@ public class World extends JPanel implements ActionListener, KeyListener {
     private final List<String> loadedImages;
     private final JButton terminateButton;
     private final List<ActiverseSound> sounds;
-    // Memory tracker
     private final MemoryTracker memoryTracker;
     private Image backgroundImage;
     private String displayText;
@@ -35,7 +33,6 @@ public class World extends JPanel implements ActionListener, KeyListener {
     private int textY;
     private JButton debugButton;
     private boolean debugMode = false;
-    // FPS tracking variables
     private int frames;
     private long lastFpsTime;
 
@@ -53,8 +50,8 @@ public class World extends JPanel implements ActionListener, KeyListener {
         setBackground(Color.WHITE);
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
         actors = new CopyOnWriteArrayList<>();
-        loadedImages = new ArrayList<>();
-        sounds = new ArrayList<>();
+        loadedImages = new CopyOnWriteArrayList<>();
+        sounds = new CopyOnWriteArrayList<>();
         timer = new Timer(1000 / 60, this);
 
         displayText = null;
