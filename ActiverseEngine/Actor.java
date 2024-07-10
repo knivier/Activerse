@@ -8,12 +8,13 @@ import java.awt.geom.AffineTransform;
  * The base class for all actors in the world.
  */
 public abstract class Actor {
-    protected double direction; // Changed access to protected
+    protected double direction;
     private int x, y;
     private World world;
     private ActiverseImage image;
     private double velocityX, velocityY;
-    private int height; // Added height field
+    private int width, height;
+    private Rectangle boundingBox = new Rectangle();
 
     /**
      * Performs the actor's action.
@@ -83,6 +84,8 @@ public abstract class Actor {
      */
     public void setImage(ActiverseImage image) {
         this.image = image;
+        this.width = image.getImage().getWidth(null);
+        this.height = image.getImage().getHeight(null);
     }
 
     /**
@@ -93,14 +96,10 @@ public abstract class Actor {
     public void paint(Graphics g) {
         if (image != null) {
             Graphics2D g2d = (Graphics2D) g;
-            int width = image.getImage().getWidth(null);
-            int height = image.getImage().getHeight(null);
 
             AffineTransform old = g2d.getTransform();
-
             g2d.rotate(direction, x + (double) width / 2, y + (double) height / 2);
             g2d.drawImage(image.getImage(), x, y, null);
-
             g2d.setTransform(old);
         }
     }
@@ -141,7 +140,8 @@ public abstract class Actor {
      * @return The bounding box of the actor.
      */
     protected Rectangle getBoundingBox() {
-        return new Rectangle(x, y, getImage().getImage().getWidth(null), getImage().getImage().getHeight(null));
+        boundingBox.setBounds(x, y, width, height);
+        return boundingBox;
     }
 
     /**
@@ -155,8 +155,8 @@ public abstract class Actor {
         int newX = x + dx;
         int newY = y + dy;
         // Check if the new position exceeds the world limits
-        if (newX >= 0 && newX + getImage().getImage().getWidth(null) <= world.getWidth() &&
-                newY >= 0 && newY + getImage().getImage().getHeight(null) <= world.getHeight()) {
+        if (newX >= 0 && newX + width <= world.getWidth() &&
+                newY >= 0 && newY + height <= world.getHeight()) {
             x = newX;
             y = newY;
         }
@@ -251,5 +251,4 @@ public abstract class Actor {
     public void setHeight(int height) {
         this.height = height;
     }
-
 }
