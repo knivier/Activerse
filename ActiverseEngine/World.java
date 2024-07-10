@@ -33,16 +33,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
     private int textY;
     private JButton debugButton;
     private boolean debugMode = false;
-    private int frames;
-    private long lastFpsTime;
 
-    /**
-     * Constructs a new World with the specified dimensions and cell size.
-     *
-     * @param width    The width of the world (number of cells).
-     * @param height   The height of the world (number of cells).
-     * @param cellSize The size of each cell in pixels.
-     */
     public World(int width, int height, int cellSize) {
         this.fixedWidth = width * cellSize;
         this.fixedHeight = height * cellSize;
@@ -88,19 +79,16 @@ public class World extends JPanel implements ActionListener, KeyListener {
         addKeyListener(this);
         setFocusable(true);
         requestFocusInWindow();
+    }
 
-        lastFpsTime = System.nanoTime();
+    public static void setFPS(int fpsValue) {
+        fps = fpsValue;
     }
 
     public static int getFPS() {
         return fps;
     }
 
-    /**
-     * Loads properties from Activerse.properties file.
-     *
-     * @return Properties object containing loaded properties.
-     */
     private Properties loadProperties() {
         Properties props = new Properties();
         try (InputStream inStream = getClass().getClassLoader().getResourceAsStream("Activerse.properties")) {
@@ -116,19 +104,11 @@ public class World extends JPanel implements ActionListener, KeyListener {
         return props;
     }
 
-    /**
-     * Sets the background image for the world.
-     *
-     * @param imagePath The path to the background image file.
-     */
     public void setBackgroundImage(String imagePath) {
         backgroundImage = Toolkit.getDefaultToolkit().getImage(imagePath);
         loadedImages.add(imagePath);
     }
 
-    /**
-     * Updates the state of the world.
-     */
     public void update() {
         for (Actor actor : actors) {
             actor.act();
@@ -136,13 +116,6 @@ public class World extends JPanel implements ActionListener, KeyListener {
         memoryTracker.update();
     }
 
-    /**
-     * Adds an actor to the world at the specified position.
-     *
-     * @param actor The actor to add to the world.
-     * @param x     The x-coordinate of the actor's position.
-     * @param y     The y-coordinate of the actor's position.
-     */
     public void addObject(Actor actor, int x, int y) {
         actor.setLocation(x, y);
         actor.setWorld(this);
@@ -152,11 +125,6 @@ public class World extends JPanel implements ActionListener, KeyListener {
         }
     }
 
-    /**
-     * Removes an actor from the world.
-     *
-     * @param actor The actor to remove from the world.
-     */
     public void removeObject(Actor actor) {
         actors.remove(actor);
         if (actor.getImage() != null) {
@@ -164,47 +132,24 @@ public class World extends JPanel implements ActionListener, KeyListener {
         }
     }
 
-    /**
-     * Adds a sound to the world.
-     *
-     * @param sound The sound to add to the world.
-     */
     public void addSound(ActiverseSound sound) {
         sounds.add(sound);
     }
 
-    /**
-     * Starts the simulation by starting the timer.
-     */
     public void start() {
         timer.start();
     }
 
-    /**
-     * Stops the simulation by stopping the timer.
-     */
     public void stop() {
         timer.stop();
     }
 
-    /**
-     * Sets the text to be displayed at the specified location.
-     *
-     * @param x    The x-coordinate of the text's position.
-     * @param y    The y-coordinate of the text's position.
-     * @param text The text to be displayed.
-     */
     public void showText(int x, int y, String text) {
         this.textX = x;
         this.textY = y;
         this.displayText = text;
     }
 
-    /**
-     * Overrides the paintComponent method to paint the background image, all actors in the world, and the text.
-     *
-     * @param g The Graphics object used for painting.
-     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -231,13 +176,6 @@ public class World extends JPanel implements ActionListener, KeyListener {
         g.setColor(Color.BLACK);
         int y = 50;
 
-        // Calculate FPS
-        long now = System.nanoTime();
-        if (now - lastFpsTime >= 1_000_000_000) {
-            fps = frames;
-            frames = 0;
-            lastFpsTime = now;
-        }
         g.drawString("FPS: " + fps + " @target " + memoryTracker.getTargetFPS(), 10, y);
         y += 20;
 
@@ -289,35 +227,19 @@ public class World extends JPanel implements ActionListener, KeyListener {
         return false;
     }
 
-    /**
-     * Overrides the actionPerformed method to update the world and repaint it.
-     *
-     * @param e The ActionEvent object representing the timer event.
-     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() != debugButton) {
             update();
             repaint();
         }
-        frames++;
     }
 
-    /**
-     * Handles key press events.
-     *
-     * @param e The KeyEvent object representing the key press event.
-     */
     @Override
     public void keyPressed(KeyEvent e) {
         KeyboardInfo.keys[e.getKeyCode()] = true;
     }
 
-    /**
-     * Handles key release events.
-     *
-     * @param e The KeyEvent object representing the key release event.
-     */
     @Override
     public void keyReleased(KeyEvent e) {
         KeyboardInfo.keys[e.getKeyCode()] = false;
@@ -328,20 +250,10 @@ public class World extends JPanel implements ActionListener, KeyListener {
         // To be implemented if needed
     }
 
-    /**
-     * Returns a list of actors in the world.
-     *
-     * @return A list of actors in the world.
-     */
     public List<Actor> getActors() {
         return actors;
     }
 
-    /**
-     * Overrides the getPreferredSize method to ensure the world has a fixed size.
-     *
-     * @return The preferred size of the world.
-     */
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(fixedWidth, fixedHeight);
