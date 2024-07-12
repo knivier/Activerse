@@ -9,3 +9,4 @@ website for this project
 at [https://knivier.github.io/KnivierWeb/activerseinfo.html]([url](https://knivier.github.io/KnivierWeb/activerseinfo.html))
 
 Remember, when starting the engine, always run the main method in Main.java
+Activerse © 2024 by Knivier / Agniva is licensed under CC BY-NC-SA 4.0 
