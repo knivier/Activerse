@@ -6,7 +6,8 @@ import ActiverseEngine.*;
  * @author Knivier
  */
 public class Main {
-    public static void main(String[] args) {
-        Activerse.start(new MyWorld());
-    }
+//    public static void main(String[] args) {
+//        Activerse.start(new MyWorld());
+//    }
+
 }
