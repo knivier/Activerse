@@ -63,6 +63,9 @@ public class GameLoop implements Runnable {
 
             if (sleepTime > 0) {
                 try {
+                    /*
+                     * Slightly broken sleep logic, will be cleared later
+                     */
                     Thread.sleep(sleepTime / 1000000, (int) (sleepTime % 1000000));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
