@@ -78,7 +78,7 @@ public class GameLoop implements Runnable {
 
     private void update() {
         world.update();
-        if(dynamicLighting) {
+        if (dynamicLighting) {
             //world.applyDynamicLighting();
         }
     }
