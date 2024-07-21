@@ -24,7 +24,6 @@ public class World extends JPanel implements ActionListener, KeyListener {
     private final Timer timer;
     private final List<Actor> actors;
     private final List<String> loadedImages;
-    private final JButton terminateButton;
     private final List<ActiverseSound> sounds;
     private final MemoryTracker memoryTracker;
     private Image backgroundImage;
@@ -67,7 +66,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
             add(debugButton);
         }
 
-        terminateButton = new JButton("End");
+        JButton terminateButton = new JButton("End");
         terminateButton.setFont(new Font("Arial", Font.PLAIN, 10));
         terminateButton.setPreferredSize(new Dimension(60, 20));
         terminateButton.setBounds(this.fixedWidth - 90, 50, 60, 20);
