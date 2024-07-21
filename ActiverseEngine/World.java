@@ -33,6 +33,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
     private int textY;
     private JButton debugButton;
     private boolean debugMode = false;
+    private boolean dynamicLighting = false;
 
     public World(int width, int height, int cellSize) {
         this.fixedWidth = width * cellSize;
@@ -50,8 +51,8 @@ public class World extends JPanel implements ActionListener, KeyListener {
         memoryTracker = new MemoryTracker();
 
         Properties props = loadProperties();
-
         boolean showDebug = Boolean.parseBoolean(props.getProperty("show_debug", "true"));
+        dynamicLighting = Boolean.parseBoolean(props.getProperty("dynamic_lighting", "false"));
 
         if (showDebug) {
             debugButton = new JButton("Debug");
@@ -158,6 +159,10 @@ public class World extends JPanel implements ActionListener, KeyListener {
             g.drawImage(backgroundImage, 0, 0, fixedWidth, fixedHeight, this);
         }
 
+        if (dynamicLighting) {
+            applyDynamicLighting(g);
+        }
+
         for (Actor actor : actors) {
             actor.paint(g);
         }
@@ -170,6 +175,27 @@ public class World extends JPanel implements ActionListener, KeyListener {
         if (debugMode) {
             drawDebugInfo(g);
         }
+    }
+
+    private void applyDynamicLighting(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g.create();
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+
+        // Apply lighting based on multiple light sources
+        for (Actor actor : actors) {
+            int actorX = actor.getX();
+            int actorY = actor.getY();
+            float distance = calculateDistance(actorX, actorY, fixedWidth / 2, fixedHeight / 2);
+            float brightness = Math.max(0, 1 - distance / 500);
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, brightness));
+            actor.paint(g2d);
+        }
+
+        g2d.dispose();
+    }
+
+    private float calculateDistance(int x1, int y1, int x2, int y2) {
+        return (float) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
 
     private void drawDebugInfo(Graphics g) {
