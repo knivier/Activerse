@@ -4,6 +4,8 @@ Activerse is a Java Game/Simulation/Physics Engine meant to simplify the game ma
 methods are provided for you to create your game. From there, try to create whatever games you wish! The possibilities
 are always endless.
 
+The engine is provided in version releases. Always make sure to install the **latest version**. From there, we give you the tools, and it's up to you to design your next creation.
+
 Reading this file is pretty useless if you want to get started. Check out the GitHub Activerse Wiki, or check out the
 website for this project
 at [https://knivier.github.io/KnivierWeb/activerseinfo.html]([url](https://knivier.github.io/KnivierWeb/activerseinfo.html))
