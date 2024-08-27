@@ -10,6 +10,11 @@ Reading this file is pretty useless if you want to get started. Check out the Gi
 website for this project
 at [https://knivier.github.io/KnivierWeb/activerseinfo.html]([url](https://knivier.github.io/KnivierWeb/activerseinfo.html))
 
-Remember, when starting the engine, always run the main method in Main.java
+
+> [!IMPORTANT]  
+> When trying to start the Engine, always run Main.java and initialize all debugging modes to **off** (occurs by default)
+
+> [!WARNING]  
+> Always have the most up-to-date version of the engine to prevent bugs and other catastrophies from occuring.
 
 Activerse © 2024 by Knivier / Agniva is licensed under CC BY-NC-SA 4.0 
