@@ -1,9 +1,9 @@
 package ActiverseEngine;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import javax.swing.*;
 
 /**
  * Provides utility methods to retrieve information about the mouse pointer location
