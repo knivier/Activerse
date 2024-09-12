@@ -1,6 +1,7 @@
 package ActiverseEngine;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -13,6 +14,7 @@ public class GameLoop implements Runnable {
     private int frames;
     private long lastFpsTime;
     private boolean dynamicLighting;
+    private volatile boolean running = true;
 
     public GameLoop(World world) {
         this.world = world;
@@ -25,8 +27,14 @@ public class GameLoop implements Runnable {
     private void loadProperties() {
         Properties props = new Properties();
         String propertiesFile = "Activerse.properties";
-        try {
-            props.load(getClass().getClassLoader().getResourceAsStream(propertiesFile));
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream(propertiesFile)) {
+            if (input == null) {
+                System.err.println("Sorry, unable to find " + propertiesFile);
+                TARGET_FPS = 60;
+                dynamicLighting = false;
+                return;
+            }
+            props.load(input);
             TARGET_FPS = Integer.parseInt(props.getProperty("fps", "60"));
             dynamicLighting = Boolean.parseBoolean(props.getProperty("dynamicLighting", "false"));
         } catch (IOException e) {
@@ -43,7 +51,7 @@ public class GameLoop implements Runnable {
 
         double delta = 0;
 
-        while (true) {
+        while (running) {
             long now = System.nanoTime();
             delta += (now - lastTime) / (double) FRAME_TIME;
             lastTime = now;
@@ -63,9 +71,6 @@ public class GameLoop implements Runnable {
 
             if (sleepTime > 0) {
                 try {
-                    /*
-                     * Slightly broken sleep logic, will be cleared later
-                     */
                     Thread.sleep(sleepTime / 1000000, (int) (sleepTime % 1000000));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -74,6 +79,10 @@ public class GameLoop implements Runnable {
                 Thread.yield();
             }
         }
+    }
+
+    public void stop() {
+        running = false;
     }
 
     private void update() {
@@ -88,7 +97,7 @@ public class GameLoop implements Runnable {
         if (now - lastFpsTime >= 1_000_000_000) {
             World.setFPS(frames);
             frames = 0;
-            lastFpsTime = now;
+            lastFpsTime += 1_000_000_000;
         }
     }
 }
