@@ -134,4 +134,12 @@ public class GameLoop implements Runnable {
             lastFpsTime += 1_000_000_000;
         }
     }
+
+    public int getTargetFps() {
+        return TARGET_FPS;
+    }
+
+    public boolean isDynamicLighting() {
+        return dynamicLighting;
+    }
 }
