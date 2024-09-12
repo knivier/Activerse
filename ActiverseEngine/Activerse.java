@@ -11,23 +11,33 @@ public class Activerse {
     private static World currentWorld;
     private static JFrame frame;
     private static GameLoop gameLoop;
+
     /**
      * Starts the Activerse application with the specified world.
      *
      * @param world The world to start the application with.
+     * @throws IllegalArgumentException if the world is null.
      */
     public static void start(World world) {
+        if (world == null) {
+            throw new IllegalArgumentException("World cannot be null");
+        }
         currentWorld = world;
 
         gameLoop = new GameLoop(currentWorld);
         new Thread(gameLoop).start();
         SwingUtilities.invokeLater(() -> {
-            frame = new JFrame("Activerse Instance v1.2.0");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.getContentPane().add(currentWorld, BorderLayout.CENTER);
-            frame.pack();
-            frame.setVisible(true);
-            currentWorld.start(); // Start the world
+            try {
+                frame = new JFrame("Activerse Instance v1.2.0");
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.getContentPane().add(currentWorld, BorderLayout.CENTER);
+                frame.pack();
+                frame.setVisible(true);
+                currentWorld.start(); // Start the world
+            } catch (Exception e) {
+                e.printStackTrace();
+                stop(currentWorld);
+            }
         });
     }
 
@@ -35,8 +45,12 @@ public class Activerse {
      * Sets the world to the inputted world.
      *
      * @param world The new world to be set.
+     * @throws IllegalArgumentException if the world is null.
      */
     public static void setWorld(World world) {
+        if (world == null) {
+            throw new IllegalArgumentException("World cannot be null");
+        }
         if (currentWorld != null) {
             stop(currentWorld);
             frame.getContentPane().remove(currentWorld);
@@ -60,7 +74,11 @@ public class Activerse {
      */
     public static void stop(World world) {
         if (world != null) {
-            world.stop();
+            try {
+                world.stop();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }
