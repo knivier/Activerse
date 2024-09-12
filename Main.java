@@ -1,4 +1,3 @@
-import ActiverseEngine.*;
 
 /**
  * Instantiates a new myWorld class and starts the game engine
@@ -6,8 +5,7 @@ import ActiverseEngine.*;
  * @author Knivier
  */
 public class Main {
-//    public static void main(String[] args) {
-//        Activerse.start(new MyWorld());
-//    }
-
+    public static void main(String[] args) {
+    // Create your world here!
+    }
 }
