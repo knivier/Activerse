@@ -3,8 +3,13 @@ package ActiverseEngine;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Properties;
 
 public class MemoryTracker {
@@ -43,6 +48,25 @@ public class MemoryTracker {
         return runtime.totalMemory() - runtime.freeMemory();
     }
 
+    private MemoryUsage getHeapMemoryUsage() {
+        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
+        return memoryMXBean.getHeapMemoryUsage();
+    }
+
+    private MemoryUsage getNonHeapMemoryUsage() {
+        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
+        return memoryMXBean.getNonHeapMemoryUsage();
+    }
+
+    private long getGarbageCollectionTime() {
+        long totalGarbageCollectionTime = 0;
+        List<GarbageCollectorMXBean> gcBeans = ManagementFactory.getGarbageCollectorMXBeans();
+        for (GarbageCollectorMXBean gcBean : gcBeans) {
+            totalGarbageCollectionTime += gcBean.getCollectionTime();
+        }
+        return totalGarbageCollectionTime;
+    }
+
     public void update() {
         long now = System.nanoTime();
         if (now - lastTime >= 1_000_000_000) { // One second has passed
@@ -70,6 +94,9 @@ public class MemoryTracker {
                 writer.println("New Log Session @ " + formattedDateTime);
                 newSessionNotified = true;
             }
+            MemoryUsage heapMemoryUsage = getHeapMemoryUsage();
+            MemoryUsage nonHeapMemoryUsage = getNonHeapMemoryUsage();
+            long gcTime = getGarbageCollectionTime();
             writer.println(logNum + " | " + formattedDateTime + " | " + getMemoryUsagePerSecond() + " | FPS: " + World.getFPS() + " targeting " + targetFPS + " | Current Sys Time " + System.currentTimeMillis());
             logNum++;
         } catch (IOException e) {
