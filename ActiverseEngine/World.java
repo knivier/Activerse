@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
+
 /**
  * Represents the world where actors interact.
  * This class extends JPanel and implements ActionListener, KeyListener.
@@ -81,12 +82,12 @@ public class World extends JPanel implements ActionListener, KeyListener {
         requestFocusInWindow();
     }
 
-    public static void setFPS(int fpsValue) {
-        fps = fpsValue;
-    }
-
     public static int getFPS() {
         return fps;
+    }
+
+    public static void setFPS(int fpsValue) {
+        fps = fpsValue;
     }
 
     private Properties loadProperties() {
@@ -198,8 +199,8 @@ public class World extends JPanel implements ActionListener, KeyListener {
         for (LightSource light : lightSources) {
             RadialGradientPaint gradient = new RadialGradientPaint(
                     light.x, light.y, light.radius,
-                    new float[] {0f, 1f},
-                    new Color[] {new Color(light.color.getRed(), light.color.getGreen(), light.color.getBlue(), 150), new Color(0, 0, 0, 0)}
+                    new float[]{0f, 1f},
+                    new Color[]{new Color(light.color.getRed(), light.color.getGreen(), light.color.getBlue(), 150), new Color(0, 0, 0, 0)}
             );
             gLighting.setPaint(gradient);
             gLighting.fillRect(0, 0, fixedWidth, fixedHeight);
@@ -232,19 +233,6 @@ public class World extends JPanel implements ActionListener, KeyListener {
         gLighting.dispose();
         g2d.dispose();
     }
-
-    private static class LightSource {
-        int x, y, radius;
-        Color color;
-
-        LightSource(int x, int y, Color color, int radius) {
-            this.x = x;
-            this.y = y;
-            this.color = color;
-            this.radius = radius;
-        }
-    }
-
 
     private float calculateDistance(int x1, int y1, int x2, int y2) {
         return (float) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
@@ -335,5 +323,17 @@ public class World extends JPanel implements ActionListener, KeyListener {
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(fixedWidth, fixedHeight);
+    }
+
+    private static class LightSource {
+        int x, y, radius;
+        Color color;
+
+        LightSource(int x, int y, Color color, int radius) {
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            this.radius = radius;
+        }
     }
 }
