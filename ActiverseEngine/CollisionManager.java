@@ -7,6 +7,7 @@ import java.awt.*;
  * This class provides a method to check if two actors intersect.
  *
  * @author Knivier
+ * @version 1.2.2
  */
 public class CollisionManager {
 

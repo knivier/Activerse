@@ -12,6 +12,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Properties;
 
+/**
+ * MemoryTracker class is used to track memory usage of the game along with other statistics
+ * @Author: Knivier
+ * @Version: 1.2.2
+ * 
+ */
 public class MemoryTracker {
     private long lastTime;
     private long lastMemoryUsed;
@@ -21,16 +27,30 @@ public class MemoryTracker {
     private boolean newSessionNotified = false;
     private int logNum = 0;
 
+    /**
+     * Constructor for MemoryTracker class
+     * @return none valid
+     * @throws none
+     */
     public MemoryTracker() {
         loadProperties();
         lastTime = System.nanoTime();
         lastMemoryUsed = getMemoryUsed();
     }
 
+    
+    /** 
+     * Returns FPS target
+     * @return int FPStarget
+     */
     public int getTargetFPS() {
         return targetFPS;
     }
 
+    /**
+     * Loads properties from the Activerse.properties file.
+     * @return none valid
+     */
     private void loadProperties() {
         Properties props = new Properties();
         try {
@@ -43,21 +63,41 @@ public class MemoryTracker {
         }
     }
 
+    
+    /** 
+     * Returns the memory used
+     * @return long
+     */
     private long getMemoryUsed() {
         Runtime runtime = Runtime.getRuntime();
         return runtime.totalMemory() - runtime.freeMemory();
     }
 
+    
+    /** 
+     * Returns the memory heap usage
+     * @return MemoryUsage obj
+     * @throws none
+     */
     private MemoryUsage getHeapMemoryUsage() {
         MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
         return memoryMXBean.getHeapMemoryUsage();
     }
 
+    
+    /** 
+     * Returns the non heap memory usage
+     * @return MemoryUsage
+     */
     private MemoryUsage getNonHeapMemoryUsage() {
         MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
         return memoryMXBean.getNonHeapMemoryUsage();
     }
 
+    /**
+     * Returns the garbage collection time
+     * @return long garbage collection time
+     */
     private long getGarbageCollectionTime() {
         long totalGarbageCollectionTime = 0;
         List<GarbageCollectorMXBean> gcBeans = ManagementFactory.getGarbageCollectorMXBeans();
@@ -67,6 +107,12 @@ public class MemoryTracker {
         return totalGarbageCollectionTime;
     }
 
+    /**
+     * Updates the memory usage statistics and writes them to a file if logging is enabled.
+     * @return none valid
+     * @throws none
+     * @see #writeMemoryUsageToFile()
+     */
     public void update() {
         long now = System.nanoTime();
         if (now - lastTime >= 1_000_000_000) { // One second has passed
@@ -81,10 +127,29 @@ public class MemoryTracker {
         }
     }
 
+    /**
+     * Returns the memory usage per second in a formatted string.
+     * @return String
+     */
     public String getMemoryUsagePerSecond() {
         return String.format("MPS: %.2f MB/s", memoryUsedPerSecond);
     }
 
+    /**
+     * Writes the memory usage statistics in the logs.log file along with other statistics.
+     * @return none valid
+     * @throws IOException if an I/O error occurs (file writer)
+     * @see #getHeapMemoryUsage()
+     * @see #getNonHeapMemoryUsage()
+     * @see #getGarbageCollectionTime()
+     * @see #getMemoryUsagePerSecond()
+     * @see #writeMemoryUsageToFile()
+     * @see #logNum
+     * @see #newSessionNotified
+     * @see #targetFPS
+     * @see #World.getFPS()
+     * @see #System.currentTimeMillis()
+     */
     private void writeMemoryUsageToFile() {
         try (PrintWriter writer = new PrintWriter(new FileWriter("logs.log", true))) {
             LocalDateTime now = LocalDateTime.now();
