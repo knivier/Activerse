@@ -49,6 +49,7 @@ public class ActiverseMouseInfo implements MouseListener {
 
     
     /** 
+     * Not in use method (built on in the future)
      * @param e
      */
     @Override
@@ -58,6 +59,7 @@ public class ActiverseMouseInfo implements MouseListener {
 
     
     /** 
+     * Detects if a mouse button is pressed.
      * @param e
      */
     @Override
@@ -70,7 +72,9 @@ public class ActiverseMouseInfo implements MouseListener {
     }
 
     
-    /** 
+    /**
+     * Detects if a mouse button is released.
+     * Limitations for this method are greater than mousePressed 
      * @param e
      */
     @Override
@@ -84,6 +88,7 @@ public class ActiverseMouseInfo implements MouseListener {
 
     
     /** 
+     * To be built in the future
      * @param e
      */
     @Override
@@ -91,6 +96,10 @@ public class ActiverseMouseInfo implements MouseListener {
         // Not used
     }
 
+    /*
+     * @param e
+     * To be built in the future
+     */
     @Override
     public void mouseExited(MouseEvent e) {
         // Not used
