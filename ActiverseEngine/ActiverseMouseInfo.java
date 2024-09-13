@@ -16,8 +16,31 @@ public class ActiverseMouseInfo implements MouseListener {
     private static boolean leftClick = false;
     private static boolean rightClick = false;
 
-    public ActiverseMouseInfo(Component component) {
+    /**
+     * @param component
+     * Constructor for the ActiverseMouseInfo class.
+     */
+    private ActiverseMouseInfo(Component component) {
+        addMouseListenerToComponent(component);
+    }
+    
+    /**
+     * @param component
+     * Adds a mouse listener to the specified component.
+     */
+    private void addMouseListenerToComponent(Component component) {
         component.addMouseListener(this);
+    }
+
+    /**
+     * Creates a new instance of the ActiverseMouseInfo class with the specified component.
+     * @param component
+     * @return
+     */
+    public static ActiverseMouseInfo createInstance(Component component) {
+        ActiverseMouseInfo instance = new ActiverseMouseInfo(component);
+        component.addMouseListener(instance);
+        return instance;
     }
 
     /**
