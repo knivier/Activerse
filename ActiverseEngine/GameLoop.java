@@ -6,6 +6,8 @@ import java.util.Properties;
 
 /**
  * Represents the main game loop for updating and rendering the game.
+ * @author Knivier
+ * @version 1.2.2
  */
 public class GameLoop implements Runnable {
     private final World world; // The game world to be updated and rendered
@@ -135,10 +137,18 @@ public class GameLoop implements Runnable {
         }
     }
 
+    
+    /** 
+     * @return int
+     */
     public int getTargetFps() {
         return TARGET_FPS;
     }
 
+    
+    /** 
+     * @return boolean
+     */
     public boolean isDynamicLighting() {
         return dynamicLighting;
     }

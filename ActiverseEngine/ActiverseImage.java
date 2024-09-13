@@ -5,6 +5,9 @@ import java.awt.*;
 /**
  * Represents an image loader for loading images from files.
  * This class provides methods to load an image and retrieve it.
+ * 
+ * @author Knivier
+ * @version 1.2.2
  */
 public class ActiverseImage {
     private final Image image;

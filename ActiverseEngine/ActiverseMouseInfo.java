@@ -8,6 +8,9 @@ import javax.swing.*;
 /**
  * Provides utility methods to retrieve information about the mouse pointer location
  * and detect mouse clicks.
+ * 
+ * @author Knivier 
+ * @version 1.2.2
  */
 public class ActiverseMouseInfo implements MouseListener {
     private static boolean leftClick = false;
@@ -44,11 +47,19 @@ public class ActiverseMouseInfo implements MouseListener {
         return rightClick;
     }
 
+    
+    /** 
+     * @param e
+     */
     @Override
     public void mouseClicked(MouseEvent e) {
         // Not used
     }
 
+    
+    /** 
+     * @param e
+     */
     @Override
     public void mousePressed(MouseEvent e) {
         if (SwingUtilities.isLeftMouseButton(e)) {
@@ -58,6 +69,10 @@ public class ActiverseMouseInfo implements MouseListener {
         }
     }
 
+    
+    /** 
+     * @param e
+     */
     @Override
     public void mouseReleased(MouseEvent e) {
         if (SwingUtilities.isLeftMouseButton(e)) {
@@ -67,6 +82,10 @@ public class ActiverseMouseInfo implements MouseListener {
         }
     }
 
+    
+    /** 
+     * @param e
+     */
     @Override
     public void mouseEntered(MouseEvent e) {
         // Not used

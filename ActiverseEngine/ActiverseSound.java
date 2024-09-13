@@ -1,12 +1,15 @@
 package ActiverseEngine;
 
-import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
+import javax.sound.sampled.*;
 
 /**
  * Represents a sound player for playing audio files.
  * This class provides methods to load, play, and stop audio files.
+ * 
+ * @author Knivier
+ * @version 1.2.2
  */
 public class ActiverseSound {
     private final String filename;
