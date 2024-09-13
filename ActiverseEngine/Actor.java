@@ -185,6 +185,8 @@ public abstract class Actor {
             try {
                 Thread.sleep(ms);
             } catch (InterruptedException e) {
+                System.out.println("An unidentified exception ocurred while delaying the next action. Please see the stack trace for more information.");
+                System.out.println("Contact ActiverseEngine support for bugs, and provide the stack trace.");
                 e.printStackTrace();
             }
             act();
