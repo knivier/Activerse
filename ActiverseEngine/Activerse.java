@@ -80,6 +80,7 @@ public class Activerse {
             try {
                 world.stop();
             } catch (Exception e) {
+                System.out.println("An unidentified error ocurred. Please see the stack trace for more information. Contact ActiverseEngine support for bugs.");
                 e.printStackTrace();
             }
         }
