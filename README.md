@@ -31,6 +31,7 @@ Reading this file is just the beginning! For more detailed guidance, examples, a
 
 - **[Activerse GitHub Wiki](https://github.com/Knivier/Activerse/wiki)**: Contains comprehensive tutorials, code examples, and a deep dive into all engine functionalities.
 - **[Official Activerse Website](https://knivier.github.io/KnivierWeb/activerseinfo.html)**: Visit the website for additional information, updates, and community support.
+- **[v1.1.2 Profile Research](https://github.com/user-attachments/files/16165118/Research.Notes.for.v1.1.2.Optimizations.pdf)**: Contains the profiling and research information of v1.1.2 with provided explanations and evidence.
 
 > **⚠️ WARNING**  
 > Always use the latest version of Activerse to prevent bugs and avoid compatibility issues. Running outdated versions may result in unexpected behavior or crashes.
