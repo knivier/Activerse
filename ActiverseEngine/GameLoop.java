@@ -6,6 +6,8 @@ import java.util.Properties;
 
 /**
  * Represents the main game loop for updating and rendering the game.
+ * @author Knivier
+ * @version 1.2.2
  */
 public class GameLoop implements Runnable {
     private final World world; // The game world to be updated and rendered
@@ -48,6 +50,8 @@ public class GameLoop implements Runnable {
             TARGET_FPS = Integer.parseInt(props.getProperty("fps", "60"));
             dynamicLighting = Boolean.parseBoolean(props.getProperty("dynamicLighting", "false"));
         } catch (IOException e) {
+            System.out.println("An error occurred while loading properties from " + propertiesFile);
+            System.out.println("Default values will be used. Contact ActiverseEngine support for bugs. Otherwise, please provide a properties file.");
             e.printStackTrace();
             TARGET_FPS = 60;
             dynamicLighting = false;
@@ -90,6 +94,9 @@ public class GameLoop implements Runnable {
                 try {
                     Thread.sleep(sleepTime / 1000000, (int) (sleepTime % 1000000));
                 } catch (InterruptedException e) {
+                    System.out.println("An error occurred while sleeping the thread. This is an unexpected error that will result in your Engine not working. Please contact ActiverseEngine support for bugs.");
+                    System.out.println("Printing stack trace now. Please provide this to developers.");
+                    System.out.println("Wait time was interrupted. This is an unexpected error.");
                     e.printStackTrace();
                 }
             } else {
@@ -135,10 +142,18 @@ public class GameLoop implements Runnable {
         }
     }
 
+    
+    /** 
+     * @return int
+     */
     public int getTargetFps() {
         return TARGET_FPS;
     }
 
+    
+    /** 
+     * @return boolean
+     */
     public boolean isDynamicLighting() {
         return dynamicLighting;
     }

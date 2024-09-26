@@ -7,6 +7,8 @@ import java.util.List;
 
 /**
  * The base class for all actors in the world.
+ * @author Knivier
+ * @version 1.2.2
  */
 public abstract class Actor {
     protected double direction; // Changed access to protected
@@ -19,6 +21,8 @@ public abstract class Actor {
 
     /**
      * Performs the actor's action.
+     * @param x
+     * @param y
      */
     public abstract void act();
 

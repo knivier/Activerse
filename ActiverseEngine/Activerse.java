@@ -1,11 +1,14 @@
 package ActiverseEngine;
 
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 /**
  * Provides utility methods to start and stop the Activerse application.
  * This class contains static methods to manage the application lifecycle.
+ * 
+ * @author Knivier  
+ * @version 1.2.2
  */
 public class Activerse {
     private static World currentWorld;
@@ -77,6 +80,7 @@ public class Activerse {
             try {
                 world.stop();
             } catch (Exception e) {
+                System.out.println("An unidentified error ocurred. Please see the stack trace for more information. Contact ActiverseEngine support for bugs.");
                 e.printStackTrace();
             }
         }
