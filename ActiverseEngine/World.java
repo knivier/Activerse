@@ -237,6 +237,10 @@ public class World extends JPanel implements ActionListener, KeyListener {
             g.drawImage(backgroundImage, 0, 0, fixedWidth, fixedHeight, this);
         }
 
+        else if(backgroundImage == null){
+            throw new NullPointerException("Background image not found");
+        }
+
         if (dynamicLighting) {
             applyDynamicLighting(g);
         }
