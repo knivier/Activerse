@@ -1,12 +1,15 @@
 package ActiverseEngine;
 
-import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
+import javax.sound.sampled.*;
 
 /**
  * Represents a sound player for playing audio files.
  * This class provides methods to load, play, and stop audio files.
+ * 
+ * @author Knivier
+ * @version 1.2.2
  */
 public class ActiverseSound {
     private final String filename;
@@ -25,6 +28,10 @@ public class ActiverseSound {
             clip = AudioSystem.getClip();
             clip.open(audioInputStream);
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            System.out.println("An unidentified exception ocurred while loading the audio file. Please see the stack trace for more information.");
+            System.out.println("Filename: " + filename + " threw your exception. Please check the file path or verify it is valid. .WAV files in limited length are supported.");
+            System.out.println("Contact ActiverseEngine support for bugs.");
+            System.out.println("Printing stack trace now");
             e.printStackTrace();
         }
     }
@@ -36,6 +43,10 @@ public class ActiverseSound {
         if (clip != null) {
             clip.setFramePosition(0);
             clip.start();
+        }
+        else if(clip == null){
+            System.out.println("The audio file is null. Please check the file path or verify it is valid. .WAV files in limited length are supported.");
+            System.out.println("Filename of null audio file: " + filename);
         }
     }
 
