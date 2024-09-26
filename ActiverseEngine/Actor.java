@@ -215,11 +215,7 @@ public abstract class Actor {
             try {
                 Thread.sleep(ms);
             } catch (InterruptedException e) {
-<<<<<<< HEAD
-                System.out.println("An unidentified exception ocurred while delaying the next action. Please see the stack trace for more information.");
-=======
                 System.out.println("An unidentified exception occurred while delaying the next action. Please see the stack trace for more information.");
->>>>>>> feceb24 (Added getWidth method to Actor class)
                 System.out.println("Contact ActiverseEngine support for bugs, and provide the stack trace.");
                 e.printStackTrace();
             }
