@@ -3,6 +3,7 @@ package ActiverseEngine;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
+import java.util.List;
 
 /**
  * The base class for all actors in the world.
@@ -14,6 +15,7 @@ public abstract class Actor {
     private ActiverseImage image;
     private double velocityX, velocityY;
     private int height; // Added height field
+    private int width; // Added width field
 
     /**
      * Performs the actor's action.
@@ -66,13 +68,19 @@ public abstract class Actor {
     public void setY(int y) {
         this.y = y;
     }
-
+    public int getWidth() {
+        return width;
+    }
     /**
      * Gets the image of the actor.
      *
-     * @return The image of the actor.
+     * @return The image of the actor, or null if no image is set.
      */
     public ActiverseImage getImage() {
+        if (image == null) {
+            System.err.println("Warning: Image not set for actor.");
+            return null;
+        }
         return image;
     }
 
@@ -93,7 +101,7 @@ public abstract class Actor {
     public void paint(Graphics g) {
         if (image != null) {
             Graphics2D g2d = (Graphics2D) g;
-            int width = image.getImage().getWidth(null);
+            width = image.getImage().getWidth(null);
             int height = image.getImage().getHeight(null);
 
             AffineTransform old = g2d.getTransform();
@@ -102,6 +110,8 @@ public abstract class Actor {
             g2d.drawImage(image.getImage(), x, y, null);
 
             g2d.setTransform(old);
+        } else {
+            System.err.println("Warning: Image not set for actor.");
         }
     }
 
@@ -141,7 +151,12 @@ public abstract class Actor {
      * @return The bounding box of the actor.
      */
     protected Rectangle getBoundingBox() {
-        return new Rectangle(x, y, getImage().getImage().getWidth(null), getImage().getImage().getHeight(null));
+        ActiverseImage img = getImage();
+        if (img != null) {
+            return new Rectangle(x, y, img.getImage().getWidth(null), img.getImage().getHeight(null));
+        } else {
+            return new Rectangle(x, y, 0, 0);
+        }
     }
 
     /**
@@ -172,6 +187,21 @@ public abstract class Actor {
     }
 
     /**
+     * Finds the intesrsectiuon of the actor with another actor then returns it
+     * @return The intersecting actor, or null if no intersection is found.
+     */
+    public Actor getOneIntersectingObject() {
+        List<Actor> actors = getWorld().getActors(); // Assume getActors() returns a List<Actor>
+        for (Actor other : actors) {
+            // Avoid checking against itself
+            if (other != this && CollisionManager.intersects(this, other)) {
+                return other; // Return the first intersecting actor
+            }
+        }
+
+        return null; // No intersection found
+    }
+    /**
      * Delays the execution of the next action by the specified milliseconds.
      *
      * @param ms The delay in milliseconds.
@@ -181,6 +211,8 @@ public abstract class Actor {
             try {
                 Thread.sleep(ms);
             } catch (InterruptedException e) {
+                System.out.println("An unidentified exception occurred while delaying the next action. Please see the stack trace for more information.");
+                System.out.println("Contact ActiverseEngine support for bugs, and provide the stack trace.");
                 e.printStackTrace();
             }
             act();
@@ -251,5 +283,4 @@ public abstract class Actor {
     public void setHeight(int height) {
         this.height = height;
     }
-
 }
