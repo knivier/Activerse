@@ -21,6 +21,9 @@ public class ActiverseImage {
     public ActiverseImage(String filename) {
         image = Toolkit.getDefaultToolkit().getImage(filename);
         path = filename;
+        if(image == null){
+            throw new NullPointerException("Image not found: " + filename);
+        }
     }
 
     /**
@@ -29,6 +32,9 @@ public class ActiverseImage {
      * @return The Image object representing the loaded image.
      */
     public Image getImage() {
+        if(image == null) {
+           throw new NullPointerException("Image not found: " + path);
+        }
         return image;
     }
 
