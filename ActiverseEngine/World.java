@@ -1,6 +1,5 @@
 package ActiverseEngine;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,11 +11,14 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.swing.*;
 
 /**
  * Represents the world where actors interact.
  * This class extends JPanel and implements ActionListener, KeyListener.
  * The world has a fixed size and a black border, and can display a background image.
+ * @author Knivier
+ * @version 1.2.2
  */
 public class World extends JPanel implements ActionListener, KeyListener {
     private static int fps;
@@ -35,6 +37,22 @@ public class World extends JPanel implements ActionListener, KeyListener {
     private boolean debugMode = false;
     private boolean dynamicLighting = false;
 
+    /**
+     * Constructor for the World class.
+     * Initializes the world with the given width, height, and cell size.
+     * Sets the preferred size, background color, and border.
+     * Initializes the list of actors, images, and sounds.
+     * Creates a timer for updating the world.
+     * Loads properties and sets debug mode and dynamic lighting.
+     * Adds a debug button and a terminate button to the world.
+     * Adds key listener and sets focus to the world.
+     * @param width The width of the world in cells.
+     * @param height The height of the world in cells.
+     * @param cellSize The size of each cell in pixels.
+     * @return none valid
+     * @throws none
+     * @see Actor
+     */
     public World(int width, int height, int cellSize) {
         this.fixedWidth = width * cellSize;
         this.fixedHeight = height * cellSize;
@@ -82,14 +100,26 @@ public class World extends JPanel implements ActionListener, KeyListener {
         requestFocusInWindow();
     }
 
+    
+    /** 
+     * @return int
+     */
     public static int getFPS() {
         return fps;
     }
 
+    
+    /** 
+     * @param fpsValue
+     */
     public static void setFPS(int fpsValue) {
         fps = fpsValue;
     }
 
+    
+    /** 
+     * @return Properties
+     */
     private Properties loadProperties() {
         Properties props = new Properties();
         try (InputStream inStream = getClass().getClassLoader().getResourceAsStream("Activerse.properties")) {
@@ -105,11 +135,21 @@ public class World extends JPanel implements ActionListener, KeyListener {
         return props;
     }
 
+    
+    /** 
+     * Sets background image of world subclasses
+     * @param imagePath
+     */
     public void setBackgroundImage(String imagePath) {
         backgroundImage = Toolkit.getDefaultToolkit().getImage(imagePath);
         loadedImages.add(imagePath);
     }
 
+    /**
+     * Updates the world by calling the act method of each actor at a tick interval
+     * Updates memory tracker
+     * @see MemoryTracker
+     */
     public void update() {
         for (Actor actor : actors) {
             actor.act();
@@ -117,6 +157,13 @@ public class World extends JPanel implements ActionListener, KeyListener {
         memoryTracker.update();
     }
 
+    /**
+     * Adds an actor to the world at the specified location
+     * @param actor The actor to add to the world
+     * @param x The x-coordinate of the actor
+     * @param y The y-coordinate of the actor
+     * @see Actor
+     */
     public void addObject(Actor actor, int x, int y) {
         actor.setLocation(x, y);
         actor.setWorld(this);
@@ -126,6 +173,11 @@ public class World extends JPanel implements ActionListener, KeyListener {
         }
     }
 
+    /**
+     * Removes an actor from the world
+     * @param actor The actor to remove from the world
+     * @see Actor
+     */
     public void removeObject(Actor actor) {
         actors.remove(actor);
         if (actor.getImage() != null) {
@@ -133,30 +185,60 @@ public class World extends JPanel implements ActionListener, KeyListener {
         }
     }
 
+    /**
+     * Adds a sound to the world
+     * @param sound The sound to add to the world
+     * @see ActiverseSound
+     */
     public void addSound(ActiverseSound sound) {
         sounds.add(sound);
     }
 
+    /**
+     * Starts the world timer
+     * @see Timer
+     */
     public void start() {
         timer.start();
     }
 
+    /**
+     * Stops the world timer
+     * @see Timer
+     */
     public void stop() {
         timer.stop();
     }
 
+    /**
+     * Shows text on the world at the specified location
+     * @param x The x-coordinate of the text
+     * @param y The y-coordinate of the text
+     * @param text The text to display
+     */
     public void showText(int x, int y, String text) {
         this.textX = x;
         this.textY = y;
         this.displayText = text;
     }
 
+    /**
+     * Paints the world by drawing the background image, actors, and debug info
+     * Applies dynamic lighting if enabled
+     * @param g The graphics object to draw on
+     * @see Graphics
+     * @see Actor
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
         if (backgroundImage != null) {
             g.drawImage(backgroundImage, 0, 0, fixedWidth, fixedHeight, this);
+        }
+
+        else if(backgroundImage == null){
+            throw new NullPointerException("Background image not found");
         }
 
         if (dynamicLighting) {
@@ -177,6 +259,11 @@ public class World extends JPanel implements ActionListener, KeyListener {
         }
     }
 
+    /**
+     * Applies dynamic lighting to the world
+     * Draws light sources and shadows
+     * @param g The graphics object to draw on
+     */
     private void applyDynamicLighting(Graphics g) {
         Graphics2D g2d = (Graphics2D) g.create();
 
@@ -234,10 +321,26 @@ public class World extends JPanel implements ActionListener, KeyListener {
         g2d.dispose();
     }
 
+    /**
+     * Calculates the distance between two points
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @return
+     */
     private float calculateDistance(int x1, int y1, int x2, int y2) {
         return (float) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
 
+    /**
+     * Draws debug information on the world
+     * Debug information can be relayed to logs.log if enabled
+     * Displays FPS, memory usage, actor positions, loaded images, playing sounds, and current keys
+     * Only occurs if property file allows for logging
+     * @see logs.log
+     * @param g The graphics object to draw on
+     */
     private void drawDebugInfo(Graphics g) {
         g.setColor(Color.BLACK);
         int y = 50;
@@ -284,6 +387,12 @@ public class World extends JPanel implements ActionListener, KeyListener {
         g.drawString(keysInfo.toString(), 10, y);
     }
 
+    /**
+     * Checks if an actor is colliding with another actor
+     * @param actor The actor to check for collision
+     * @return true if the actor is colliding with another actor, false otherwise
+     * @see Actor
+     */
     private boolean checkCollision(Actor actor) {
         for (Actor other : actors) {
             if (actor != other && CollisionManager.intersects(actor, other)) {
@@ -293,6 +402,9 @@ public class World extends JPanel implements ActionListener, KeyListener {
         return false;
     }
 
+    /**
+     * Updates the world and repaints it
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() != debugButton) {
@@ -301,30 +413,50 @@ public class World extends JPanel implements ActionListener, KeyListener {
         }
     }
 
+    /**
+     * Handles key presses
+     */
     @Override
     public void keyPressed(KeyEvent e) {
         KeyboardInfo.keys[e.getKeyCode()] = true;
     }
 
+    /**
+     * Handles key releases
+     */
     @Override
     public void keyReleased(KeyEvent e) {
         KeyboardInfo.keys[e.getKeyCode()] = false;
     }
 
+    /**
+     * Handles key typing
+     */
     @Override
     public void keyTyped(KeyEvent e) {
         // To be implemented if needed
     }
-
+    /**
+     * Returns the list of actors in the world
+     * @return The list of actors in the world
+     * @see Actor
+     */
     public List<Actor> getActors() {
         return actors;
     }
 
+    /**
+     * Returns the list of loaded images in the world
+     * @return The list of loaded images in the world
+     */
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(fixedWidth, fixedHeight);
     }
 
+    /**
+     * Light source class for dynamic lighting
+     */
     private static class LightSource {
         int x, y, radius;
         Color color;
