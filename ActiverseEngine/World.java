@@ -354,7 +354,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
         for (Actor actor : actors) {
             String info = String.format("Actor at (%d, %d)", actor.getX(), actor.getY());
             boolean isColliding = checkCollision(actor);
-            info += isColliding ? " - Colliding" : " - Not colliding";
+            info += isColliding ? " - Collides" : " - Not colliding";
             g.drawString(info, 10, y);
             y += 20;
         }
@@ -376,7 +376,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
         }
 
         y += 20;
-        g.drawString("Current Keys:", 10, y);
+        g.drawString("Active Keys:", 10, y);
         y += 20;
         StringBuilder keysInfo = new StringBuilder();
         for (int i = 0; i < KeyboardInfo.keys.length; i++) {
