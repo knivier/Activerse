@@ -95,9 +95,13 @@ public class World extends JPanel implements ActionListener, KeyListener {
         });
         add(terminateButton);
 
-        addKeyListener(this);
         setFocusable(true);
         requestFocusInWindow();
+        initializeKeyListener();
+    }
+
+    private void initializeKeyListener() {
+        addKeyListener(this);
     }
 
     
