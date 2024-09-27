@@ -161,10 +161,14 @@ public class MemoryTracker {
                 writer.println("New Log Session @ " + formattedDateTime);
                 newSessionNotified = true;
             }
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            String formattedTime = currentTime.format(timeFormatter);
             MemoryUsage heapMemoryUsage = getHeapMemoryUsage();
             MemoryUsage nonHeapMemoryUsage = getNonHeapMemoryUsage();
             long gcTime = getGarbageCollectionTime();
-            writer.println(logNum + " | " + formattedDateTime + " | " + getMemoryUsagePerSecond() + " | FPS: " + World.getFPS() + " targeting " + targetFPS + " | Current Sys Time " + System.currentTimeMillis());
+            writer.println(logNum + " | " + formattedTime + " | " + getMemoryUsagePerSecond() + " | FPS: " + World.getFPS() + " targeting " + targetFPS + " | Current Sys Time " + System.currentTimeMillis());
             logNum++;
         } catch (IOException e) {
             System.out.println("An error occurred while writing memory usage statistics to logs.log");
