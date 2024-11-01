@@ -74,7 +74,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
         if (showDebug) {
             debugButton = new JButton("Debug");
-            debugButton.addActionListener(_ -> {
+            debugButton.addActionListener(e -> {
                 debugMode = !debugMode;
                 requestFocusInWindow();
                 repaint();
@@ -89,7 +89,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
         terminateButton.setFont(new Font("Arial", Font.PLAIN, 10));
         terminateButton.setPreferredSize(new Dimension(60, 20));
         terminateButton.setBounds(this.fixedWidth - 90, 50, 60, 20);
-        terminateButton.addActionListener(_ -> {
+        terminateButton.addActionListener(e -> {
             stop();
             System.exit(0);
         });
