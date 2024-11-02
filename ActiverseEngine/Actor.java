@@ -107,16 +107,14 @@ public abstract class Actor {
         if (image != null) {
             Graphics2D g2d = (Graphics2D) g;
             width = image.getImage().getWidth(null);
-            int height = image.getImage().getHeight(null);
-
-            AffineTransform old = g2d.getTransform();
+            int height = image.getImage().getHeight(null);            AffineTransform old = g2d.getTransform();
 
             g2d.rotate(direction, x + (double) width / 2, y + (double) height / 2);
             g2d.drawImage(image.getImage(), x, y, null);
 
             g2d.setTransform(old);
         } else {
-            System.err.println("Warning: Image not set for actor.");
+            System.err.println("5A.OUT-CONNTO-2A.OUT:(LN: paint(Graphics g) - ACEHS Error thrown; image is null. Please check the image path and try again.");
         }
     }
 
@@ -216,9 +214,7 @@ public abstract class Actor {
             try {
                 Thread.sleep(ms);
             } catch (InterruptedException e) {
-                System.out.println("An unidentified exception occurred while delaying the next action. Please see the stack trace for more information.");
-                System.out.println("Contact ActiverseEngine support for bugs, and provide the stack trace.");
-                e.printStackTrace();
+                System.err.println("5A.IO:(LN: delayNext(int ms) - ACEHS Error thrown; an error occurred while delaying the next action.");
             }
             act();
         }).start();
