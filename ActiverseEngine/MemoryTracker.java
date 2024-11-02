@@ -59,9 +59,10 @@ public class MemoryTracker {
             loggingEnabled = Boolean.parseBoolean(props.getProperty("logging", "false"));
             targetFPS = Integer.parseInt(props.getProperty("fps", "60"));
         } catch (IOException e) {
-            System.out.println("An error occurred while loading properties from Activerse.properties");
-            System.out.println("Default values will be used. Contact ActiverseEngine support for bugs. Otherwise, please provide a properties file.");
+            System.err.println("9A.IN:(LN: loadProperties() - ACEHS Error thrown; an error occurred while loading properties. Default values will be used. Contact ActiverseEngine support for bugs. Otherwise, please provide a properties file.");
             e.printStackTrace();
+            loggingEnabled = false;
+            targetFPS = 60;
         }
     }
 
@@ -171,8 +172,7 @@ public class MemoryTracker {
             writer.println(logNum + " | " + formattedTime + " | " + getMemoryUsagePerSecond() + " | FPS: " + World.getFPS() + " targeting " + targetFPS + " | Current Sys Time " + System.currentTimeMillis());
             logNum++;
         } catch (IOException e) {
-            System.out.println("An error occurred while writing memory usage statistics to logs.log");
-            System.out.println("Please check if the file is writeable and has enough space. Contact ActiverseEngine support for bugs.");
+            System.err.println("9A.IO.OUT:(LN: writeMemoryUsageToFile()) - ACEHS Error thrown (IO Netty & an output write); an error occurred while writing to the log file. Contact ActiverseEngine support for bugs.");
             e.printStackTrace();
         }
     }
