@@ -22,7 +22,7 @@ public class ActiverseImage {
         image = Toolkit.getDefaultToolkit().getImage(filename);
         path = filename;
         if(image == null){
-            throw new NullPointerException("2A.OUT:(LN: ActiverseImage(String filename) - ACEHS Error thrown; image is null. Please check the image path and try again.");
+            throw new NullPointerException("2A.IN:(LN: ActiverseImage(String filename) - ACEHS Error thrown; image is null (Report: INTO). Please check the image path and try again.");
         }
     }
 
