@@ -41,7 +41,7 @@ public class GameLoop implements Runnable {
         String propertiesFile = "Activerse.properties";
         try (InputStream input = getClass().getClassLoader().getResourceAsStream(propertiesFile)) {
             if (input == null) {
-                System.err.println("Sorry, unable to find " + propertiesFile);
+                System.err.println("7A.IN:(LN: loadProperties() - ACEHS Error thrown; properties file not found. Default values will be used. Contact ActiverseEngine support for bugs. Otherwise, please provide a properties file.");
                 TARGET_FPS = 60;
                 dynamicLighting = false;
                 return;
@@ -50,8 +50,7 @@ public class GameLoop implements Runnable {
             TARGET_FPS = Integer.parseInt(props.getProperty("fps", "60"));
             dynamicLighting = Boolean.parseBoolean(props.getProperty("dynamicLighting", "false"));
         } catch (IOException e) {
-            System.out.println("An error occurred while loading properties from " + propertiesFile);
-            System.out.println("Default values will be used. Contact ActiverseEngine support for bugs. Otherwise, please provide a properties file.");
+            System.err.println("7A.OUT:(LN: loadProperties() - ACEHS Error thrown; an error occurred while loading properties. Default values will be used. Contact ActiverseEngine support for bugs. Otherwise, please provide a properties file.");
             e.printStackTrace();
             TARGET_FPS = 60;
             dynamicLighting = false;
@@ -94,9 +93,7 @@ public class GameLoop implements Runnable {
                 try {
                     Thread.sleep(sleepTime / 1000000, (int) (sleepTime % 1000000));
                 } catch (InterruptedException e) {
-                    System.out.println("An error occurred while sleeping the thread. This is an unexpected error that will result in your Engine not working. Please contact ActiverseEngine support for bugs.");
-                    System.out.println("Printing stack trace now. Please provide this to developers.");
-                    System.out.println("Wait time was interrupted. This is an unexpected error.");
+                    System.out.println("7A.IO:(LN: run()) - ACEHS Error thrown; an error occurred while sleeping the thread. Contact ActiverseEngine support for bugs.");
                     e.printStackTrace();
                 }
             } else {
