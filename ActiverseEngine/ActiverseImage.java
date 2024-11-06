@@ -44,6 +44,9 @@ public class ActiverseImage {
      * @return The path to the image file.
      */
     public String getPath() {
+        if(path == null) {
+            throw new NullPointerException("2A.IN.OUT:(LN: getPath() - ACEHS Error thrown; path is null. Please check the image path and try again.");
+        }
         return path;
     }
 }
