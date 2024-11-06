@@ -12,7 +12,7 @@ import java.util.Properties;
 public class GameLoop implements Runnable {
     private final World world; // The game world to be updated and rendered
     private final long FRAME_TIME; // Time per frame in nanoseconds
-    private int TARGET_FPS; // Target frames per second
+    private long TARGET_FPS; // Target frames per second
     private int frames; // Frame counter for FPS calculation
     private long lastFpsTime; // Last time FPS was calculated
     private boolean dynamicLighting; // Flag for dynamic lighting

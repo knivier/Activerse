@@ -107,14 +107,15 @@ public abstract class Actor {
         if (image != null) {
             Graphics2D g2d = (Graphics2D) g;
             width = image.getImage().getWidth(null);
-            int height = image.getImage().getHeight(null);            AffineTransform old = g2d.getTransform();
+            int height = image.getImage().getHeight(null);
+            AffineTransform old = g2d.getTransform();
 
             g2d.rotate(direction, x + (double) width / 2, y + (double) height / 2);
             g2d.drawImage(image.getImage(), x, y, null);
 
             g2d.setTransform(old);
-        } else {
-            System.err.println("5A.OUT-CONNTO-2A.OUT:(LN: paint(Graphics g) - ACEHS Error thrown; image is null. Please check the image path and try again.");
+        } else { // Can't throw nullpointerexception for lack of image, because this is meant to be played without an image on offchance
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: paint(Graphics g) - ACEHS Error thrown; image is null. Please check the image path and try again.");
         }
     }
 
