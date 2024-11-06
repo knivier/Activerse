@@ -36,6 +36,10 @@ public class Activerse {
                 frame.pack();
                 frame.setVisible(true);
                 currentWorld.start(); // Start the world
+            } catch (HeadlessException | IllegalArgumentException e) {
+                System.out.println("1A.IO:(LN: SwingUtilities.invokeLater caught Exception at Activerse.start()) - ACEHS Error fetched and thrown; a specific error occurred. Please see the stack trace for more information. Contact ActiverseEngine support for bugs.");
+                e.printStackTrace();
+                stop(currentWorld);
             } catch (Exception e) {
                 System.out.println("1A.IO:(LN: SwingUtilities.invokeLater caught Exception at Activerse.start()) - ACEHS Error fetched and thrown; an unidentified error occurred. Please see the stack trace for more information. Contact ActiverseEngine support for bugs.");
                 e.printStackTrace();
