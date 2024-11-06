@@ -53,6 +53,9 @@ public class ActiverseSound {
         if (clip != null) {
             clip.stop();
         }
+        else{
+            throw new NullPointerException("4A.OUT:(LN: stop() - ACEHS Error thrown; audio file is null. Please check the file path and try again.");
+        }
     }
 
     /**
@@ -61,7 +64,7 @@ public class ActiverseSound {
      * @return true if the audio file is playing, false otherwise.
      */
     public boolean isPlaying() {
-        return clip != null && clip.isRunning();
+        return clip != null && clip.isRunning(); // Check if clip is not null and is running, maybe one day add null asfety for this check
     }
 
     /**
