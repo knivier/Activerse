@@ -141,9 +141,9 @@ public class GameLoop implements Runnable {
 
     
     /** 
-     * @return int
+     * @return long
      */
-    public int getTargetFps() {
+    public long getTargetFps() {
         return TARGET_FPS;
     }
 
