@@ -52,4 +52,33 @@ Well, what does this mean for you?
 - **Disclaimer of Warranties and Limitation of Liability**: The material is provided "as-is" without warranties of any kind, and the licensor is not liable for any damages arising from its use.
 ---
 
+## Error handling
+
+As of v1.3.1, Activerse uses the **ACESH System** or "Activerse Concurrent Error Handling System". This is a simple and native error reporting interface that utilizes Java's own stack trace along with error codes; should you encounter broken code (or a developer extending the engine), they will know where the error occurred in greater detail.
+
+This system is always improving. Activerse developers are not responsible for broken or malicious code within their product.
+
+File name extensions:
+
+- 1A - Activerse.java
+- 2A - ActiverseImage.java
+- 3A - ActiverseMouseInfo.java
+- 4A - ActiverseSound.ava
+- 5A - Actor.Java
+- 6A - CollisionnManager.java
+- 7A - GameLoop.Java
+- 8A - KeyBoardInfo.java
+- 9A - MemoryTracker.Java
+- 10A - World.Java
+- PROP.IN.OUT.IO - Activerse.properties error; major screwup by developers
+
+Keywords that may be helpful
+- IO - A central breakdown; this is typically a result of multiple errors that are being caught by ACESH that cause an IO error
+- IN - An input breakdown
+- OUT - An output breakdown
+- LN - Error line reporting
+- DEV - Contact Dev's; this is not a good error
+- CONNTO - A connecting line of code that connects class to class that may cause errors in each
+
+
 Happy coding, and enjoy bringing your creations to life with Activerse!

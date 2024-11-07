@@ -28,10 +28,7 @@ public class ActiverseSound {
             clip = AudioSystem.getClip();
             clip.open(audioInputStream);
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            System.out.println("An unidentified exception ocurred while loading the audio file. Please see the stack trace for more information.");
-            System.out.println("Filename: " + filename + " threw your exception. Please check the file path or verify it is valid. .WAV files in limited length are supported.");
-            System.out.println("Contact ActiverseEngine support for bugs.");
-            System.out.println("Printing stack trace now");
+            System.out.println("4A.IN:(LN: ActiverseSound(String filename) - ACEHS Error thrown; an error occurred while loading the audio file (type: INTO). Please check the file path and try again. WAV files are only supported at this time.");
             e.printStackTrace();
         }
     }
@@ -45,8 +42,7 @@ public class ActiverseSound {
             clip.start();
         }
         else if(clip == null){
-            System.out.println("The audio file is null. Please check the file path or verify it is valid. .WAV files in limited length are supported.");
-            System.out.println("Filename of null audio file: " + filename);
+            throw new NullPointerException("4A.OUT:(LN: play() - ACEHS Error thrown; audio file is null. Please check the file path and try again.");
         }
     }
 
@@ -57,6 +53,9 @@ public class ActiverseSound {
         if (clip != null) {
             clip.stop();
         }
+        else{
+            throw new NullPointerException("4A.OUT:(LN: stop() - ACEHS Error thrown; audio file is null. Please check the file path and try again.");
+        }
     }
 
     /**
@@ -65,7 +64,7 @@ public class ActiverseSound {
      * @return true if the audio file is playing, false otherwise.
      */
     public boolean isPlaying() {
-        return clip != null && clip.isRunning();
+        return clip != null && clip.isRunning(); // Check if clip is not null and is running, maybe one day add null asfety for this check
     }
 
     /**

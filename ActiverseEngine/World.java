@@ -74,7 +74,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
         if (showDebug) {
             debugButton = new JButton("Debug");
-            debugButton.addActionListener(_ -> {
+            debugButton.addActionListener(e -> {
                 debugMode = !debugMode;
                 requestFocusInWindow();
                 repaint();
@@ -89,7 +89,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
         terminateButton.setFont(new Font("Arial", Font.PLAIN, 10));
         terminateButton.setPreferredSize(new Dimension(60, 20));
         terminateButton.setBounds(this.fixedWidth - 90, 50, 60, 20);
-        terminateButton.addActionListener(_ -> {
+        terminateButton.addActionListener(e -> {
             stop();
             System.exit(0);
         });
@@ -133,8 +133,8 @@ public class World extends JPanel implements ActionListener, KeyListener {
                 System.err.println("Activerse.properties not found or could not be loaded.");
             }
         } catch (IOException e) {
+            System.out.println("10A.IN:(LN: loadProperties() - ACEHS Error thrown; an error occurred while loading properties. Default values will be used. Contact ActiverseEngine support for bugs. Otherwise, please provide a properties file.");
             e.printStackTrace();
-            System.err.println("Error loading Activerse.properties: " + e.getMessage());
         }
         return props;
     }
