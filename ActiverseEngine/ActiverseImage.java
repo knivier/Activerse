@@ -22,7 +22,7 @@ public class ActiverseImage {
         image = Toolkit.getDefaultToolkit().getImage(filename);
         path = filename;
         if(image == null){
-            throw new NullPointerException("Image not found: " + filename);
+            throw new NullPointerException("2A.IN:(LN: ActiverseImage(String filename) - ACEHS Error thrown; image is null (Report: INTO). Please check the image path and try again.");
         }
     }
 
@@ -33,7 +33,7 @@ public class ActiverseImage {
      */
     public Image getImage() {
         if(image == null) {
-           throw new NullPointerException("Image not found: " + path);
+            throw new NullPointerException("2A.OUT:(LN: getImage() - ACEHS Error thrown; image is null. Please check the image path and try again.");
         }
         return image;
     }
@@ -44,6 +44,9 @@ public class ActiverseImage {
      * @return The path to the image file.
      */
     public String getPath() {
+        if(path == null) {
+            throw new NullPointerException("2A.IN.OUT:(LN: getPath() - ACEHS Error thrown; path is null. Please check the image path and try again.");
+        }
         return path;
     }
 }
