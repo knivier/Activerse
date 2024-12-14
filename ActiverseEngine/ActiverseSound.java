@@ -9,7 +9,7 @@ import javax.sound.sampled.*;
  * This class provides methods to load, play, and stop audio files.
  * 
  * @author Knivier
- * @version 1.2.2
+ * @version 1.3.2
  */
 public class ActiverseSound {
     private final String filename;

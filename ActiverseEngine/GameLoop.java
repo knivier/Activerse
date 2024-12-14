@@ -7,7 +7,7 @@ import java.util.Properties;
 /**
  * Represents the main game loop for updating and rendering the game.
  * @author Knivier
- * @version 1.2.2
+ * @version 1.3.2
  */
 public class GameLoop implements Runnable {
     private final World world; // The game world to be updated and rendered
@@ -64,7 +64,6 @@ public class GameLoop implements Runnable {
     @Override
     public void run() {
         long lastTime = System.nanoTime();
-        long timer = System.currentTimeMillis();
         double delta = 0;
 
         while (running) {
@@ -97,7 +96,12 @@ public class GameLoop implements Runnable {
                     e.printStackTrace();
                 }
             } else {
-                Thread.yield();
+                try {
+                    Thread.sleep(1); // Sleep for 1ms when we can't match the target frame time
+                } catch (InterruptedException e) {
+                    System.out.println("7A.IO:(LN: run()) - ACEHS Error thrown; an error occurred while sleeping the thread. Contact ActiverseEngine support for bugs.");
+                    e.printStackTrace();
+                }
             }
         }
     }

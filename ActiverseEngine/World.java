@@ -18,7 +18,7 @@ import javax.swing.*;
  * This class extends JPanel and implements ActionListener, KeyListener.
  * The world has a fixed size and a black border, and can display a background image.
  * @author Knivier
- * @version 1.2.2
+ * @version 1.3.2
  */
 public class World extends JPanel implements ActionListener, KeyListener {
     private static int fps;
