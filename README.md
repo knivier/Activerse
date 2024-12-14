@@ -80,5 +80,4 @@ Keywords that may be helpful
 - DEV - Contact Dev's; this is not a good error
 - CONNTO - A connecting line of code that connects class to class that may cause errors in each
 
-
 Happy coding, and enjoy bringing your creations to life with Activerse!

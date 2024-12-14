@@ -15,7 +15,7 @@ import java.util.Properties;
 /**
  * MemoryTracker class is used to track memory usage of the game along with other statistics
  * @Author: Knivier
- * @Version: 1.2.2
+ * @version 1.3.2
  * 
  */
 public class MemoryTracker {

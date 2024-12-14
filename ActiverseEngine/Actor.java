@@ -12,6 +12,9 @@ import java.util.Set;
 
 /**
  * The base class for all actors in the world.
+ * 
+ * @author Knivier
+ * @version 1.3.2
  */
 public abstract class Actor {
     protected double direction; 
