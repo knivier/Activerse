@@ -1,4 +1,7 @@
 import ActiverseEngine.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.Timer;
 
 public class BreakoutWorld extends World {
     
@@ -12,7 +15,24 @@ public class BreakoutWorld extends World {
         addObject(new Brick(), 20 ,50 ); // Adding 3 bricks to the world
         addObject(new Brick(), 200 ,50 );
         addObject(new Brick(), 500 ,50 );
+        showText(150, 150, "World started, 5 seconds");
+        super.pause();
+        Timer timer = new Timer(1000 / 30, new ActionListener() {
+            int countdown = 90; // 3 sdeconds * 30 FPS
 
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            if (countdown > 0) {
+                showText(150, 150, "World starts in: " + (countdown / 30) + " seconds");
+                countdown--;
+            } else {
+                ((Timer) e.getSource()).stop();
+                showText(150, 150, "");
+                BreakoutWorld.this.resume();
+            }
+            }
+        });
+        timer.start(); 
     }
 
     public void update(){
