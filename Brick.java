@@ -5,9 +5,8 @@ public class Brick extends Actor {
     public Brick() {
         setImage(new ActiverseImage("brick.png"));
     }
-    public void act(){
-        // It don't act it a brick
-        
+    public void act(){        
+        // Bricks don't do anything, so we can leave this blank
     }
     
 }
