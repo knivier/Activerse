@@ -8,10 +8,11 @@ public class BreakoutWorld extends World {
         setBackgroundImage("background.png"); // Sets the background image 
           // Creates a new ball object at position 300,500
         addObject(new Paddle(), 300,500); // Adds the paddle to bat the ball
-        addObject(new Ball(300,600), 300, 600); // Adds the ball to the world
+        addObject(new Ball(400,450), 400, 450); // Adds the ball to the world
         addObject(new Brick(), 20 ,50 ); // Adding 3 bricks to the world
         addObject(new Brick(), 200 ,50 );
         addObject(new Brick(), 500 ,50 );
+
     }
 
     public void update(){

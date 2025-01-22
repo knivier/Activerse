@@ -10,6 +10,8 @@ public class Ball extends Actor {
     public ActiverseSound boom = new ActiverseSound("explosion.wav");
 
     public Ball(int x, int y) {
+        this.x = x;
+        this.y = y;
         setLocation(x, y); // Set initial position
         setImage(new ActiverseImage("ball.png"));
     }
@@ -19,8 +21,8 @@ public class Ball extends Actor {
         if (initialMove) {
             for (int i = 0; i < 50; i++) {
                 move(-5);
-                initialMove = false;
             }
+            initialMove = false;
         }
         updatePosition();
         getWorld().getActors().forEach(actor -> {
