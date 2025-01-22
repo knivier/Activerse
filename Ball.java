@@ -56,6 +56,19 @@ public class Ball extends Actor {
     public void handlePaddleCollision(Paddle paddle) {
         // Check collision with paddle
         if (y + diameter >= paddle.getY() && x + diameter > paddle.getX() && x < paddle.getX() + paddle.getWidth()) {
+            int paddleSection = paddle.getWidth() / 4;
+            int ballPosition = x - paddle.getX();
+
+            if (ballPosition < paddleSection) {
+                xSpeed = -Math.abs(xSpeed) - 1; // Far left section
+            } else if (ballPosition < 2 * paddleSection) {
+                xSpeed = -Math.abs(xSpeed); // Left middle section
+            } else if (ballPosition < 3 * paddleSection) {
+                xSpeed = Math.abs(xSpeed); // Right middle section
+            } else {
+                xSpeed = Math.abs(xSpeed) + 1; // Far right section
+            }
+
             ySpeed = -ySpeed;
             y = paddle.getY() - diameter; // Reset position
             bounce.play();
