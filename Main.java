@@ -13,6 +13,6 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
-        Activerse.start(new BreakoutWorld());
+        Activerse.start(new BreakoutWorld()); // Starts breakout
     }
 }
