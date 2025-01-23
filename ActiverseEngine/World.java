@@ -342,7 +342,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
     }
 
     /**
-     * Calculates the distance between two points
+     * Calculates the distance between two points, based on the Euclidean distance formula
      * @param x1
      * @param y1
      * @param x2
