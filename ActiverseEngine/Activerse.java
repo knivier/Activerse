@@ -30,7 +30,7 @@ public class Activerse {
         new Thread(gameLoop).start();
         SwingUtilities.invokeLater(() -> {
             try {
-                frame = new JFrame("Activerse Instance v1.3.1");
+                frame = new JFrame("Activerse Instance v1.3.3");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.getContentPane().add(currentWorld, BorderLayout.CENTER);
                 frame.pack();
