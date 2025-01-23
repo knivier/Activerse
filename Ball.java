@@ -14,6 +14,8 @@ public class Ball extends Actor {
         this.y = y;
         setLocation(x, y); // Set initial position
         setImage(new ActiverseImage("ball.png"));
+        boom.setVolume(0.8f);
+        bounce.setVolume(0.75f);
     }
     
     @Override
