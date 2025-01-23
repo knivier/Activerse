@@ -4,8 +4,6 @@ import java.awt.event.ActionListener;
 import javax.swing.Timer;
 
 public class BreakoutWorld extends World {
-    
-
     public BreakoutWorld() {
         super(800, 600, 1); // Creates a world of size 800x600 with 1x cell size
         setBackgroundImage("background.png"); // Sets the background image 
@@ -35,6 +33,7 @@ public class BreakoutWorld extends World {
         timer.start(); 
     }
 
+    @Override
     public void update(){
         super.update();
         if(getActors().stream().noneMatch(actor -> actor instanceof Brick)){ // Checking for any instances of brick; let's not hard code this 
