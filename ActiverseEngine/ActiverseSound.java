@@ -8,7 +8,7 @@ import javax.sound.sampled.*;
  * Represents a sound player for playing audio files.
  * This class provides methods to load, play, stop, and manage the volume of audio files.
  * 
- * @version 1.3.3
+ * @version 1.3.2
  */
 public class ActiverseSound {
     private final String filename;

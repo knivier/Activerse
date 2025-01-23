@@ -8,7 +8,7 @@ import java.awt.event.KeyListener;
  * This class implements the KeyListener interface to handle keyboard events.
  *
  * @author Knivier
- * @version 1.3.3
+ * @version 1.3.2
  */
 public class KeyboardInfo implements KeyListener {
     public static boolean[] keys = new boolean[256];
