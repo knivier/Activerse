@@ -7,7 +7,7 @@ import java.util.Properties;
 /**
  * Represents the main game loop for updating and rendering the game.
  * @author Knivier
- * @version 1.3.3
+ * @version 1.3.2
  */
 public class GameLoop implements Runnable {
     private final World world; // The game world to be updated and rendered
