@@ -10,7 +10,7 @@ import javax.swing.*;
  * and detect mouse clicks.
  * 
  * @author Knivier 
- * @version 1.3.2
+ * @version 1.3.3
  */
 public class ActiverseMouseInfo implements MouseListener {
     private static boolean leftClick = false;

@@ -8,7 +8,7 @@ import javax.swing.*;
  * This class contains static methods to manage the application lifecycle.
  * 
  * @author Knivier  
- * @version 1.3.2
+ * @version 1.3.3
  */
 public class Activerse {
     private static World currentWorld;
