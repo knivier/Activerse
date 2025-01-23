@@ -169,7 +169,7 @@ public class MemoryTracker {
             MemoryUsage heapMemoryUsage = getHeapMemoryUsage();
             MemoryUsage nonHeapMemoryUsage = getNonHeapMemoryUsage();
             long gcTime = getGarbageCollectionTime();
-            writer.println(logNum + " | " + formattedTime + " | " + getMemoryUsagePerSecond() + " | FPS: " + World.getFPS() + " targeting " + targetFPS + " | Current Sys Time " + System.currentTimeMillis());
+            writer.println(logNum + " | " + formattedTime + " | " + getMemoryUsagePerSecond() + " | Heap: " + heapMemoryUsage.getUsed() / (1024 * 1024) + " MB | Non-Heap: " + nonHeapMemoryUsage.getUsed() / (1024 * 1024) + " MB | GC Time: " + gcTime + " ms | FPS: " + World.getFPS() + " targeting " + targetFPS + " | Current Sys Time " + System.currentTimeMillis());
             logNum++;
         } catch (IOException e) {
             System.err.println("9A.IO.OUT:(LN: writeMemoryUsageToFile()) - ACEHS Error thrown (IO Netty & an output write); an error occurred while writing to the log file. Contact ActiverseEngine support for bugs.");
