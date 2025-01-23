@@ -215,6 +215,22 @@ public class World extends JPanel implements ActionListener, KeyListener {
     }
 
     /**
+     * Pauses the world timer
+     * @see Timer
+     */
+    public void pause() {
+        timer.stop();
+    }
+
+    /**
+     * Resumes the world timer
+     * @see Timer
+     */
+    public void resume() {
+        timer.start();
+    }
+
+    /**
      * Shows text on the world at the specified location
      * @param x The x-coordinate of the text
      * @param y The y-coordinate of the text
@@ -326,7 +342,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
     }
 
     /**
-     * Calculates the distance between two points
+     * Calculates the distance between two points, based on the Euclidean distance formula
      * @param x1
      * @param y1
      * @param x2

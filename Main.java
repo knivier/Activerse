@@ -1,4 +1,7 @@
 
+import ActiverseEngine.Activerse;
+
+
 /**
  * Instantiates a new myWorld class and starts the game engine
  *
@@ -10,6 +13,6 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
-    // Create your world here!
+        Activerse.start(new BreakoutWorld()); // Starts breakout
     }
 }
