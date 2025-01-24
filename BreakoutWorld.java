@@ -4,15 +4,19 @@ import java.awt.event.ActionListener;
 import javax.swing.Timer;
 
 public class BreakoutWorld extends World {
+    ActiverseSound lobby = new ActiverseSound("dream-speedrun-music.wav");
     public BreakoutWorld() {
         super(800, 600, 1); // Creates a world of size 800x600 with 1x cell size
         setBackgroundImage("background.png"); // Sets the background image 
           // Creates a new ball object at position 300,500
         addObject(new Paddle(), 300,500); // Adds the paddle to bat the ball
         addObject(new Ball(400,450), 400, 450); // Adds the ball to the world
-        addObject(new Brick(), 20 ,50 ); // Adding 3 bricks to the world
-        addObject(new Brick(), 200 ,50 );
-        addObject(new Brick(), 500 ,50 );
+        lobby.play();
+        for(int x = 0; x < 800; x += 100) {
+            for(int y = 0; y < 200; y += 50) {
+                addObject(new Brick(), x, y);
+            }
+        }
         showText(150, 150, "World started, 5 seconds");
         super.pause();
         Timer timer = new Timer(1000 / 30, new ActionListener() {

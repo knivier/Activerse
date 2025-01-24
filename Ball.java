@@ -56,7 +56,7 @@ public class Ball extends Actor {
             bounce.play();
         }
     }
-
+    
     public void handlePaddleCollision(Paddle paddle) {
         // Check collision with paddle
         if (y + diameter >= paddle.getY() && x + diameter > paddle.getX() && x < paddle.getX() + paddle.getWidth()) {
