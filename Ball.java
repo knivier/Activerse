@@ -3,6 +3,7 @@ import java.awt.*;
 
 public class Ball extends Actor {
     private int x, y;
+    private int ballsUsed = 0;
     private final int diameter = 20;
     private int xSpeed = 2, ySpeed = -2;
     private boolean initialMove = true;
@@ -20,12 +21,7 @@ public class Ball extends Actor {
     
     @Override
     public void act() {
-        if (initialMove) {
-            for (int i = 0; i < 50; i++) {
-                move(-5);
-            }
-            initialMove = false;
-        }
+        // Removed initial move logic
         updatePosition();
         getWorld().getActors().forEach(actor -> {
             switch (actor) {
@@ -47,7 +43,7 @@ public class Ball extends Actor {
         y += ySpeed;
         setLocation(x, y); // Update the ball's position
         // Bounce off walls
-        if (x < 0 || x > 800 - diameter) {
+        if (x < 0 || x > getWorld().getWidth() - diameter) {
             xSpeed = -xSpeed;
             bounce.play();
         }
@@ -55,8 +51,22 @@ public class Ball extends Actor {
             ySpeed = -ySpeed;
             bounce.play();
         }
+        // Reset velocity if the ball goes out of bounds
+        if (y > getWorld().getHeight()) {
+            xSpeed = 2;
+            ySpeed = -2;
+            x = 400;
+            y = 450;
+            setLocation(x, y);
+            initialMove = true;
+            ballsUsed++;
+        }
     }
-    
+
+    public int getBallsUsed() {
+        return ballsUsed;
+    }
+
     public void handlePaddleCollision(Paddle paddle) {
         // Check collision with paddle
         if (y + diameter >= paddle.getY() && x + diameter > paddle.getX() && x < paddle.getX() + paddle.getWidth()) {
