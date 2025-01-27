@@ -36,6 +36,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
     private JButton debugButton;
     private boolean debugMode = false;
     private boolean dynamicLighting = false;
+    private int ticksDone = 0;
 
     /**
      * Constructor for the World class.
@@ -111,7 +112,6 @@ public class World extends JPanel implements ActionListener, KeyListener {
     public static int getFPS() {
         return fps;
     }
-
     
     /** 
      * @param fpsValue
@@ -119,9 +119,9 @@ public class World extends JPanel implements ActionListener, KeyListener {
     public static void setFPS(int fpsValue) {
         fps = fpsValue;
     }
-
     
     /** 
+     * Attempts to load the properties file using the class loader and stream systems
      * @return Properties
      */
     private Properties loadProperties() {
@@ -155,6 +155,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
      * @see MemoryTracker
      */
     public void update() {
+        ticksDone++;
         for (Actor actor : actors) {
             actor.act();
         }
@@ -240,6 +241,10 @@ public class World extends JPanel implements ActionListener, KeyListener {
         this.textX = x;
         this.textY = y;
         this.displayText = text;
+    }
+
+    public int getticksDone() {
+        return ticksDone;
     }
 
     /**
@@ -334,7 +339,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
             }
         }
 
-        // Draw the lighting buffer onto the main Graphics object
+        // Apply the lighting buffer onto the main Graphics object
         g2d.drawImage(lightingBuffer, 0, 0, null);
 
         gLighting.dispose();
@@ -367,6 +372,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
         g.drawString("FPS: " + fps + " @target " + memoryTracker.getTargetFPS(), 10, y);
         y += 20;
+        g.drawString(" Ticks: " + ticksDone, 10, 60);
 
         g.drawString(memoryTracker.getMemoryUsagePerSecond(), 10, y);
         y += 20;
