@@ -36,7 +36,8 @@ public class World extends JPanel implements ActionListener, KeyListener {
     private JButton debugButton;
     private boolean debugMode = false;
     private boolean dynamicLighting = false;
-    private int ticksDone = 0;
+    private static int ticksDone = 0;
+    
 
     /**
      * Constructor for the World class.
@@ -120,6 +121,15 @@ public class World extends JPanel implements ActionListener, KeyListener {
         fps = fpsValue;
     }
     
+    /**
+     * Sets default FPS value for Activerse (60)
+     * @return None valid
+     */
+
+     public static void defaultFPS(){
+        fps = 60;
+     }
+
     /** 
      * Attempts to load the properties file using the class loader and stream systems
      * @return Properties
@@ -243,7 +253,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
         this.displayText = text;
     }
 
-    public int getticksDone() {
+    public static int getTicksDone() {
         return ticksDone;
     }
 
