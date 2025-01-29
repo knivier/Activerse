@@ -42,7 +42,7 @@ Reading this file is just the beginning! For more detailed guidance, examples, a
 
 ## 📝 License
 
-**Activerse © 2024 by Knivier / Agniva** is licensed under **[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)**.
+**Activerse © 2025 by Knivier / Agniva** is licensed under **[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)**.
 Well, what does this mean for you?
 
 - **Attribution**: You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
