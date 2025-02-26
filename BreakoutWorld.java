@@ -6,11 +6,11 @@ import javax.swing.Timer;
 public class BreakoutWorld extends World {;
     private static final int WORLD_WIDTH = 800;
     private static final int WORLD_HEIGHT = 600;
-    ActiverseSound lobby = new ActiverseSound("dream-speedrun-music.wav");
+    ActiverseSound lobby = new ActiverseSound("assets/audio/dream-speedrun-music.wav");
     
     public BreakoutWorld() {
         super(WORLD_WIDTH, WORLD_HEIGHT, 1); // Creates a world of size 800x600 with 1x cell size
-        setBackgroundImage("background.png"); // Sets the background image 
+        setBackgroundImage("assets/images/background.png"); // Sets the background image
           // Creates a new ball object at position 300,500
         addObject(new Paddle(), 300,500); // Adds the paddle to bat the ball
         addObject(new Ball(400,450), 400, 450); // Adds the ball to the world

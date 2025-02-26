@@ -3,7 +3,7 @@ import ActiverseEngine.*;
 
 public class Brick extends Actor {
     public Brick() {
-        setImage(new ActiverseImage("brick.png"));
+        setImage(new ActiverseImage("assets/images/brick.png"));
     }
 
     @Override 
