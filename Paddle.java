@@ -7,7 +7,7 @@ import ActiverseEngine.*;
 public class Paddle extends Actor{
     // Constructor for Paddle object with image type paddle.png and height of 10
     public Paddle(){
-        setImage(new ActiverseImage("paddle.png"));
+        setImage(new ActiverseImage("assets/images/paddle.png"));
         setHeight(10);
     }
 

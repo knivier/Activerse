@@ -7,14 +7,14 @@ public class Ball extends Actor {
     private final int diameter = 20;
     private int xSpeed = 2, ySpeed = -2;
     private boolean initialMove = true;
-    public ActiverseSound bounce = new ActiverseSound("bounce.wav");
-    public ActiverseSound boom = new ActiverseSound("explosion.wav");
+    public ActiverseSound bounce = new ActiverseSound("assets/audio/bounce.wav");
+    public ActiverseSound boom = new ActiverseSound("assets/audio/explosion.wav");
 
     public Ball(int x, int y) {
         this.x = x;
         this.y = y;
         setLocation(x, y); // Set initial position
-        setImage(new ActiverseImage("ball.png"));
+        setImage(new ActiverseImage("assets/images/ball.png"));
         boom.setVolume(0.8f);
         bounce.setVolume(0.75f);
     }
