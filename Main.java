@@ -9,9 +9,10 @@ import ActiverseEngine.Activerse;
 public class Main {
     
     /** 
-     * @param args
+     * @param args console arguments, none are valid, all are not
      */
     public static void main(String[] args) {
-        Activerse.start(new BreakoutWorld()); // Starts breakout
+        System.out.println(1.0/0.0 * 2);
+        //Activerse.start(new BreakoutWorld()); // Starts breakout
     }
 }
