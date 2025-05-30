@@ -32,25 +32,13 @@ Reading this file is just the beginning! For more detailed guidance, examples, a
 - **[Activerse GitHub Wiki](https://github.com/Knivier/Activerse/wiki)**: Contains comprehensive tutorials, code examples, and a deep dive into all engine functionalities.
 - **[Official Activerse Website](https://knivier.github.io/KnivierWeb/activerseinfo.html)**: Visit the website for additional information, updates, and community support.
 - **[v1.1.2 Profile Research](https://github.com/user-attachments/files/16165118/Research.Notes.for.v1.1.2.Optimizations.pdf)**: Contains the profiling and research information of v1.1.2 with provided explanations and evidence.
-- **[Activerse Examplers](https://github.com/knivier/Activerse-Examplers)**: Example games created by the Activerse team usually meant to give you inspiration, show you how the game works, or provide testing to a new version.
+- **Game Examples**: As of v1.3.3, examples of games created in Activerse are now stored in the "Examples" folder. These have their own engine components, so it's best to CD into the project and start up a directory in that for the least confusion. The Activerse Exemplers GitHub has been removed.
 
 > **⚠️ WARNING**  
 > Always use the latest version of Activerse to prevent bugs and avoid compatibility issues. Running outdated versions may result in unexpected behavior or crashes.
 
 > **💡 IMPORTANT**  
-> When starting the engine, always run `Main.java` and ensure all debugging modes are initialized to **off**.
-
-## 📝 License
-
-**Activerse © 2025 by Knivier / Agniva** is licensed under **[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)**.
-Well, what does this mean for you?
-
-- **Attribution**: You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
-- **NonCommercial**: You may not use the material for commercial purposes.
-- **ShareAlike**: If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
-- **No additional restrictions**: You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
-- **Disclaimer of Warranties and Limitation of Liability**: The material is provided "as-is" without warranties of any kind, and the licensor is not liable for any damages arising from its use.
----
+> When starting the engine, always run `Main.java`.
 
 ## Error handling
 
@@ -81,3 +69,15 @@ Keywords that may be helpful
 - CONNTO - A connecting line of code that connects class to class that may cause errors in each
 
 Happy coding, and enjoy bringing your creations to life with Activerse!
+
+## 📝 License
+
+**Activerse © 2025 by Knivier / Agniva** is licensed under **[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)**.
+Well, what does this mean for you?
+
+- **Attribution**: You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+- **NonCommercial**: You may not use the material for commercial purposes.
+- **ShareAlike**: If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
+- **No additional restrictions**: You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+- **Disclaimer of Warranties and Limitation of Liability**: The material is provided "as-is" without warranties of any kind, and the licensor is not liable for any damages arising from its use.
+---
