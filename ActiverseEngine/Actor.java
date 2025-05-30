@@ -1,5 +1,4 @@
 package ActiverseEngine;
-
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
@@ -9,12 +8,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Set;
-
 /**
  * The base class for all actors in the world.
  * 
  * @author Knivier
- * @version 1.3.2
+ * @version 1.3.3
  */
 public abstract class Actor {
     protected double direction; 
@@ -24,11 +22,121 @@ public abstract class Actor {
     private double velocityX, velocityY;
     private int height; 
     private int width; 
-
+    private List<Item> inventory; // List of items the actor can hold
+    private int maxInventory = 10000; // Maximum number of items the actor can hold
     /**
      * Performs the actor's action.
      */
     public abstract void act();
+    
+    /**
+     * Enables inventory for the actor. By default, it is disabled.
+     */
+    public void enableInventory() {
+        if (inventory == null) inventory = new java.util.ArrayList<>();
+        else System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: enableInventory() - ACEHS Error thrown; inventory is already enabled.");
+    }
+
+    /**
+     * Disables the actor's inventory.
+     * Clears the inventory list and sets it to null.
+     */
+    public void disableInventory() {
+        if (inventory != null) {
+            inventory.clear();
+            inventory = null;
+        } else {
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: disableInventory() - ACEHS Error thrown; inventory is already disabled.");
+        }
+    }
+
+    /**
+     * Checks if the actor has an inventory.
+     *
+     * @return true if the actor has an inventory, false otherwise.
+     */
+    public void setInventorySize(int size) {
+        if (inventory == null) {
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: setInventorySize(int size) - ACEHS Error thrown; inventory is not enabled.");
+            return;
+        }
+        if (size < 0) {
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: setInventorySize(int size) - ACEHS Error thrown; size cannot be negative.");
+            return;
+        }
+        maxInventory = size;
+    }
+
+    /**
+     * Gets the maximum size of the actor's inventory.
+     *
+     * @return The maximum size of the inventory.
+     */
+    public int getInventorySize() {
+        if (inventory == null) {
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: getInventorySize() - ACEHS Error thrown; inventory is not enabled.");
+            return 0;
+        }
+        return inventory.size();
+    }
+
+    /**
+     * Checks if the actor has an inventory.
+     *
+     * @return true if the actor has an inventory, false otherwise.
+     */
+    public boolean hasInventory() {
+        return inventory != null;
+    }
+
+    /**
+     * Adds an item to the actor's inventory.
+     *
+     * @param item The item to add to the inventory.
+     */
+    public boolean addItem(Item item) {
+        if (inventory == null) {
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: addItem(Item item) - ACEHS Error thrown; inventory is not enabled.");
+            return false;
+        }
+        if (inventory.size() < maxInventory) { // Assuming a maximum of 10 items
+            inventory.add(item);
+            return true;
+        } else {
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: addItem(Item item) - ACEHS Error thrown; inventory is full.");
+            return false;
+        }
+    }
+
+    /**
+     * Removes an item from the actor's inventory.
+     *
+     * @param item The item to remove from the inventory.
+     */
+    public void removeItem(Item item) {
+        if (inventory == null) {
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: removeItem(Item item) - ACEHS Error thrown; inventory is not enabled.");
+            return;
+        }
+        if (inventory.contains(item)) {
+            inventory.remove(item);
+        } else {
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: removeItem(Item item) - ACEHS Error thrown; item not found in inventory.");
+        }
+    }
+
+    /**
+     * Gets the inventory of the actor.
+     *
+     * @return The list of items in the actor's inventory, or null if inventory is not enabled.
+     */
+    public List<Item> getInventory() {
+        if (inventory == null) {
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: getInventory() - ACEHS Error thrown; inventory is not enabled.");
+            return null;
+        }
+        return inventory;
+    }
 
     /**
      * Sets the location of the actor.
