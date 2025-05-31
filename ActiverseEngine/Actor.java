@@ -10,7 +10,7 @@ import java.util.List;
  * The base class for all actors in the world.
  *
  * @author Knivier
- * @version 1.3.3
+ * @version 1.4.0
  */
 public abstract class Actor {
     protected double direction;
@@ -24,14 +24,26 @@ public abstract class Actor {
     private int maxInventory = 10000; // Maximum number of items the actor can hold
     private boolean isStatic = false; // Whether the actor is static or not
     
+    /**
+     * Returns the state of the actor on whether it is static or not.
+     * A static actor does not move and is not affected by gravity.
+     * It will not be updated in the debug menus
+     * @return boolean indicating if the actor is static
+     */
     public boolean isStatic() {
         return isStatic;
     }
 
+    /**
+     * Sets the state of the actor to static or not.
+     * @param isStatic
+     * @return boolean indicating if the state was successfully set
+     */
     public boolean setStatic(boolean isStatic) {
         this.isStatic = isStatic;
         return true;
     }
+
     /**
      * Performs the actor's action.
      */

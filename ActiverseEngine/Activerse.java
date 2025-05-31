@@ -8,7 +8,7 @@ import javax.swing.*;
  * This class contains static methods to manage the application lifecycle.
  *
  * @author Knivier
- * @version 1.3.2
+ * @version 1.4.0
  */
 public class Activerse {
     private static World currentWorld;
@@ -35,7 +35,8 @@ public class Activerse {
                 frame.getContentPane().add(currentWorld, BorderLayout.CENTER);
                 frame.pack();
                 frame.setVisible(true);
-                frame.setResizable(false);
+                frame.setResizable(false); // Prevent resizing of the window
+                frame.setLocationRelativeTo(null); // Center the window on the screen
                 currentWorld.start(); // Start the world
             } catch (HeadlessException | IllegalArgumentException e) {
                 System.out.println("1A.IO:(LN: SwingUtilities.invokeLater caught Exception at Activerse.start()) - ACEHS Error fetched and thrown; a specific error occurred. Please see the stack trace for more information. Contact ActiverseEngine support for bugs.");
