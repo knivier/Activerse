@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Represents a highly parallelized game loop maximizing CPU usage while maintaining stability.
  * Threads are split across update/render responsibilities with precise frame pacing.
  * @author Knivier
- * @version 1.5.0
+ * @version 1.4.0
  */
 public class GameLoop implements Runnable {
     private final World world;
@@ -36,6 +36,12 @@ public class GameLoop implements Runnable {
         lastFpsTime = System.nanoTime();
     }
 
+    /**
+     * Loads properties from Activerse.properties file.
+     * This file should be located in the classpath.
+     * If the file is not found or an error occurs,
+     * default values are used:
+     */
     private void loadProperties() {
         Properties props = new Properties();
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("Activerse.properties")) {
@@ -55,6 +61,10 @@ public class GameLoop implements Runnable {
         }
     }
 
+    /**
+     * Starts the game loop on separate threads for update and render.
+     * This method initializes the threads and begins the game loop.
+     */
     public void start() {
         if (running.get()) return;
 
@@ -68,6 +78,10 @@ public class GameLoop implements Runnable {
         System.out.println("[Activerse] Game loop started on multiple threads.");
     }
 
+    /**
+     * Stops the game loop and waits for threads to finish.
+     * This method safely terminates the update and render threads,
+     */
     public void stop() {
         running.set(false);
         try {
@@ -79,6 +93,11 @@ public class GameLoop implements Runnable {
         System.out.println("[Activerse] Game loop stopped.");
     }
 
+    /**
+     * Main update loop that runs at a fixed frame rate.
+     * This method processes game updates at the target FPS,
+     * ensuring smooth game state updates without blocking rendering.
+     */
     private void updateLoop() {
         long lastTime = System.nanoTime();
         double delta = 0;
@@ -101,6 +120,11 @@ public class GameLoop implements Runnable {
         }
     }
 
+    /**
+     * Main render loop that runs at a fixed frame rate.
+     * This method handles rendering the game world at the target FPS,
+     * ensuring smooth visual updates without blocking game logic.
+     */
     private void renderLoop() {
         while (running.get()) {
             long start = System.nanoTime();
@@ -125,7 +149,11 @@ public class GameLoop implements Runnable {
             }
         }
     }
-
+    /**
+     * Calculates and updates the frames per second (FPS) based on the elapsed time.
+     * This method is called periodically to update the FPS value in the World class.
+     * @param now the current time in nanoseconds
+     */
     private void calculateFPS(long now) {
         if (now - lastFpsTime >= 1_000_000_000L) {
             World.setFPS(frames);
@@ -151,10 +179,19 @@ public class GameLoop implements Runnable {
         start();
     }
 
+    /**
+     * Returns the target frames per second (FPS) for the game loop.
+     * This value is loaded from the properties file or defaults to 60 FPS.
+     * @return the target FPS
+     */
     public long getTargetFps() {
         return TARGET_FPS;
     }
-
+    /**
+     * Returns whether dynamic lighting is enabled in the game loop.
+     * This value is loaded from the properties file or defaults to false.
+     * @return true if dynamic lighting is enabled, false otherwise
+     */
     public boolean isDynamicLighting() {
         return dynamicLighting;
     }
