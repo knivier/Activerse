@@ -14,9 +14,9 @@ import java.util.Properties;
 
 /**
  * MemoryTracker class is used to track memory usage of the game along with other statistics
+ *
  * @author Knivier
  * @version 1.3.2
- * 
  */
 public class MemoryTracker {
     private long lastTime;
@@ -36,9 +36,10 @@ public class MemoryTracker {
         lastMemoryUsed = getMemoryUsed();
     }
 
-    
-    /** 
+
+    /**
      * Returns FPS target
+     *
      * @return int FPStarget
      */
     public int getTargetFPS() {
@@ -63,9 +64,10 @@ public class MemoryTracker {
         }
     }
 
-    
-    /** 
+
+    /**
      * Returns the memory used
+     *
      * @return long
      */
     private long getMemoryUsed() {
@@ -73,9 +75,10 @@ public class MemoryTracker {
         return runtime.totalMemory() - runtime.freeMemory();
     }
 
-    
-    /** 
+
+    /**
      * Returns the memory heap usage
+     *
      * @return MemoryUsage obj
      */
     private MemoryUsage getHeapMemoryUsage() {
@@ -83,9 +86,10 @@ public class MemoryTracker {
         return memoryMXBean.getHeapMemoryUsage();
     }
 
-    
-    /** 
+
+    /**
      * Returns the non heap memory usage
+     *
      * @return MemoryUsage
      */
     private MemoryUsage getNonHeapMemoryUsage() {
@@ -95,6 +99,7 @@ public class MemoryTracker {
 
     /**
      * Returns the garbage collection time
+     *
      * @return long garbage collection time
      */
     private long getGarbageCollectionTime() {
@@ -108,6 +113,7 @@ public class MemoryTracker {
 
     /**
      * Updates the memory usage statistics and writes them to a file if logging is enabled.
+     *
      * @see #writeMemoryUsageToFile()
      */
     public void update() {
@@ -126,6 +132,7 @@ public class MemoryTracker {
 
     /**
      * Returns the memory usage per second in a formatted string.
+     *
      * @return String
      */
     public String getMemoryUsagePerSecond() {
@@ -134,6 +141,7 @@ public class MemoryTracker {
 
     /**
      * Writes the memory usage statistics in the logs.log file along with other statistics.
+     *
      * @throws IOException if an I/O error occurs (file writer)
      * @see #getHeapMemoryUsage()
      * @see #getNonHeapMemoryUsage()

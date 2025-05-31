@@ -3,6 +3,7 @@ package ActiverseEngine;
 /**
  * Represents an item in the Activerse game engine.
  * Each item has a name, type, and value.
+ *
  * @author Knivier
  * @version 1.4.0
  */
@@ -13,8 +14,9 @@ public abstract class Item {
 
     /**
      * Constructor for items inside an inventory. All inventory items must go under the Item class
-     * @param name The name of the item
-     * @param type The classification you give the item (ex: heal etc)
+     *
+     * @param name  The name of the item
+     * @param type  The classification you give the item (ex: heal etc)
      * @param value The value you give (strength, modifier, etc)
      */
     public Item(String name, String type, int value) {
@@ -25,6 +27,7 @@ public abstract class Item {
 
     /**
      * Returns the name of the item
+     *
      * @return String item name
      */
     public String getName() {
@@ -33,6 +36,7 @@ public abstract class Item {
 
     /**
      * For implementation
+     *
      * @return String type of item
      */
     public String getType() {
@@ -41,6 +45,7 @@ public abstract class Item {
 
     /**
      * Returns the value as signed and serialized of type item
+     *
      * @return Value none defined
      */
     public int getValue() {

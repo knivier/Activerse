@@ -1,13 +1,13 @@
 package ActiverseEngine;
 
+import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
-import javax.sound.sampled.*;
 
 /**
  * Represents a sound player for playing audio files.
  * This class provides methods to load, play, stop, and manage the volume of audio files.
- * 
+ *
  * @version 1.3.2
  */
 public class ActiverseSound {
@@ -76,20 +76,6 @@ public class ActiverseSound {
     }
 
     /**
-     * Sets the volume of the audio file.
-     *
-     * @param volume The volume level to set (range: 0.0 to 1.0).
-     */
-    public void setVolume(float volume) {
-        if (volumeControl != null) {
-            float min = volumeControl.getMinimum();
-            float max = volumeControl.getMaximum();
-            float newVolume = min + (max - min) * volume;
-            volumeControl.setValue(newVolume);
-        }
-    }
-
-    /**
      * Gets the current volume of the audio file.
      *
      * @return The current volume level (range: 0.0 to 1.0).
@@ -102,5 +88,19 @@ public class ActiverseSound {
             return volume;
         }
         return 0.0f;
+    }
+
+    /**
+     * Sets the volume of the audio file.
+     *
+     * @param volume The volume level to set (range: 0.0 to 1.0).
+     */
+    public void setVolume(float volume) {
+        if (volumeControl != null) {
+            float min = volumeControl.getMinimum();
+            float max = volumeControl.getMaximum();
+            float newVolume = min + (max - min) * volume;
+            volumeControl.setValue(newVolume);
+        }
     }
 }

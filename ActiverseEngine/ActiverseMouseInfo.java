@@ -1,15 +1,15 @@
 package ActiverseEngine;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import javax.swing.*;
 
 /**
  * Provides utility methods to retrieve information about the mouse pointer location
  * and detect mouse clicks.
- * 
- * @author Knivier 
+ *
+ * @author Knivier
  * @version 1.3.2
  */
 public class ActiverseMouseInfo implements MouseListener {
@@ -17,23 +17,15 @@ public class ActiverseMouseInfo implements MouseListener {
     private static boolean rightClick = false;
 
     /**
-     * @param component
-     * Constructor for the ActiverseMouseInfo class.
+     * @param component Constructor for the ActiverseMouseInfo class.
      */
     private ActiverseMouseInfo(Component component) {
         addMouseListenerToComponent(component);
     }
-    
-    /**
-     * @param component
-     * Adds a mouse listener to the specified component.
-     */
-    private void addMouseListenerToComponent(Component component) {
-        component.addMouseListener(this);
-    }
 
     /**
      * Creates a new instance of the ActiverseMouseInfo class with the specified component.
+     *
      * @param component Core component
      * @return Returns the instance of the current mouse info
      */
@@ -70,9 +62,16 @@ public class ActiverseMouseInfo implements MouseListener {
         return rightClick;
     }
 
-    
-    /** 
+    /**
+     * @param component Adds a mouse listener to the specified component.
+     */
+    private void addMouseListenerToComponent(Component component) {
+        component.addMouseListener(this);
+    }
+
+    /**
      * Not in use method (built on in the future)
+     *
      * @param e Mouse event
      */
     @Override
@@ -80,9 +79,10 @@ public class ActiverseMouseInfo implements MouseListener {
         // Not used
     }
 
-    
-    /** 
+
+    /**
      * Detects if a mouse button is pressed.
+     *
      * @param e The event if a mouse is pressed
      */
     @Override
@@ -94,10 +94,11 @@ public class ActiverseMouseInfo implements MouseListener {
         }
     }
 
-    
+
     /**
      * Detects if a mouse button is released.
-     * Limitations for this method are greater than mousePressed 
+     * Limitations for this method are greater than mousePressed
+     *
      * @param e The event when mouse is released
      */
     @Override
@@ -109,9 +110,10 @@ public class ActiverseMouseInfo implements MouseListener {
         }
     }
 
-    
-    /** 
+
+    /**
      * To be built in the future
+     *
      * @param e Mouse Event, later implementated
      */
     @Override
