@@ -18,24 +18,40 @@ import javax.swing.*;
  * This class extends JPanel and implements ActionListener, KeyListener.
  * The world has a fixed size and a black border, and can display a background image.
  * @author Knivier
- * @version 1.3.2
+ * @version 1.4.0
  */
 public class World extends JPanel implements ActionListener, KeyListener {
+    /** Frames per second for the world update/render loop */
     private static int fps;
+    /** Fixed pixel width of the world */
     private final int fixedWidth;
+    /** Fixed pixel height of the world */
     private final int fixedHeight;
+    /** Timer for scheduling world updates */
     private final Timer timer;
+    /** List of all actors currently in the world */
     private final List<Actor> actors;
+    /** List of paths to loaded images in the world */
     private final List<String> loadedImages;
+    /** List of sounds currently managed by the world */
     private final List<ActiverseSound> sounds;
+    /** Tracks memory usage and performance statistics */
     private final MemoryTracker memoryTracker;
+    /** The background image displayed in the world */
     private Image backgroundImage;
+    /** Text to display on the world (if any) */
     private String displayText;
+    /** X-coordinate for displaying text */
     private int textX;
+    /** Y-coordinate for displaying text */
     private int textY;
+    /** Button to toggle debug mode */
     private JButton debugButton;
+    /** Whether debug mode is currently enabled */
     private boolean debugMode = false;
+    /** Whether dynamic lighting is enabled */
     private boolean dynamicLighting = false;
+    /** Number of update ticks completed since world start */
     private static int ticksDone = 0;
     
 
@@ -51,9 +67,6 @@ public class World extends JPanel implements ActionListener, KeyListener {
      * @param width The width of the world in cells.
      * @param height The height of the world in cells.
      * @param cellSize The size of each cell in pixels.
-     * @return none valid
-     * @throws none
-     * @see Actor
      */
     public World(int width, int height, int cellSize) {
         this.fixedWidth = width * cellSize;
@@ -107,7 +120,8 @@ public class World extends JPanel implements ActionListener, KeyListener {
     }
 
     
-    /** 
+    /**
+     * Returns targeting FPS
      * @return int
      */
     public static int getFPS() {
@@ -115,7 +129,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
     }
     
     /** 
-     * @param fpsValue
+     * @param fpsValue Targeted FPS value
      */
     public static void setFPS(int fpsValue) {
         fps = fpsValue;
@@ -123,7 +137,6 @@ public class World extends JPanel implements ActionListener, KeyListener {
     
     /**
      * Sets default FPS value for Activerse (60)
-     * @return None valid
      */
 
      public static void defaultFPS(){
@@ -152,7 +165,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
     
     /** 
      * Sets background image of world subclasses
-     * @param imagePath
+     * @param imagePath Relative path for image to load as background image
      */
     public void setBackgroundImage(String imagePath) {
         backgroundImage = Toolkit.getDefaultToolkit().getImage(imagePath);
@@ -253,6 +266,10 @@ public class World extends JPanel implements ActionListener, KeyListener {
         this.displayText = text;
     }
 
+    /**
+     * Gets ticks done in the engine
+     * @return int Ticks done
+     */
     public static int getTicksDone() {
         return ticksDone;
     }
@@ -362,7 +379,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
      * @param y1
      * @param x2
      * @param y2
-     * @return
+     * @return int Distance between two points as an Activerse unit relative
      */
     private float calculateDistance(int x1, int y1, int x2, int y2) {
         return (float) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
