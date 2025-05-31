@@ -14,7 +14,7 @@ import java.util.Properties;
 
 /**
  * MemoryTracker class is used to track memory usage of the game along with other statistics
- * @Author: Knivier
+ * @author Knivier
  * @version 1.3.2
  * 
  */
@@ -29,8 +29,6 @@ public class MemoryTracker {
 
     /**
      * Constructor for MemoryTracker class
-     * @return none valid
-     * @throws none
      */
     public MemoryTracker() {
         loadProperties();
@@ -49,7 +47,6 @@ public class MemoryTracker {
 
     /**
      * Loads properties from the Activerse.properties file.
-     * @return none valid
      */
     private void loadProperties() {
         Properties props = new Properties();
@@ -80,7 +77,6 @@ public class MemoryTracker {
     /** 
      * Returns the memory heap usage
      * @return MemoryUsage obj
-     * @throws none
      */
     private MemoryUsage getHeapMemoryUsage() {
         MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
@@ -112,8 +108,6 @@ public class MemoryTracker {
 
     /**
      * Updates the memory usage statistics and writes them to a file if logging is enabled.
-     * @return none valid
-     * @throws none
      * @see #writeMemoryUsageToFile()
      */
     public void update() {
@@ -140,7 +134,6 @@ public class MemoryTracker {
 
     /**
      * Writes the memory usage statistics in the logs.log file along with other statistics.
-     * @return none valid
      * @throws IOException if an I/O error occurs (file writer)
      * @see #getHeapMemoryUsage()
      * @see #getNonHeapMemoryUsage()

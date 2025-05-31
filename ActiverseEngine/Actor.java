@@ -51,9 +51,8 @@ public abstract class Actor {
     }
 
     /**
-     * Checks if the actor has an inventory.
-     *
-     * @return true if the actor has an inventory, false otherwise.
+     * Sets the inventory size
+     * @param size the maximum inventory size (maximum number of type Item)
      */
     public void setInventorySize(int size) {
         if (inventory == null) {
@@ -93,6 +92,7 @@ public abstract class Actor {
      * Adds an item to the actor's inventory.
      *
      * @param item The item to add to the inventory.
+     * @return Boolean the success of adding the item
      */
     public boolean addItem(Item item) {
         if (inventory == null) {
@@ -184,6 +184,11 @@ public abstract class Actor {
     public void setY(int y) {
         this.y = y;
     }
+
+    /**
+     *  Returns the width of the Actor
+     * @return int Actor width in Activerse Unit (relative)
+     */
     public int getWidth() {
         return width;
     }
@@ -399,7 +404,6 @@ public abstract class Actor {
 
     /**
      * Gets the direction of the actor.
-     * @author Knivier
      * @param other The actor to follow
      * @param x The number of iterations to follow the actor (seconds)
      */

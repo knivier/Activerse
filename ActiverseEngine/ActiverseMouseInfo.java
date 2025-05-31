@@ -34,8 +34,8 @@ public class ActiverseMouseInfo implements MouseListener {
 
     /**
      * Creates a new instance of the ActiverseMouseInfo class with the specified component.
-     * @param component
-     * @return
+     * @param component Core component
+     * @return Returns the instance of the current mouse info
      */
     public static ActiverseMouseInfo createInstance(Component component) {
         ActiverseMouseInfo instance = new ActiverseMouseInfo(component);
@@ -73,7 +73,7 @@ public class ActiverseMouseInfo implements MouseListener {
     
     /** 
      * Not in use method (built on in the future)
-     * @param e
+     * @param e Mouse event
      */
     @Override
     public void mouseClicked(MouseEvent e) {
@@ -83,7 +83,7 @@ public class ActiverseMouseInfo implements MouseListener {
     
     /** 
      * Detects if a mouse button is pressed.
-     * @param e
+     * @param e The event if a mouse is pressed
      */
     @Override
     public void mousePressed(MouseEvent e) {
@@ -98,7 +98,7 @@ public class ActiverseMouseInfo implements MouseListener {
     /**
      * Detects if a mouse button is released.
      * Limitations for this method are greater than mousePressed 
-     * @param e
+     * @param e The event when mouse is released
      */
     @Override
     public void mouseReleased(MouseEvent e) {
@@ -112,7 +112,7 @@ public class ActiverseMouseInfo implements MouseListener {
     
     /** 
      * To be built in the future
-     * @param e
+     * @param e Mouse Event, later implementated
      */
     @Override
     public void mouseEntered(MouseEvent e) {
