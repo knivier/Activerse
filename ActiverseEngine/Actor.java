@@ -22,7 +22,16 @@ public abstract class Actor {
     private int width;
     private List<Item> inventory; // List of items the actor can hold
     private int maxInventory = 10000; // Maximum number of items the actor can hold
+    private boolean isStatic = false; // Whether the actor is static or not
+    
+    public boolean isStatic() {
+        return isStatic;
+    }
 
+    public boolean setStatic(boolean isStatic) {
+        this.isStatic = isStatic;
+        return true;
+    }
     /**
      * Performs the actor's action.
      */
