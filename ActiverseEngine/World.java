@@ -1,5 +1,6 @@
 package ActiverseEngine;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,7 +12,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
-import javax.swing.*;
 
 /**
  * Represents the world where actors interact.
@@ -89,7 +89,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
     private long lastFrameTime = System.currentTimeMillis();
     private int frameCount = 0;
-private int actualFPS = 0;
+    private int actualFPS = 0;
 
     /**
      * Constructor for the World class.
@@ -358,12 +358,12 @@ private int actualFPS = 0;
         }
 
         frameCount++;
-long currentTime = System.currentTimeMillis();
-if (currentTime - lastFrameTime >= 1000) {
-    actualFPS = frameCount;
-    frameCount = 0;
-    lastFrameTime = currentTime;
-}
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastFrameTime >= 1000) {
+            actualFPS = frameCount;
+            frameCount = 0;
+            lastFrameTime = currentTime;
+        }
 
     }
 
@@ -456,8 +456,8 @@ if (currentTime - lastFrameTime >= 1000) {
         g.setColor(Color.BLACK);
         int y = 50;
 
-g.drawString("FPS: " + actualFPS, 10, y);
-y += 15;
+        g.drawString("FPS: " + actualFPS, 10, y);
+        y += 15;
         y += 20;
         g.drawString(" Ticks: " + ticksDone, 10, 60);
 
@@ -466,11 +466,11 @@ y += 15;
 
         for (Actor actor : actors) {
             if (!actor.isStatic()) {
-            String info = String.format("Actor at (%d, %d)", actor.getX(), actor.getY());
-            boolean isColliding = checkCollision(actor);
-            info += isColliding ? " - Collides" : " - Not colliding";
-            g.drawString(info, 10, y);
-            y += 20;
+                String info = String.format("Actor at (%d, %d)", actor.getX(), actor.getY());
+                boolean isColliding = checkCollision(actor);
+                info += isColliding ? " - Collides" : " - Not colliding";
+                g.drawString(info, 10, y);
+                y += 20;
             }
         }
 

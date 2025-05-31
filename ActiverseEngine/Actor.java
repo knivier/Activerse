@@ -23,11 +23,12 @@ public abstract class Actor {
     private List<Item> inventory; // List of items the actor can hold
     private int maxInventory = 10000; // Maximum number of items the actor can hold
     private boolean isStatic = false; // Whether the actor is static or not
-    
+
     /**
      * Returns the state of the actor on whether it is static or not.
      * A static actor does not move and is not affected by gravity.
      * It will not be updated in the debug menus
+     *
      * @return boolean indicating if the actor is static
      */
     public boolean isStatic() {
@@ -36,6 +37,7 @@ public abstract class Actor {
 
     /**
      * Sets the state of the actor to static or not.
+     *
      * @param isStatic
      * @return boolean indicating if the state was successfully set
      */
