@@ -1,7 +1,7 @@
 package ActiverseEngine;
 
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 /**
  * Provides utility methods to start and stop the Activerse application.
@@ -35,6 +35,7 @@ public class Activerse {
                 frame.getContentPane().add(currentWorld, BorderLayout.CENTER);
                 frame.pack();
                 frame.setVisible(true);
+                frame.setResizable(false);
                 currentWorld.start(); // Start the world
             } catch (HeadlessException | IllegalArgumentException e) {
                 System.out.println("1A.IO:(LN: SwingUtilities.invokeLater caught Exception at Activerse.start()) - ACEHS Error fetched and thrown; a specific error occurred. Please see the stack trace for more information. Contact ActiverseEngine support for bugs.");
