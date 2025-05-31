@@ -68,6 +68,8 @@ Keywords that may be helpful
 - DEV - Contact Dev's; this is not a good error
 - CONNTO - A connecting line of code that connects class to class that may cause errors in each
 
+ACEHS can continue running your game even with errors. However, there are certain fatal errors that will be crashed. If you don't care about possible headaches, you can find the ACEHS line and convert the catch expression to instead continue execution. 
+
 Happy coding, and enjoy bringing your creations to life with Activerse!
 
 ## 📝 License

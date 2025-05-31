@@ -1,6 +1,5 @@
 package ActiverseEngine;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,6 +11,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.swing.*;
 
 /**
  * Represents the world where actors interact.
@@ -474,9 +474,29 @@ public class World extends JPanel implements ActionListener, KeyListener {
             }
         }
 
-        StringBuilder imagesInfo = new StringBuilder("Loaded Images: ");
+        // Count occurrences of each image file
+        java.util.Map<String, Integer> imageCountMap = new java.util.LinkedHashMap<>();
         for (String imagePath : loadedImages) {
-            imagesInfo.append(imagePath).append(" ");
+            String fileName = imagePath.substring(imagePath.lastIndexOf('/') + 1);
+            imageCountMap.put(fileName, imageCountMap.getOrDefault(fileName, 0) + 1);
+        }
+        StringBuilder imagesInfo = new StringBuilder("Loaded Images: ");
+        for (java.util.Map.Entry<String, Integer> entry : imageCountMap.entrySet()) {
+            String imageName = entry.getKey();
+            boolean exists = false;
+            // Check if the image resource exists in the classpath
+            if (getClass().getClassLoader().getResource(imageName) != null) {
+                exists = true; // py ahh formatting
+            }
+            imagesInfo.append(imageName);
+            if (!exists) {
+                imagesInfo.append("x MIA");
+                System.out.println("10A.IN:(LN: drawDebugInfo() - ACEHS Error thrown; an image file is missing from the classpath: " + imageName + ". Please ensure the image exists in the resources directory.");
+         }
+            if (entry.getValue() > 1) {
+            imagesInfo.append("x").append(entry.getValue());
+            }
+            imagesInfo.append(" ");
         }
         g.drawString(imagesInfo.toString(), 10, y);
 
