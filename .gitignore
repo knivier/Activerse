@@ -1,8 +1,11 @@
 dirt.png
 grass.png
 Main.java
-mainplayer.png
 Player.java
 SandBox.java
 stone.png
 Tile.java
+player.png
+out
+logs.log
+Activerse.properties
