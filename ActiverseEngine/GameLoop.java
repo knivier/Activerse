@@ -8,21 +8,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Represents a highly parallelized game loop maximizing CPU usage while maintaining stability.
  * Threads are split across update/render responsibilities with precise frame pacing.
+ *
  * @author Knivier
  * @version 1.4.0
  */
 public class GameLoop implements Runnable {
     private final World world;
-    private long TARGET_FPS;
     private final long FRAME_TIME_NANOS;
-
+    private final AtomicBoolean running = new AtomicBoolean(false);
+    private long TARGET_FPS;
     private volatile int frames;
     private volatile int updates;
     private long lastFpsTime;
-
     private boolean dynamicLighting;
-    private final AtomicBoolean running = new AtomicBoolean(false);
-
     private Thread updateThread;
     private Thread renderThread;
 
@@ -142,16 +140,19 @@ public class GameLoop implements Runnable {
             if (sleepTime > 0) {
                 try {
                     Thread.sleep(sleepTime / 1_000_000L, (int) (sleepTime % 1_000_000L));
-                } catch (InterruptedException ignored) {}
+                } catch (InterruptedException ignored) {
+                }
             } else {
                 // Frame overran; yield CPU briefly to avoid complete spin
                 Thread.yield();
             }
         }
     }
+
     /**
      * Calculates and updates the frames per second (FPS) based on the elapsed time.
      * This method is called periodically to update the FPS value in the World class.
+     *
      * @param now the current time in nanoseconds
      */
     private void calculateFPS(long now) {
@@ -182,14 +183,17 @@ public class GameLoop implements Runnable {
     /**
      * Returns the target frames per second (FPS) for the game loop.
      * This value is loaded from the properties file or defaults to 60 FPS.
+     *
      * @return the target FPS
      */
     public long getTargetFps() {
         return TARGET_FPS;
     }
+
     /**
      * Returns whether dynamic lighting is enabled in the game loop.
      * This value is loaded from the properties file or defaults to false.
+     *
      * @return true if dynamic lighting is enabled, false otherwise
      */
     public boolean isDynamicLighting() {
