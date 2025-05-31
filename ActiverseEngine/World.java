@@ -1,6 +1,5 @@
 package ActiverseEngine;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,6 +11,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.swing.*;
 
 /**
  * Represents the world where actors interact.
@@ -87,6 +87,9 @@ public class World extends JPanel implements ActionListener, KeyListener {
      */
     private boolean dynamicLighting = false;
 
+    private long lastFrameTime = System.currentTimeMillis();
+    private int frameCount = 0;
+private int actualFPS = 0;
 
     /**
      * Constructor for the World class.
@@ -353,6 +356,15 @@ public class World extends JPanel implements ActionListener, KeyListener {
         if (debugMode) {
             drawDebugInfo(g);
         }
+
+        frameCount++;
+long currentTime = System.currentTimeMillis();
+if (currentTime - lastFrameTime >= 1000) {
+    actualFPS = frameCount;
+    frameCount = 0;
+    lastFrameTime = currentTime;
+}
+
     }
 
     /**
@@ -444,7 +456,8 @@ public class World extends JPanel implements ActionListener, KeyListener {
         g.setColor(Color.BLACK);
         int y = 50;
 
-        g.drawString("FPS: " + fps + " @target " + memoryTracker.getTargetFPS(), 10, y);
+g.drawString("FPS: " + actualFPS, 10, y);
+y += 15;
         y += 20;
         g.drawString(" Ticks: " + ticksDone, 10, 60);
 
@@ -452,11 +465,13 @@ public class World extends JPanel implements ActionListener, KeyListener {
         y += 20;
 
         for (Actor actor : actors) {
+            if (!actor.isStatic()) {
             String info = String.format("Actor at (%d, %d)", actor.getX(), actor.getY());
             boolean isColliding = checkCollision(actor);
             info += isColliding ? " - Collides" : " - Not colliding";
             g.drawString(info, 10, y);
             y += 20;
+            }
         }
 
         StringBuilder imagesInfo = new StringBuilder("Loaded Images: ");
