@@ -72,8 +72,6 @@ public class GameLoop implements Runnable {
 
         updateThread.start();
         renderThread.start();
-
-        System.out.println("[Activerse] Game loop started on multiple threads.");
     }
 
     /**
