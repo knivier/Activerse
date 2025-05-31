@@ -403,6 +403,14 @@ public abstract class Actor {
     }
 
     /**
+     * Sets the width of the actor.
+     *
+     * @param width The width to set.
+     */
+    public void setWidth(int width) {
+        this.width = width;
+    }
+    /**
      * Gets the direction of the actor.
      * @param other The actor to follow
      * @param x The number of iterations to follow the actor (seconds)
