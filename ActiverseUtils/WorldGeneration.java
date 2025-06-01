@@ -29,6 +29,17 @@ public class WorldGeneration {
     protected final PerlinNoise perlin;
 
     /**
+     * ACESH error reporting utility.
+     * @param fileCode The file code (e.g., "1B" for ActorVector.java)
+     * @param errorType The error type (e.g., "LN", "IN", "OUT", etc.)
+     * @param method The method where the error occurred
+     * @param e The exception
+     */
+    private static void reportACESH(String fileCode, String errorType, String method, Exception e) {
+        System.out.println(fileCode + "." + errorType + "." + method + " :(LN: " + method + "() - ACESH Error thrown; " + e.getClass().getSimpleName() + ": " + e.getMessage() + ")");
+    }
+
+    /**
      * Constructs a world with the given dimensions using current time as seed.
      */
     public WorldGeneration(int width, int height) {
@@ -249,6 +260,9 @@ public class WorldGeneration {
     public void saveToFile(String path) throws IOException {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path))) {
             oos.writeObject(tileMap);
+        } catch (IOException e) {
+            reportACESH("6B", "OUT", "saveToFile", e);
+            throw e;
         }
     }
 
@@ -261,6 +275,9 @@ public class WorldGeneration {
             Tile[][] loaded = (Tile[][]) ois.readObject();
             for (int x = 0; x < width; x++)
                 if (height >= 0) System.arraycopy(loaded[x], 0, tileMap[x], 0, height);
+        } catch (IOException | ClassNotFoundException e) {
+            reportACESH("6B", "IN", "loadFromFile", e);
+            throw e;
         }
     }
 

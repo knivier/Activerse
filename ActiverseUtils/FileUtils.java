@@ -2,8 +2,8 @@ package ActiverseUtils;
 
 import java.io.*;
 import java.nio.file.*;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * FileUtils - A utility class for common file operations such as reading, writing, appending,
@@ -17,6 +17,17 @@ import java.util.ArrayList;
 public class FileUtils {
 
     /**
+     * ACESH error reporting utility.
+     * @param fileCode The file code (e.g., "1B" for ActorVector.java)
+     * @param errorType The error type (e.g., "LN", "IN", "OUT", etc.)
+     * @param method The method where the error occurred
+     * @param e The exception
+     */
+    private static void reportACESH(String fileCode, String errorType, String method, Exception e) {
+        System.out.println(fileCode + "." + errorType + "." + method + " :(LN: " + method + "() - ACESH Error thrown; " + e.getClass().getSimpleName() + ": " + e.getMessage() + ")");
+    }
+
+    /**
      * Writes a string content to a file, overwriting if it exists.
      *
      * @param filePath The path to the file to write.
@@ -28,7 +39,7 @@ public class FileUtils {
             writer.write(content);
             return true;
         } catch (IOException e) {
-            System.err.println("Error writing to file '" + filePath + "': " + e.getMessage());
+            reportACESH("2B", "OUT", "writeFile", e);
             return false;
         }
     }
@@ -46,7 +57,7 @@ public class FileUtils {
             writer.write(content);
             return true;
         } catch (IOException e) {
-            System.err.println("Error appending to file '" + filePath + "': " + e.getMessage());
+            reportACESH("2B", "OUT", "appendToFile", e);
             return false;
         }
     }
@@ -61,7 +72,7 @@ public class FileUtils {
         try {
             return Files.readAllLines(Paths.get(filePath));
         } catch (IOException e) {
-            System.err.println("Error reading lines from file '" + filePath + "': " + e.getMessage());
+            reportACESH("2B", "IN", "readAllLines", e);
             return new ArrayList<>();
         }
     }
@@ -76,7 +87,7 @@ public class FileUtils {
         try {
             return Files.readString(Paths.get(filePath));
         } catch (IOException e) {
-            System.err.println("Error reading file as string '" + filePath + "': " + e.getMessage());
+            reportACESH("2B", "IN", "readFileAsString", e);
             return "";
         }
     }
@@ -102,7 +113,7 @@ public class FileUtils {
             Files.createDirectories(Paths.get(dirPath));
             return true;
         } catch (IOException e) {
-            System.err.println("Error creating directories '" + dirPath + "': " + e.getMessage());
+            reportACESH("2B", "OUT", "createDirectories", e);
             return false;
         }
     }
@@ -117,7 +128,7 @@ public class FileUtils {
         try {
             return Files.deleteIfExists(Paths.get(filePath));
         } catch (IOException e) {
-            System.err.println("Error deleting file '" + filePath + "': " + e.getMessage());
+            reportACESH("2B", "OUT", "deleteFile", e);
             return false;
         }
     }
@@ -134,7 +145,7 @@ public class FileUtils {
             Files.copy(Paths.get(sourcePath), Paths.get(targetPath), StandardCopyOption.REPLACE_EXISTING);
             return true;
         } catch (IOException e) {
-            System.err.println("Error copying file from '" + sourcePath + "' to '" + targetPath + "': " + e.getMessage());
+            reportACESH("2B", "OUT", "copyFile", e);
             return false;
         }
     }
@@ -151,7 +162,7 @@ public class FileUtils {
             Files.move(Paths.get(sourcePath), Paths.get(targetPath), StandardCopyOption.REPLACE_EXISTING);
             return true;
         } catch (IOException e) {
-            System.err.println("Error moving file from '" + sourcePath + "' to '" + targetPath + "': " + e.getMessage());
+            reportACESH("2B", "OUT", "moveFile", e);
             return false;
         }
     }
@@ -169,7 +180,7 @@ public class FileUtils {
             Files.write(Paths.get(filePath), lines);
             return true;
         } catch (IOException e) {
-            System.err.println("Error saving lines to file '" + filePath + "': " + e.getMessage());
+            reportACESH("2B", "OUT", "saveLinesToFile", e);
             return false;
         }
     }
@@ -206,7 +217,7 @@ public class FileUtils {
         try (InputStream input = Files.newInputStream(Paths.get(filePath))) {
             props.load(input);
         } catch (IOException e) {
-            System.err.println("Error loading properties file '" + filePath + "': " + e.getMessage());
+            reportACESH("2B", "IN", "loadProperties", e);
         }
         return props;
     }
@@ -224,7 +235,7 @@ public class FileUtils {
             properties.store(output, comments);
             return true;
         } catch (IOException e) {
-            System.err.println("Error saving properties file '" + filePath + "': " + e.getMessage());
+            reportACESH("2B", "OUT", "saveProperties", e);
             return false;
         }
     }
