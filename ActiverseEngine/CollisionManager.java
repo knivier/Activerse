@@ -41,8 +41,8 @@ public class CollisionManager {
                 int by = y - b.getY();
 
                 if (ax < 0 || ay < 0 || bx < 0 || by < 0 ||
-                    ax >= imgA.getWidth() || ay >= imgA.getHeight() ||
-                    bx >= imgB.getWidth() || by >= imgB.getHeight()) {
+                        ax >= imgA.getWidth() || ay >= imgA.getHeight() ||
+                        bx >= imgB.getWidth() || by >= imgB.getHeight()) {
                     continue;
                 }
 

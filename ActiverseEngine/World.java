@@ -1,5 +1,6 @@
 package ActiverseEngine;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,7 +13,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
-import javax.swing.*;
 
 /**
  * Represents the world where actors interact.
@@ -367,6 +367,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
         }
 
     }
+
     /**
      * Applies dynamic lighting to the world.
      * Supports multiple light sources, flicker, color temperature, spotlights, and soft shadows.
@@ -388,9 +389,9 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
         // Example: dynamic, flickering, colored, and directional lights
         List<LightSource> lightSources = List.of(
-            new LightSource(fixedWidth / 2, fixedHeight / 2, Color.YELLOW, 300, 1.0f, true, 0f, (float) (2 * Math.PI), 4000f), // Flickering warm omni
-            new LightSource(fixedWidth / 3, fixedHeight / 3, Color.CYAN, 200, 0.7f, false, (float) (Math.PI / 4), (float) (Math.PI / 2), 8000f), // Cool spotlight
-            new LightSource(fixedWidth * 2 / 3, fixedHeight * 2 / 3, Color.MAGENTA, 250, 0.9f, false, (float) (Math.PI), (float) (Math.PI), 6500f) // Neutral semi-spot
+                new LightSource(fixedWidth / 2, fixedHeight / 2, Color.YELLOW, 300, 1.0f, true, 0f, (float) (2 * Math.PI), 4000f), // Flickering warm omni
+                new LightSource(fixedWidth / 3, fixedHeight / 3, Color.CYAN, 200, 0.7f, false, (float) (Math.PI / 4), (float) (Math.PI / 2), 8000f), // Cool spotlight
+                new LightSource(fixedWidth * 2 / 3, fixedHeight * 2 / 3, Color.MAGENTA, 250, 0.9f, false, (float) (Math.PI), (float) (Math.PI), 6500f) // Neutral semi-spot
         );
 
         // Update flicker and draw each light
@@ -411,8 +412,8 @@ public class World extends JPanel implements ActionListener, KeyListener {
                 Point2D center = new Point2D.Float(light.x, light.y);
                 float[] dist = {0f, 1f};
                 Color[] colors = {
-                    new Color(tempColor.getRed(), tempColor.getGreen(), tempColor.getBlue(), centerAlpha),
-                    new Color(0, 0, 0, 0)
+                        new Color(tempColor.getRed(), tempColor.getGreen(), tempColor.getBlue(), centerAlpha),
+                        new Color(0, 0, 0, 0)
                 };
                 RadialGradientPaint rgp = new RadialGradientPaint(center, light.radius, dist, colors);
                 gSpot.setPaint(rgp);
@@ -427,12 +428,12 @@ public class World extends JPanel implements ActionListener, KeyListener {
             } else {
                 // Omni light as radial gradient
                 RadialGradientPaint gradient = new RadialGradientPaint(
-                    new Point2D.Float(light.x, light.y), light.radius,
-                    new float[]{0f, 1f},
-                    new Color[]{
-                        new Color(tempColor.getRed(), tempColor.getGreen(), tempColor.getBlue(), centerAlpha),
-                        new Color(0, 0, 0, 0)
-                    }
+                        new Point2D.Float(light.x, light.y), light.radius,
+                        new float[]{0f, 1f},
+                        new Color[]{
+                                new Color(tempColor.getRed(), tempColor.getGreen(), tempColor.getBlue(), centerAlpha),
+                                new Color(0, 0, 0, 0)
+                        }
                 );
                 gLighting.setPaint(gradient);
                 gLighting.fillOval(light.x - light.radius, light.y - light.radius, light.radius * 2, light.radius * 2);
@@ -466,10 +467,10 @@ public class World extends JPanel implements ActionListener, KeyListener {
                     }
                     // Fade shadow with distance and alpha
                     GradientPaint shadowPaint = new GradientPaint(
-                        actorCenterX, actorCenterY, new Color(0, 0, 0, 80),
-                        actorCenterX + (int) (shadowLength * Math.cos(angle)),
-                        actorCenterY + (int) (shadowLength * Math.sin(angle)),
-                        new Color(0, 0, 0, 0)
+                            actorCenterX, actorCenterY, new Color(0, 0, 0, 80),
+                            actorCenterX + (int) (shadowLength * Math.cos(angle)),
+                            actorCenterY + (int) (shadowLength * Math.sin(angle)),
+                            new Color(0, 0, 0, 0)
                     );
                     gLighting.setPaint(shadowPaint);
                     gLighting.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f * light.intensity));
@@ -510,12 +511,12 @@ public class World extends JPanel implements ActionListener, KeyListener {
     }
 
     /**
-     * Calculates the distance between two points, based on the Euclidean distance formula. 
+     * Calculates the distance between two points, based on the Euclidean distance formula.
      * This method is useful for determining how far apart two points are in the world.
      * You're welcome to create your own distance calculation method, but this one is provided for convenience.
-     * Access via: `World.calculateDistance(int x1, int y1, int x2, int y2)`. 
+     * Access via: `World.calculateDistance(int x1, int y1, int x2, int y2)`.
      * If you do not have a set world, you can create a "empty" world with `new World(0, 0, 1)` and use this method.
-     * 
+     *
      * @param x1
      * @param y1
      * @param x2
@@ -566,18 +567,16 @@ public class World extends JPanel implements ActionListener, KeyListener {
         StringBuilder imagesInfo = new StringBuilder("Loaded Images: ");
         for (java.util.Map.Entry<String, Integer> entry : imageCountMap.entrySet()) {
             String imageName = entry.getKey();
-            boolean exists = false;
+            boolean exists = getClass().getClassLoader().getResource(imageName) != null;
             // Check if the image resource exists in the classpath
-            if (getClass().getClassLoader().getResource(imageName) != null) {
-                exists = true; // py ahh formatting
-            }
+            // py ahh formatting
             imagesInfo.append(imageName);
             if (!exists) {
                 imagesInfo.append("x MIA");
                 System.out.println("10A.IN.CONNTO.2A :(LN: drawDebugInfo() - ACEHS Error thrown; an image file is missing from the classpath: " + imageName + ". Please ensure the image exists in the resources directory.");
-         }
+            }
             if (entry.getValue() > 1) {
-            imagesInfo.append("x").append(entry.getValue());
+                imagesInfo.append("x").append(entry.getValue());
             }
             imagesInfo.append(" ");
         }

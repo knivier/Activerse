@@ -8,6 +8,7 @@ import java.util.Random;
  * 1D, 2D, and 3D Perlin noise with support for fractal octave noise.
  * <p>
  * Based on Ken Perlin's original algorithm.
+ *
  * @author Knivier
  * @version 1.4.0
  */
@@ -17,7 +18,7 @@ public class PerlinNoise {
 
     /**
      * Constructs a new PerlinNoise generator with a given seed.
-     * 
+     *
      * @param seed Seed for the internal random number generator.
      */
     public PerlinNoise(long seed) {
@@ -95,13 +96,13 @@ public class PerlinNoise {
         int BB = p[B + 1] + Z;
 
         return lerp(w, lerp(v, lerp(u, grad(p[AA], x, y, z),
-                                       grad(p[BA], x - 1, y, z)),
-                               lerp(u, grad(p[AB], x, y - 1, z),
-                                       grad(p[BB], x - 1, y - 1, z))),
-                       lerp(v, lerp(u, grad(p[AA + 1], x, y, z - 1),
-                                       grad(p[BA + 1], x - 1, y, z - 1)),
-                               lerp(u, grad(p[AB + 1], x, y - 1, z - 1),
-                                       grad(p[BB + 1], x - 1, y - 1, z - 1))));
+                                grad(p[BA], x - 1, y, z)),
+                        lerp(u, grad(p[AB], x, y - 1, z),
+                                grad(p[BB], x - 1, y - 1, z))),
+                lerp(v, lerp(u, grad(p[AA + 1], x, y, z - 1),
+                                grad(p[BA + 1], x - 1, y, z - 1)),
+                        lerp(u, grad(p[AB + 1], x, y - 1, z - 1),
+                                grad(p[BB + 1], x - 1, y - 1, z - 1))));
     }
 
     // === Fractal noise with octaves ===
@@ -109,8 +110,8 @@ public class PerlinNoise {
     /**
      * Computes 1D fractal Perlin noise using multiple octaves.
      *
-     * @param x          Input coordinate.
-     * @param octaves    Number of layers of detail.
+     * @param x           Input coordinate.
+     * @param octaves     Number of layers of detail.
      * @param persistence Controls amplitude scaling between octaves.
      * @return Fractal noise value in the range [-1, 1].
      */
@@ -159,7 +160,7 @@ public class PerlinNoise {
 
     /**
      * Fade function to smooth interpolation.
-     * 
+     *
      * @param t Value in [0, 1].
      * @return Smoothed value.
      */
@@ -169,7 +170,7 @@ public class PerlinNoise {
 
     /**
      * Linear interpolation.
-     * 
+     *
      * @param t Interpolation factor.
      * @param a Start value.
      * @param b End value.
@@ -193,6 +194,6 @@ public class PerlinNoise {
         double u = h < 8 ? x : y;
         double v = h < 4 ? y : (h == 12 || h == 14 ? x : z);
         return ((h & 1) == 0 ? u : -u) +
-               ((h & 2) == 0 ? v : -v);
+                ((h & 2) == 0 ? v : -v);
     }
 }
