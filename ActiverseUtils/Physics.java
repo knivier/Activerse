@@ -571,9 +571,7 @@ public class Physics {
 
         /**
          * Tile is a serializable record that stores the type of tile and any custom metadata.
-         *
-         * @return A record containing tile type and metadata.
-         */
+         * */
         public record Tile(String type, Map<String, Object> metadata) implements Serializable {
         }
     }
