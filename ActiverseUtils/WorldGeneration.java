@@ -246,8 +246,8 @@ public class WorldGeneration {
 
     /**
      * Loads a previously saved tileMap from disk and replaces the current one.
+     * @throws IOException Errors from file reading
      */
-    @SuppressWarnings("unchecked")
     public void loadFromFile(String path) throws IOException, ClassNotFoundException {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path))) {
             Tile[][] loaded = (Tile[][]) ois.readObject();
@@ -259,7 +259,6 @@ public class WorldGeneration {
     /**
      * Tile is a serializable record that stores the type of tile and any custom metadata.
      *
-     * @return A record containing tile type and metadata.
      */
     public record Tile(String type, Map<String, Object> metadata) implements Serializable {
     }
