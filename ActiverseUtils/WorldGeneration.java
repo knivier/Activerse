@@ -57,6 +57,9 @@ public class WorldGeneration {
 
     /**
      * Sets the tile at (x, y) with a type and no metadata.
+     * @param x Horizontal coordinate
+     * @param y Vertical coordinate
+     * @param type Tile type as a string
      */
     public void setTile(int x, int y, String type) {
         setTile(x, y, type, new HashMap<>());
@@ -64,6 +67,10 @@ public class WorldGeneration {
 
     /**
      * Sets the tile at (x, y) with a specified type and metadata map.
+     * @param x Horizontal coordinate
+     * @param y Vertical coordinate
+     * @param type Tile type as a string
+     * @param metadata Additional metadata for the tile
      */
     public void setTile(int x, int y, String type, Map<String, Object> metadata) {
         if (inBounds(x, y)) {
@@ -73,7 +80,8 @@ public class WorldGeneration {
 
     /**
      * Returns true if (x, y) is within world boundaries.
-     *
+     * @param x Horizontal coordinate
+     * @param y Vertical coordinate
      * @return boolean indicating if coordinates are valid.
      */
     public boolean inBounds(int x, int y) {
