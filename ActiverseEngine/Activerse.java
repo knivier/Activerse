@@ -1,7 +1,7 @@
 package ActiverseEngine;
 
-import java.awt.*;
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * Provides utility methods to start and stop the Activerse application.

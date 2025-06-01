@@ -1,12 +1,16 @@
 package ActiverseEngine;
 
 import java.io.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * WorldGeneration provides advanced utilities for procedural world generation.
  * It supports biomes, cave generation, tile metadata, Perlin noise terrain,
  * structure placement, and world serialization.
+ *
  * @author Knivier
  * @version 1.4.0
  */
@@ -23,12 +27,6 @@ public class WorldGeneration {
 
     // Instance of Perlin noise generator for terrain
     protected final PerlinNoise perlin;
-
-    /**
-     * Tile is a serializable record that stores the type of tile and any custom metadata.
-     * @return A record containing tile type and metadata.
-     */
-    public record Tile(String type, Map<String, Object> metadata) implements Serializable {}
 
     /**
      * Constructs a world with the given dimensions using current time as seed.
@@ -48,15 +46,16 @@ public class WorldGeneration {
         this.tileMap = new Tile[width][height];
     }
 
-    // === Tile Access ===
-
     /**
      * Returns the Tile object at the specified (x, y), or null if out of bounds.
+     *
      * @return Tile at (x, y) or null if out of bounds.
      */
     public Tile getTile(int x, int y) {
         return inBounds(x, y) ? tileMap[x][y] : null;
     }
+
+    // === Tile Access ===
 
     /**
      * Sets the tile at (x, y) with a type and no metadata.
@@ -76,6 +75,7 @@ public class WorldGeneration {
 
     /**
      * Returns true if (x, y) is within world boundaries.
+     *
      * @return boolean indicating if coordinates are valid.
      */
     public boolean inBounds(int x, int y) {
@@ -91,6 +91,7 @@ public class WorldGeneration {
 
     /**
      * Returns the internal random instance (for procedural hooks).
+     *
      * @return Random instance used for procedural generation.
      */
     public Random getRandom() {
@@ -105,8 +106,6 @@ public class WorldGeneration {
             Arrays.fill(tileMap[x], null);
     }
 
-    // === Terrain Generation ===
-
     /**
      * Generates a 1D heightmap using Perlin noise with default octaves and persistence.
      *
@@ -119,14 +118,17 @@ public class WorldGeneration {
         return generatePerlinSurface(baseLevel, frequency, amplitude, 4, 0.5);
     }
 
+    // === Terrain Generation ===
+
     /**
      * Generates a customizable Perlin-based heightmap with multiple octaves.
-     * @return An array of Y-values representing the surface.
-     * @param baseLevel The vertical base to center terrain around. 
-     * @param frequency Controls horizontal stretching (lower = wider features).
-     * @param amplitude Controls vertical height variation.
-     * @param octaves Number of octaves for detail (higher = more detail).
+     *
+     * @param baseLevel   The vertical base to center terrain around.
+     * @param frequency   Controls horizontal stretching (lower = wider features).
+     * @param amplitude   Controls vertical height variation.
+     * @param octaves     Number of octaves for detail (higher = more detail).
      * @param persistence Controls amplitude scaling between octaves (0.0-1.0).
+     * @return An array of Y-values representing the surface.
      */
     public int[] generatePerlinSurface(int baseLevel, double frequency, double amplitude, int octaves, double persistence) {
         int[] surface = new int[width];
@@ -141,11 +143,11 @@ public class WorldGeneration {
     /**
      * Fills terrain below the surface based on a heightmap using layered materials.
      *
-     * @param surface The heightmap array.
-     * @param stoneLevel Y-value below which stone is used.
+     * @param surface     The heightmap array.
+     * @param stoneLevel  Y-value below which stone is used.
      * @param surfaceType Tile type for surface layer.
-     * @param dirtType Tile type for soil layer.
-     * @param stoneType Tile type for deep underground.
+     * @param dirtType    Tile type for soil layer.
+     * @param stoneType   Tile type for deep underground.
      */
     public void fillBelowSurface(int[] surface, int stoneLevel, String surfaceType, String dirtType, String stoneType) {
         for (int x = 0; x < width; x++) {
@@ -159,8 +161,6 @@ public class WorldGeneration {
             }
         }
     }
-
-    // === Biome Generation ===
 
     /**
      * Assigns biomes to each tile based on horizontal position and biome width.
@@ -177,7 +177,7 @@ public class WorldGeneration {
         }
     }
 
-    // === Structures ===
+    // === Biome Generation ===
 
     /**
      * Places a rectangular structure into the world, starting at (x, y).
@@ -194,13 +194,13 @@ public class WorldGeneration {
         }
     }
 
-    // === Cave Generation ===
+    // === Structures ===
 
     /**
      * Generates cave-like structures using a randomized cellular automata.
      *
      * @param fillProbability Initial chance for a cell to be wall.
-     * @param steps Number of smoothing iterations (higher = smoother caves).
+     * @param steps           Number of smoothing iterations (higher = smoother caves).
      */
     public void generateCaves(double fillProbability, int steps) {
         boolean[][] caveMap = new boolean[width][height];
@@ -229,8 +229,11 @@ public class WorldGeneration {
                     setTile(x, y, null);
     }
 
+    // === Cave Generation ===
+
     /**
      * Helper for counting wall neighbors around a given cell.
+     *
      * @return Number of neighboring cells that are walls.
      */
     private int countNeighbors(boolean[][] map, int x, int y) {
@@ -242,8 +245,6 @@ public class WorldGeneration {
         return count;
     }
 
-    // === Save & Load ===
-
     /**
      * Serializes the tileMap to a file on disk.
      */
@@ -253,6 +254,8 @@ public class WorldGeneration {
         }
     }
 
+    // === Save & Load ===
+
     /**
      * Loads a previously saved tileMap from disk and replaces the current one.
      */
@@ -261,8 +264,15 @@ public class WorldGeneration {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path))) {
             Tile[][] loaded = (Tile[][]) ois.readObject();
             for (int x = 0; x < width; x++)
-                for (int y = 0; y < height; y++)
-                    tileMap[x][y] = loaded[x][y];
+                if (height >= 0) System.arraycopy(loaded[x], 0, tileMap[x], 0, height);
         }
+    }
+
+    /**
+     * Tile is a serializable record that stores the type of tile and any custom metadata.
+     *
+     * @return A record containing tile type and metadata.
+     */
+    public record Tile(String type, Map<String, Object> metadata) implements Serializable {
     }
 }
