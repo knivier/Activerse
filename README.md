@@ -29,7 +29,7 @@ To start using Activerse, follow these steps:
 
 Reading this file is just the beginning! For more detailed guidance, examples, and documentation, explore the following resources:
 
-- **[Activerse GitHub Wiki](https://github.com/Knivier/Activerse/wiki)**: Contains comprehensive tutorials, code examples, and a deep dive into all engine functionalities.
+- **[Activerse GitHub Wiki](https://knivier.com/ActiWiki/wiki.html)**: Contains comprehensive tutorials, code examples, and a deep dive into all engine functionalities.
 - **[Official Activerse Website](https://knivier.github.io/KnivierWeb/activerseinfo.html)**: Visit the website for additional information, updates, and community support.
 - **[v1.1.2 Profile Research](https://github.com/user-attachments/files/16165118/Research.Notes.for.v1.1.2.Optimizations.pdf)**: Contains the profiling and research information of v1.1.2 with provided explanations and evidence.
 - **Game Examples**: As of v1.3.3, examples of games created in Activerse are now stored in the "Examples" folder. These have their own engine components, so it's best to CD into the project and start up a directory in that for the least confusion. The Activerse Exemplers GitHub has been removed.
