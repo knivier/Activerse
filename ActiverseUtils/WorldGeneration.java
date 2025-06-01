@@ -1,4 +1,4 @@
-package ActiverseEngine;
+package ActiverseUtils;
 
 import java.io.*;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package ActiverseEngine;
+package ActiverseUtils;
 
 import java.util.Random;
 
