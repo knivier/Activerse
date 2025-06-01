@@ -278,8 +278,6 @@ public class Physics {
         return Math.sqrt(2 * gravitationalConstant * mass / radius);
     }
 
-    // === Additional Methods ===
-
     /**
      * Calculates average velocity: v = Δx / Δt
      *

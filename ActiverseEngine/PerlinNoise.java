@@ -44,8 +44,6 @@ public class PerlinNoise {
         }
     }
 
-    // === Public Perlin noise methods ===
-
     /**
      * Computes 1D Perlin noise.
      *
@@ -105,8 +103,6 @@ public class PerlinNoise {
                                 grad(p[BB + 1], x - 1, y - 1, z - 1))));
     }
 
-    // === Fractal noise with octaves ===
-
     /**
      * Computes 1D fractal Perlin noise using multiple octaves.
      *
@@ -155,8 +151,6 @@ public class PerlinNoise {
 
         return total / maxAmplitude;
     }
-
-    // === Utility functions ===
 
     /**
      * Fade function to smooth interpolation.
