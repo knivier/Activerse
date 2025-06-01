@@ -1,14 +1,14 @@
 package ActiverseEngine;
 
-import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
+import javax.sound.sampled.*;
 
 /**
  * Represents a sound player for playing audio files.
  * This class provides methods to load, play, stop, and manage the volume of audio files.
  *
- * @version 1.3.2
+ * @version 1.4.0
  */
 public class ActiverseSound {
     private final String filename;
@@ -103,4 +103,94 @@ public class ActiverseSound {
             volumeControl.setValue(newVolume);
         }
     }
+
+        /**
+     * Loops the audio continuously.
+     */
+    public void loop() {
+        if (clip != null) {
+            clip.setFramePosition(0);
+            clip.loop(Clip.LOOP_CONTINUOUSLY);
+        } else {
+            throw new NullPointerException("4A.OUT:(LN: loop() - ACEHS Error thrown; audio file is null. Cannot loop audio.");
+        }
+    }
+
+    /**
+     * Loops the audio a specified number of times.
+     *
+     * @param count The number of times to loop. Use Clip.LOOP_CONTINUOUSLY for infinite.
+     */
+    public void loop(int count) {
+        if (clip != null) {
+            clip.setFramePosition(0);
+            clip.loop(count);
+        } else {
+            throw new NullPointerException("4A.OUT:(LN: loop(int count) - ACEHS Error thrown; audio file is null. Cannot loop audio.");
+        }
+    }
+
+    /**
+     * Pauses the currently playing audio.
+     */
+    public void pause() {
+        if (clip != null && clip.isRunning()) {
+            clip.stop(); // stops but does not reset position
+        }
+    }
+
+    /**
+     * Resumes the audio from where it was paused.
+     */
+    public void resume() {
+        if (clip != null && !clip.isRunning()) {
+            clip.start();
+        }
+    }
+
+    /**
+     * Seeks to a specific time position in the audio.
+     *
+     * @param milliseconds The position in milliseconds to seek to.
+     */
+    public void seek(long milliseconds) {
+        if (clip != null) {
+            int frame = (int) (milliseconds * clip.getFormat().getFrameRate() / 1000);
+            clip.setFramePosition(frame);
+        }
+    }
+
+    /**
+     * Gets the current playback position in milliseconds.
+     *
+     * @return The current position in milliseconds.
+     */
+    public long getPosition() {
+        if (clip != null) {
+            return (long) (clip.getMicrosecondPosition() / 1000);
+        }
+        return 0;
+    }
+
+    /**
+     * Gets the total length of the audio clip in milliseconds.
+     *
+     * @return The duration in milliseconds.
+     */
+    public long getLength() {
+        if (clip != null) {
+            return (long) (clip.getMicrosecondLength() / 1000);
+        }
+        return 0;
+    }
+
+    /**
+     * Releases system resources associated with the audio clip.
+     */
+    public void dispose() {
+        if (clip != null) {
+            clip.close();
+        }
+    }
+
 }
