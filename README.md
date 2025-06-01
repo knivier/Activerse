@@ -36,7 +36,6 @@ Reading this file is just the beginning! For more detailed guidance, examples, a
 
 > **⚠️ WARNING**  
 > Always use the latest version of Activerse to prevent bugs and avoid compatibility issues. Running outdated versions may result in unexpected behavior or crashes.
-
 > **💡 IMPORTANT**  
 > When starting the engine, always run `Main.java`.
 
@@ -58,17 +57,26 @@ File name extensions:
 - 8A - KeyBoardInfo.java
 - 9A - MemoryTracker.Java
 - 10A - World.Java
+- 11A - Item.java
+- 1B - ActorVector.java
+- 2B - FileUtils.java
+- 3B - PerlinNoise.java
+- 4B - Physics.java
+- 5B - Timer.java
+- 6B - WorldGeneration.java
+
 - PROP.IN.OUT.IO - Activerse.properties error; major screwup by developers
 
 Keywords that may be helpful
-- IO - A central breakdown; this is typically a result of multiple errors that are being caught by ACESH that cause an IO error
+
+- IO - A centeralized breakdown; this is typically a result of multiple errors that are being caught by ACESH that cause an IO error
 - IN - An input breakdown
 - OUT - An output breakdown
 - LN - Error line reporting
 - DEV - Contact Dev's; this is not a good error
 - CONNTO - A connecting line of code that connects class to class that may cause errors in each
 
-ACEHS can continue running your game even with errors. However, there are certain fatal errors that will be crashed. If you don't care about possible headaches, you can find the ACEHS line and convert the catch expression to instead continue execution. 
+ACEHS can continue running your game even with errors. However, there are certain fatal errors that will be crashed. If you don't care about possible headaches, you can find the ACEHS line and convert the catch expression to instead continue execution.
 
 Happy coding, and enjoy bringing your creations to life with Activerse!
 
@@ -82,4 +90,5 @@ Well, what does this mean for you?
 - **ShareAlike**: If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
 - **No additional restrictions**: You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
 - **Disclaimer of Warranties and Limitation of Liability**: The material is provided "as-is" without warranties of any kind, and the licensor is not liable for any damages arising from its use.
+
 ---
