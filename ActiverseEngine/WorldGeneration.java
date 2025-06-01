@@ -55,8 +55,6 @@ public class WorldGeneration {
         return inBounds(x, y) ? tileMap[x][y] : null;
     }
 
-    // === Tile Access ===
-
     /**
      * Sets the tile at (x, y) with a type and no metadata.
      */
@@ -118,8 +116,6 @@ public class WorldGeneration {
         return generatePerlinSurface(baseLevel, frequency, amplitude, 4, 0.5);
     }
 
-    // === Terrain Generation ===
-
     /**
      * Generates a customizable Perlin-based heightmap with multiple octaves.
      *
@@ -177,8 +173,6 @@ public class WorldGeneration {
         }
     }
 
-    // === Biome Generation ===
-
     /**
      * Places a rectangular structure into the world, starting at (x, y).
      * Each non-null string in the 2D array represents a tile type.
@@ -193,8 +187,6 @@ public class WorldGeneration {
             }
         }
     }
-
-    // === Structures ===
 
     /**
      * Generates cave-like structures using a randomized cellular automata.
@@ -229,8 +221,6 @@ public class WorldGeneration {
                     setTile(x, y, null);
     }
 
-    // === Cave Generation ===
-
     /**
      * Helper for counting wall neighbors around a given cell.
      *
@@ -253,8 +243,6 @@ public class WorldGeneration {
             oos.writeObject(tileMap);
         }
     }
-
-    // === Save & Load ===
 
     /**
      * Loads a previously saved tileMap from disk and replaces the current one.
