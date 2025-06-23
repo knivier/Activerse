@@ -3,157 +3,196 @@ package ActiverseEngine;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Represents the main game loop for updating and rendering the game.
+ * Represents a highly parallelized game loop maximizing CPU usage while maintaining stability.
+ * Threads are split across update/render responsibilities with precise frame pacing.
+ *
  * @author Knivier
- * @version 1.3.2
+ * @version 1.4.0
  */
 public class GameLoop implements Runnable {
-    private final World world; // The game world to be updated and rendered
-    private final long FRAME_TIME; // Time per frame in nanoseconds
-    private long TARGET_FPS; // Target frames per second
-    private int frames; // Frame counter for FPS calculation
-    private long lastFpsTime; // Last time FPS was calculated
-    private boolean dynamicLighting; // Flag for dynamic lighting
-    private volatile boolean running = true; // Flag to control the game loop
+    private final World world;
+    private final long FRAME_TIME_NANOS;
+    private final AtomicBoolean running = new AtomicBoolean(false);
+    private long TARGET_FPS;
+    private volatile int frames;
+    private volatile int updates;
+    private long lastFpsTime;
+    private boolean dynamicLighting;
+    private Thread updateThread;
+    private Thread renderThread;
 
-    /**
-     * Constructor to initialize the game loop with the given world.
-     * Loads properties and sets initial values.
-     *
-     * @param world The game world to be updated and rendered.
-     */
+    // Optional thread for input/event processing in the future
+    // private Thread inputThread;
+
     public GameLoop(World world) {
         this.world = world;
         loadProperties();
-        FRAME_TIME = 1000000000 / TARGET_FPS;
-        frames = 0;
+        FRAME_TIME_NANOS = 1_000_000_000L / TARGET_FPS;
         lastFpsTime = System.nanoTime();
     }
 
     /**
-     * Loads properties from the Activerse.properties file.
-     * Sets the target FPS and dynamic lighting flag.
+     * Loads properties from Activerse.properties file.
+     * This file should be located in the classpath.
+     * If the file is not found or an error occurs,
+     * default values are used:
      */
     private void loadProperties() {
         Properties props = new Properties();
-        String propertiesFile = "Activerse.properties";
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream(propertiesFile)) {
-            if (input == null) {
-                System.err.println("7A.IN:(LN: loadProperties() - ACEHS Error thrown; properties file not found. Default values will be used. Contact ActiverseEngine support for bugs. Otherwise, please provide a properties file.");
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("Activerse.properties")) {
+            if (input != null) {
+                props.load(input);
+                TARGET_FPS = Integer.parseInt(props.getProperty("fps", "60"));
+                dynamicLighting = Boolean.parseBoolean(props.getProperty("dynamicLighting", "false"));
+            } else {
+                System.err.println("[Activerse] Properties file not found. Using default settings.");
                 TARGET_FPS = 60;
                 dynamicLighting = false;
-                return;
             }
-            props.load(input);
-            TARGET_FPS = Integer.parseInt(props.getProperty("fps", "60"));
-            dynamicLighting = Boolean.parseBoolean(props.getProperty("dynamicLighting", "false"));
         } catch (IOException e) {
-            System.err.println("7A.OUT:(LN: loadProperties() - ACEHS Error thrown; an error occurred while loading properties. Default values will be used. Contact ActiverseEngine support for bugs. Otherwise, please provide a properties file.");
-            e.printStackTrace();
+            System.err.println("[Activerse] Error loading properties. Using default settings.");
             TARGET_FPS = 60;
             dynamicLighting = false;
         }
     }
 
     /**
-     * The main game loop that updates and renders the game.
-     * It runs until the running flag is set to false.
+     * Starts the game loop on separate threads for update and render.
+     * This method initializes the threads and begins the game loop.
      */
-    @Override
-    public void run() {
+    public void start() {
+        if (running.get()) return;
+
+        running.set(true);
+        updateThread = new Thread(this::updateLoop, "UpdateThread");
+        renderThread = new Thread(this::renderLoop, "RenderThread");
+
+        updateThread.start();
+        renderThread.start();
+    }
+
+    /**
+     * Stops the game loop and waits for threads to finish.
+     * This method safely terminates the update and render threads,
+     */
+    public void stop() {
+        running.set(false);
+        try {
+            updateThread.join();
+            renderThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("[Activerse] Game loop stopped.");
+    }
+
+    /**
+     * Main update loop that runs at a fixed frame rate.
+     * This method processes game updates at the target FPS,
+     * ensuring smooth game state updates without blocking rendering.
+     */
+    private void updateLoop() {
         long lastTime = System.nanoTime();
         double delta = 0;
 
-        while (running) {
+        while (running.get()) {
             long now = System.nanoTime();
-            delta += (now - lastTime) / (double) FRAME_TIME;
+            delta += (now - lastTime) / (double) FRAME_TIME_NANOS;
             lastTime = now;
 
-            // Update the game state if enough time has passed
+            // Process all update ticks necessary
             while (delta >= 1) {
-                update();
+                synchronized (world) {
+                    world.update(); // Update game state
+                }
+                updates++;
                 delta--;
             }
 
-            // Render the game
-            render();
+            spinWaitNano(250_000); // short delay to reduce wasted CPU
+        }
+    }
 
-            // Increment the frame counter
+    /**
+     * Main render loop that runs at a fixed frame rate.
+     * This method handles rendering the game world at the target FPS,
+     * ensuring smooth visual updates without blocking game logic.
+     */
+    private void renderLoop() {
+        while (running.get()) {
+            long start = System.nanoTime();
+
+            synchronized (world) {
+                world.repaint(); // Safe rendering
+            }
+
             frames++;
-            calculateFPS(now);
+            calculateFPS(start);
 
-            // Calculate the time taken for the frame and sleep if necessary
-            long frameTime = System.nanoTime() - lastTime;
-            long sleepTime = FRAME_TIME - frameTime;
+            long frameTime = System.nanoTime() - start;
+            long sleepTime = FRAME_TIME_NANOS - frameTime;
 
             if (sleepTime > 0) {
                 try {
-                    Thread.sleep(sleepTime / 1000000, (int) (sleepTime % 1000000));
-                } catch (InterruptedException e) {
-                    System.out.println("7A.IO:(LN: run()) - ACEHS Error thrown; an error occurred while sleeping the thread. Contact ActiverseEngine support for bugs.");
-                    e.printStackTrace();
+                    Thread.sleep(sleepTime / 1_000_000L, (int) (sleepTime % 1_000_000L));
+                } catch (InterruptedException ignored) {
                 }
             } else {
-                try {
-                    Thread.sleep(1); // Sleep for 1ms when we can't match the target frame time
-                } catch (InterruptedException e) {
-                    System.out.println("7A.IO:(LN: run()) - ACEHS Error thrown; an error occurred while sleeping the thread. Contact ActiverseEngine support for bugs.");
-                    e.printStackTrace();
-                }
+                // Frame overran; yield CPU briefly to avoid complete spin
+                Thread.yield();
             }
         }
     }
 
     /**
-     * Stops the game loop by setting the running flag to false.
-     */
-    public void stop() {
-        running = false;
-    }
-
-    /**
-     * Updates the game world.
-     * This method is called once per frame.
-     */
-    private void update() {
-        world.update();
-    }
-
-    /**
-     * Renders the game world.
-     * This method is called once per frame.
-     */
-    private void render() {
-        world.repaint();
-    }
-
-    /**
-     * Calculates the frames per second (FPS) and updates the world with the new FPS value.
-     * This method is called once per second.
+     * Calculates and updates the frames per second (FPS) based on the elapsed time.
+     * This method is called periodically to update the FPS value in the World class.
      *
-     * @param now The current time in nanoseconds.
+     * @param now the current time in nanoseconds
      */
     private void calculateFPS(long now) {
-        if (now - lastFpsTime >= 1_000_000_000) {
+        if (now - lastFpsTime >= 1_000_000_000L) {
             World.setFPS(frames);
             frames = 0;
-            lastFpsTime += 1_000_000_000;
+            updates = 0;
+            lastFpsTime = now;
         }
     }
 
-    
-    /** 
-     * @return long
+    /**
+     * Uses a short busy-wait to lightly throttle CPU in tight loops.
+     * Useful for high-frequency loops without costly sleep overhead.
+     */
+    private void spinWaitNano(long duration) {
+        long target = System.nanoTime() + duration;
+        while (System.nanoTime() < target) {
+            // Minimal wait – burn a bit of CPU but improves timing precision
+        }
+    }
+
+    @Override
+    public void run() {
+        start();
+    }
+
+    /**
+     * Returns the target frames per second (FPS) for the game loop.
+     * This value is loaded from the properties file or defaults to 60 FPS.
+     *
+     * @return the target FPS
      */
     public long getTargetFps() {
         return TARGET_FPS;
     }
 
-    
-    /** 
-     * @return boolean
+    /**
+     * Returns whether dynamic lighting is enabled in the game loop.
+     * This value is loaded from the properties file or defaults to false.
+     *
+     * @return true if dynamic lighting is enabled, false otherwise
      */
     public boolean isDynamicLighting() {
         return dynamicLighting;

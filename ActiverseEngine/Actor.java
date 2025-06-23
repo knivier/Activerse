@@ -3,32 +3,164 @@ package ActiverseEngine;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
-import java.util.Comparator;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
-import java.util.PriorityQueue;
-import java.util.Set;
 
 /**
  * The base class for all actors in the world.
- * 
+ *
  * @author Knivier
- * @version 1.3.2
+ * @version 1.4.0
  */
 public abstract class Actor {
-    protected double direction; 
+    protected double direction;
     private int x, y;
     private World world;
     private ActiverseImage image;
     private double velocityX, velocityY;
-    private int height; 
-    private int width; 
+    private int height;
+    private int width;
+    private List<Item> inventory; // List of items the actor can hold
+    private int maxInventory = 10000; // Maximum number of items the actor can hold
+    private boolean isStatic = false; // Whether the actor is static or not
+
+    /**
+     * Returns the state of the actor on whether it is static or not.
+     * A static actor does not move and is not affected by gravity.
+     * It will not be updated in the debug menus
+     *
+     * @return boolean indicating if the actor is static
+     */
+    public boolean isStatic() {
+        return isStatic;
+    }
+
+    /**
+     * Sets the state of the actor to static or not.
+     *
+     * @param isStatic
+     * @return boolean indicating if the state was successfully set
+     */
+    public boolean setStatic(boolean isStatic) {
+        this.isStatic = isStatic;
+        return true;
+    }
 
     /**
      * Performs the actor's action.
      */
     public abstract void act();
+
+    /**
+     * Enables inventory for the actor. By default, it is disabled.
+     */
+    public void enableInventory() {
+        if (inventory == null) inventory = new java.util.ArrayList<>();
+        else
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: enableInventory() - ACEHS Error thrown; inventory is already enabled.");
+    }
+
+    /**
+     * Disables the actor's inventory.
+     * Clears the inventory list and sets it to null.
+     */
+    public void disableInventory() {
+        if (inventory != null) {
+            inventory.clear();
+            inventory = null;
+        } else {
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: disableInventory() - ACEHS Error thrown; inventory is already disabled.");
+        }
+    }
+
+    /**
+     * Gets the maximum size of the actor's inventory.
+     *
+     * @return The maximum size of the inventory.
+     */
+    public int getInventorySize() {
+        if (inventory == null) {
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: getInventorySize() - ACEHS Error thrown; inventory is not enabled.");
+            return 0;
+        }
+        return inventory.size();
+    }
+
+    /**
+     * Sets the inventory size
+     *
+     * @param size the maximum inventory size (maximum number of type Item)
+     */
+    public void setInventorySize(int size) {
+        if (inventory == null) {
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: setInventorySize(int size) - ACEHS Error thrown; inventory is not enabled.");
+            return;
+        }
+        if (size < 0) {
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: setInventorySize(int size) - ACEHS Error thrown; size cannot be negative.");
+            return;
+        }
+        maxInventory = size;
+    }
+
+    /**
+     * Checks if the actor has an inventory.
+     *
+     * @return true if the actor has an inventory, false otherwise.
+     */
+    public boolean hasInventory() {
+        return inventory != null;
+    }
+
+    /**
+     * Adds an item to the actor's inventory.
+     *
+     * @param item The item to add to the inventory.
+     * @return Boolean the success of adding the item
+     */
+    public boolean addItem(Item item) {
+        if (inventory == null) {
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: addItem(Item item) - ACEHS Error thrown; inventory is not enabled.");
+            return false;
+        }
+        if (inventory.size() < maxInventory) { // Assuming a maximum of 10 items
+            inventory.add(item);
+            return true;
+        } else {
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: addItem(Item item) - ACEHS Error thrown; inventory is full.");
+            return false;
+        }
+    }
+
+    /**
+     * Removes an item from the actor's inventory.
+     *
+     * @param item The item to remove from the inventory.
+     */
+    public void removeItem(Item item) {
+        if (inventory == null) {
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: removeItem(Item item) - ACEHS Error thrown; inventory is not enabled.");
+            return;
+        }
+        if (inventory.contains(item)) {
+            inventory.remove(item);
+        } else {
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: removeItem(Item item) - ACEHS Error thrown; item not found in inventory.");
+        }
+    }
+
+    /**
+     * Gets the inventory of the actor.
+     *
+     * @return The list of items in the actor's inventory, or null if inventory is not enabled.
+     */
+    public List<Item> getInventory() {
+        if (inventory == null) {
+            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: getInventory() - ACEHS Error thrown; inventory is not enabled.");
+            return null;
+        }
+        return inventory;
+    }
 
     /**
      * Sets the location of the actor.
@@ -76,9 +208,25 @@ public abstract class Actor {
     public void setY(int y) {
         this.y = y;
     }
+
+    /**
+     * Returns the width of the Actor
+     *
+     * @return int Actor width in Activerse Unit (relative)
+     */
     public int getWidth() {
         return width;
     }
+
+    /**
+     * Sets the width of the actor.
+     *
+     * @param width The width to set.
+     */
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
     /**
      * Gets the image of the actor.
      *
@@ -195,6 +343,7 @@ public abstract class Actor {
 
     /**
      * Finds the intesrsectiuon of the actor with another actor then returns it
+     *
      * @return The intersecting actor, or null if no intersection is found.
      */
     public Actor getOneIntersectingObject() {
@@ -208,6 +357,7 @@ public abstract class Actor {
 
         return null; // No intersection found
     }
+
     /**
      * Delays the execution of the next action by the specified milliseconds.
      *
@@ -291,151 +441,153 @@ public abstract class Actor {
 
     /**
      * Gets the direction of the actor.
-     * @author Knivier
+     *
      * @param other The actor to follow
-     * @param x The number of iterations to follow the actor (seconds)
+     * @param x     The number of iterations to follow the actor (seconds)
      */
     public void useAStar(Actor other, int x) {
-    // Define start and target positions
-    int startX = this.getX();
-    int startY = this.getY();
-    int targetX = other.getX();
-    int targetY = other.getY();
+        // Define start and target positions
+        int startX = this.getX();
+        int startY = this.getY();
+        int targetX = other.getX();
+        int targetY = other.getY();
 
-    // Define open and closed lists for A*
-    PriorityQueue<Node> openList = new PriorityQueue<>(Comparator.comparingDouble(n -> n.fCost));
-    Set<Node> closedList = new HashSet<>();
+        // Define open and closed lists for A*
+        PriorityQueue<Node> openList = new PriorityQueue<>(Comparator.comparingDouble(n -> n.fCost));
+        Set<Node> closedList = new HashSet<>();
 
-    // Start node
-    Node startNode = new Node(startX, startY, null, 0, calculateHeuristic(startX, startY, targetX, targetY));
-    openList.add(startNode);
+        // Start node
+        Node startNode = new Node(startX, startY, null, 0, calculateHeuristic(startX, startY, targetX, targetY));
+        openList.add(startNode);
 
-    // A* algorithm
-    while (!openList.isEmpty() && x > 0) {
-        Node currentNode = openList.poll();
-        
-        // If target is reached
-        if (currentNode.x == targetX && currentNode.y == targetY) {
-            followPath(currentNode);
-            return;
+        // A* algorithm
+        while (!openList.isEmpty() && x > 0) {
+            Node currentNode = openList.poll();
+
+            // If target is reached
+            if (currentNode.x == targetX && currentNode.y == targetY) {
+                followPath(currentNode);
+                return;
+            }
+
+            closedList.add(currentNode);
+
+            // Explore neighbors (up, down, left, right)
+            for (int[] direction : new int[][]{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}) {
+                int neighborX = currentNode.x + direction[0];
+                int neighborY = currentNode.y + direction[1];
+
+                if (closedList.contains(new Node(neighborX, neighborY))) continue;
+
+                double gCost = currentNode.gCost + 1;
+                double hCost = calculateHeuristic(neighborX, neighborY, targetX, targetY);
+                double fCost = gCost + hCost;
+
+                Node neighborNode = new Node(neighborX, neighborY, currentNode, gCost, fCost);
+
+                if (openList.stream().anyMatch(n -> n.equals(neighborNode) && n.gCost <= gCost)) continue;
+
+                openList.add(neighborNode);
+            }
+
+            x--;
         }
+    }
 
-        closedList.add(currentNode);
+    /**
+     * Calculates the heuristic cost between two points using the Manhattan distance.
+     *
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @return
+     */
+    private double calculateHeuristic(int x1, int y1, int x2, int y2) {
+        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+    }
 
-        // Explore neighbors (up, down, left, right)
-        for (int[] direction : new int[][]{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}) {
-            int neighborX = currentNode.x + direction[0];
-            int neighborY = currentNode.y + direction[1];
+    /**
+     * Follows the path from the target node to the start node.
+     *
+     * @param targetNode
+     */
+    private void followPath(Node targetNode) {
+        Node currentNode = targetNode;
 
-            if (closedList.contains(new Node(neighborX, neighborY))) continue;
+        while (currentNode.parent != null) {
+            int directionX = currentNode.x - currentNode.parent.x;
+            int directionY = currentNode.y - currentNode.parent.y;
 
-            double gCost = currentNode.gCost + 1;
-            double hCost = calculateHeuristic(neighborX, neighborY, targetX, targetY);
-            double fCost = gCost + hCost;
+            // Set actor's position
+            this.setX(currentNode.x);
+            this.setY(currentNode.y);
 
-            Node neighborNode = new Node(neighborX, neighborY, currentNode, gCost, fCost);
+            // Adjust movement direction
+            if (directionX == 1) this.turn(0); // right
+            if (directionX == -1) this.turn(180); // left
+            if (directionY == 1) this.turn(90); // down
+            if (directionY == -1) this.turn(270); // up
 
-            if (openList.stream().anyMatch(n -> n.equals(neighborNode) && n.gCost <= gCost)) continue;
+            this.move(1); // move to the next cell
 
-            openList.add(neighborNode);
+            currentNode = currentNode.parent;
         }
-        
-        x--; 
     }
-}
-
-/**
- * Calculates the heuristic cost between two points using the Manhattan distance.
- * @param x1
- * @param y1
- * @param x2
- * @param y2
- * @return
- */
-private double calculateHeuristic(int x1, int y1, int x2, int y2) {
-    return Math.abs(x1 - x2) + Math.abs(y1 - y2);
-}
-
-/**
- * Follows the path from the target node to the start node.
- * @param targetNode
- */
-private void followPath(Node targetNode) {
-    Node currentNode = targetNode;
-
-    while (currentNode.parent != null) {
-        int directionX = currentNode.x - currentNode.parent.x;
-        int directionY = currentNode.y - currentNode.parent.y;
-        
-        // Set actor's position
-        this.setX(currentNode.x);
-        this.setY(currentNode.y);
-
-        // Adjust movement direction
-        if (directionX == 1) this.turn(0); // right
-        if (directionX == -1) this.turn(180); // left
-        if (directionY == 1) this.turn(90); // down
-        if (directionY == -1) this.turn(270); // up
-        
-        this.move(1); // move to the next cell
-        
-        currentNode = currentNode.parent;
-    }
-}
 
 // Node class for A* pathfinding
-/**
- * Represents a node in the A* pathfinding algorithm.
- * The node contains the x and y coordinates, the parent node, the cost to reach the node (gCost),
- * and the total cost of the node (fCost).
- * The fCost is the sum of the gCost and the heuristic cost (hCost).
- * The heuristic cost is the estimated cost to reach the target node from the current node.
- * The node also overrides the equals and hashCode methods to compare nodes based on their x and y coordinates.
- * The node class is used in the A* pathfinding algorithm to find the shortest path from the start node to the target node.
- * The algorithm explores the neighboring nodes and calculates the cost to reach each node.
- * The node with the lowest total cost (fCost) is selected for further exploration
- * until the target node is reached or the open list is empty.
- * The path is then reconstructed by following the parent nodes from the target node to the start node.
- * The actor moves along the path by setting its position to the x and y coordinates of each node.
- * The actor also adjusts its movement direction based on the difference between the current node and its parent node.
- * The actor moves one cell at a time to reach the target node.
- *
- * @param x The x-coordinate of the node.
- * @param y The y-coordinate of the node.
- * @param parent The parent node of the current node.
- * @param gCost The cost to reach the current node.
- * @param fCost The total cost of the current node.
- * @return The node object.
- *
- */
-class Node {
-    int x, y;
-    Node parent;
-    double gCost, fCost;
 
-    Node(int x, int y) {
-        this(x, y, null, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-    }
+    /**
+     * Represents a node in the A* pathfinding algorithm.
+     * The node contains the x and y coordinates, the parent node, the cost to reach the node (gCost),
+     * and the total cost of the node (fCost).
+     * The fCost is the sum of the gCost and the heuristic cost (hCost).
+     * The heuristic cost is the estimated cost to reach the target node from the current node.
+     * The node also overrides the equals and hashCode methods to compare nodes based on their x and y coordinates.
+     * The node class is used in the A* pathfinding algorithm to find the shortest path from the start node to the target node.
+     * The algorithm explores the neighboring nodes and calculates the cost to reach each node.
+     * The node with the lowest total cost (fCost) is selected for further exploration
+     * until the target node is reached or the open list is empty.
+     * The path is then reconstructed by following the parent nodes from the target node to the start node.
+     * The actor moves along the path by setting its position to the x and y coordinates of each node.
+     * The actor also adjusts its movement direction based on the difference between the current node and its parent node.
+     * The actor moves one cell at a time to reach the target node.
+     *
+     * @param x      The x-coordinate of the node.
+     * @param y      The y-coordinate of the node.
+     * @param parent The parent node of the current node.
+     * @param gCost  The cost to reach the current node.
+     * @param fCost  The total cost of the current node.
+     * @return The node object.
+     */
+    class Node {
+        int x, y;
+        Node parent;
+        double gCost, fCost;
 
-    Node(int x, int y, Node parent, double gCost, double fCost) {
-        this.x = x;
-        this.y = y;
-        this.parent = parent;
-        this.gCost = gCost;
-        this.fCost = fCost;
-    }
+        Node(int x, int y) {
+            this(x, y, null, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+        }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Node node = (Node) obj;
-        return x == node.x && y == node.y;
-    }
+        Node(int x, int y, Node parent, double gCost, double fCost) {
+            this.x = x;
+            this.y = y;
+            this.parent = parent;
+            this.gCost = gCost;
+            this.fCost = fCost;
+        }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(x, y);
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            Node node = (Node) obj;
+            return x == node.x && y == node.y;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(x, y);
+        }
     }
-}
 }

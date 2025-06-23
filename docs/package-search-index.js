@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"ActiverseEngine"},{"l":"All Packages","u":"allpackages-index.html"}];updateSearchResults();
+packageSearchIndex = [{"l":"ActiverseEngine"},{"l":"ActiverseUtils"},{"l":"All Packages","u":"allpackages-index.html"}];updateSearchResults();
