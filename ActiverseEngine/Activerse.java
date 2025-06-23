@@ -1,14 +1,14 @@
 package ActiverseEngine;
 
-import java.awt.*;
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * Provides utility methods to start and stop the Activerse application.
  * This class contains static methods to manage the application lifecycle.
- * 
- * @author Knivier  
- * @version 1.3.2
+ *
+ * @author Knivier
+ * @version 1.4.0
  */
 public class Activerse {
     private static World currentWorld;
@@ -30,11 +30,13 @@ public class Activerse {
         new Thread(gameLoop).start();
         SwingUtilities.invokeLater(() -> {
             try {
-                frame = new JFrame("Activerse Instance v1.3.2");
+                frame = new JFrame("Activerse Instance v1.4.0");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.getContentPane().add(currentWorld, BorderLayout.CENTER);
                 frame.pack();
                 frame.setVisible(true);
+                frame.setResizable(false); // Prevent resizing of the window
+                frame.setLocationRelativeTo(null); // Center the window on the screen
                 currentWorld.start(); // Start the world
             } catch (HeadlessException | IllegalArgumentException e) {
                 System.out.println("1A.IO:(LN: SwingUtilities.invokeLater caught Exception at Activerse.start()) - ACEHS Error fetched and thrown; a specific error occurred. Please see the stack trace for more information. Contact ActiverseEngine support for bugs.");

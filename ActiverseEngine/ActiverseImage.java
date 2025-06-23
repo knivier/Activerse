@@ -5,7 +5,7 @@ import java.awt.*;
 /**
  * Represents an image loader for loading images from files.
  * This class provides methods to load an image and retrieve it.
- * 
+ *
  * @author Knivier
  * @version 1.3.2
  */
@@ -21,7 +21,7 @@ public class ActiverseImage {
     public ActiverseImage(String filename) {
         image = Toolkit.getDefaultToolkit().getImage(filename);
         path = filename;
-        if(image == null){
+        if (image == null) {
             throw new NullPointerException("2A.IN:(LN: ActiverseImage(String filename) - ACEHS Error thrown; image is null (Report: INTO). Please check the image path and try again.");
         }
     }
@@ -32,7 +32,7 @@ public class ActiverseImage {
      * @return The Image object representing the loaded image.
      */
     public Image getImage() {
-        if(image == null) {
+        if (image == null) {
             throw new NullPointerException("2A.OUT:(LN: getImage() - ACEHS Error thrown; image is null. Please check the image path and try again.");
         }
         return image;
@@ -44,7 +44,7 @@ public class ActiverseImage {
      * @return The path to the image file.
      */
     public String getPath() {
-        if(path == null) {
+        if (path == null) {
             throw new NullPointerException("2A.IN.OUT:(LN: getPath() - ACEHS Error thrown; path is null. Please check the image path and try again.");
         }
         return path;
