@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
  * This class provides a method to check if two actors intersect.
  *
  * @author Knivier
- * @version 1.4.0
+ * @version 1.4.1
  */
 public class CollisionManager {
 

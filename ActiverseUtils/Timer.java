@@ -5,7 +5,7 @@ package ActiverseUtils;
  * Part of the Activerse engine.
  *
  * @author Knivier
- * @version 1.4.0
+ * @version 1.4.1
  */
 public class Timer {
     private long startTime;       // when the timer started

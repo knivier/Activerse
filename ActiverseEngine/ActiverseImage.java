@@ -9,7 +9,7 @@ import java.awt.*;
  * This class provides methods to load an image and retrieve it.
  *
  * @author Knivier
- * @version 1.4.0
+ * @version 1.4.1
  */
 public class ActiverseImage {
     private final Image image; // Image object to store the loaded image

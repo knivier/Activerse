@@ -11,7 +11,7 @@ import java.util.Properties;
  * Provides centralized configuration management for ActiverseEngine applications
  * 
  * @author Knivier
- * @version 1.4.0
+ * @version 1.4.1
  */
 public class ConfigPuller {
     private static Properties properties = null;

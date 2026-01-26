@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Threads are split across update/render responsibilities with precise frame pacing.
  *
  * @author Knivier
- * @version 1.4.0
+ * @version 1.4.1
  */
 public class GameLoop implements Runnable {
     private final World world;

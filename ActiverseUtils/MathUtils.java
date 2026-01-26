@@ -4,7 +4,7 @@ package ActiverseUtils;
  * MathUtils - Common mathematical utility functions for game development
  * 
  * @author Knivier
- * @version 1.4.0
+ * @version 1.4.1
  */
 public class MathUtils {
     

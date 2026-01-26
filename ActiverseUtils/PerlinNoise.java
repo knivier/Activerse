@@ -10,7 +10,7 @@ import java.util.Random;
  * Based on Ken Perlin's original algorithm.
  *
  * @author Knivier
- * @version 1.4.0
+ * @version 1.4.1
  */
 public class PerlinNoise {
     private final int[] permutation;

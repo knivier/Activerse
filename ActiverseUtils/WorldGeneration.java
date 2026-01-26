@@ -12,7 +12,7 @@ import java.util.Random;
  * structure placement, and world serialization.
  *
  * @author Knivier
- * @version 1.4.0
+ * @version 1.4.1
  */
 public class WorldGeneration {
     // Dimensions of the world

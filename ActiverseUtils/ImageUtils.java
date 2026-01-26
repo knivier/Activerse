@@ -9,7 +9,7 @@ import java.awt.Image;
  * ImageUtils - Shared helpers for safe image dimension lookups.
  *
  * @author Knivier
- * @version 1.4.0
+ * @version 1.4.1
  */
 public final class ImageUtils {
     private ImageUtils() {
