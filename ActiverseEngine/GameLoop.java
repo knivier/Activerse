@@ -81,9 +81,21 @@ public class GameLoop implements Runnable {
     public void stop() {
         running.set(false);
         try {
-            updateThread.join();
-            renderThread.join();
+            if (updateThread != null && updateThread.isAlive()) {
+                updateThread.join(1000); // Wait up to 1 second
+                if (updateThread.isAlive()) {
+                    System.err.println("[Activerse] Warning: Update thread did not terminate in time.");
+                }
+            }
+            if (renderThread != null && renderThread.isAlive()) {
+                renderThread.join(1000); // Wait up to 1 second
+                if (renderThread.isAlive()) {
+                    System.err.println("[Activerse] Warning: Render thread did not terminate in time.");
+                }
+            }
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("[Activerse] Error stopping game loop threads.");
             e.printStackTrace();
         }
         System.out.println("[Activerse] Game loop stopped.");

@@ -13,8 +13,9 @@ import java.awt.event.MouseListener;
  * @version 1.3.2
  */
 public class ActiverseMouseInfo implements MouseListener {
-    private static boolean leftClick = false;
-    private static boolean rightClick = false;
+    private static volatile boolean leftClick = false;
+    private static volatile boolean rightClick = false;
+    private static final Object clickLock = new Object();
 
     /**
      * @param component Constructor for the ActiverseMouseInfo class.
@@ -31,7 +32,6 @@ public class ActiverseMouseInfo implements MouseListener {
      */
     public static ActiverseMouseInfo createInstance(Component component) {
         ActiverseMouseInfo instance = new ActiverseMouseInfo(component);
-        component.addMouseListener(instance);
         return instance;
     }
 
@@ -50,7 +50,9 @@ public class ActiverseMouseInfo implements MouseListener {
      * @return true if the left mouse button is clicked, false otherwise.
      */
     public static boolean isLeftClick() {
-        return leftClick;
+        synchronized (clickLock) {
+            return leftClick;
+        }
     }
 
     /**
@@ -59,7 +61,9 @@ public class ActiverseMouseInfo implements MouseListener {
      * @return true if the right mouse button is clicked, false otherwise.
      */
     public static boolean isRightClick() {
-        return rightClick;
+        synchronized (clickLock) {
+            return rightClick;
+        }
     }
 
     /**
@@ -87,10 +91,12 @@ public class ActiverseMouseInfo implements MouseListener {
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        if (SwingUtilities.isLeftMouseButton(e)) {
-            leftClick = true;
-        } else if (SwingUtilities.isRightMouseButton(e)) {
-            rightClick = true;
+        synchronized (clickLock) {
+            if (SwingUtilities.isLeftMouseButton(e)) {
+                leftClick = true;
+            } else if (SwingUtilities.isRightMouseButton(e)) {
+                rightClick = true;
+            }
         }
     }
 
@@ -103,10 +109,12 @@ public class ActiverseMouseInfo implements MouseListener {
      */
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (SwingUtilities.isLeftMouseButton(e)) {
-            leftClick = false;
-        } else if (SwingUtilities.isRightMouseButton(e)) {
-            rightClick = false;
+        synchronized (clickLock) {
+            if (SwingUtilities.isLeftMouseButton(e)) {
+                leftClick = false;
+            } else if (SwingUtilities.isRightMouseButton(e)) {
+                rightClick = false;
+            }
         }
     }
 

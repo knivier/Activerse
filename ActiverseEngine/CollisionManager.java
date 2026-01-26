@@ -20,9 +20,37 @@ public class CollisionManager {
      * @return true if the non-transparent pixels of the two actors overlap, false otherwise.
      */
     public static boolean intersects(Actor a, Actor b) {
+        if (a == null || b == null) {
+            return false;
+        }
+        
+        ActiverseImage imgA = a.getImage();
+        ActiverseImage imgB = b.getImage();
+        
+        if (imgA == null || imgB == null || imgA.getImage() == null || imgB.getImage() == null) {
+            // Fall back to bounding box collision if images are not available
+            Rectangle r1 = a.getBoundingBox();
+            Rectangle r2 = b.getBoundingBox();
+            return r1.intersects(r2);
+        }
+        
         // Get bounding rectangles
-        Rectangle r1 = new Rectangle(a.getX(), a.getY(), a.getImage().getImage().getWidth(null), a.getImage().getImage().getHeight(null));
-        Rectangle r2 = new Rectangle(b.getX(), b.getY(), b.getImage().getImage().getWidth(null), b.getImage().getImage().getHeight(null));
+        Image imageA = imgA.getImage();
+        Image imageB = imgB.getImage();
+        int widthA = imageA.getWidth(null);
+        int heightA = imageA.getHeight(null);
+        int widthB = imageB.getWidth(null);
+        int heightB = imageB.getHeight(null);
+        
+        if (widthA < 0 || heightA < 0 || widthB < 0 || heightB < 0) {
+            // Image not loaded yet, use bounding box
+            Rectangle r1 = a.getBoundingBox();
+            Rectangle r2 = b.getBoundingBox();
+            return r1.intersects(r2);
+        }
+        
+        Rectangle r1 = new Rectangle(a.getX(), a.getY(), widthA, heightA);
+        Rectangle r2 = new Rectangle(b.getX(), b.getY(), widthB, heightB);
         Rectangle intersection = r1.intersection(r2);
 
         if (intersection.isEmpty()) {
@@ -30,8 +58,8 @@ public class CollisionManager {
         }
 
         // Convert images to BufferedImage for pixel access
-        BufferedImage imgA = toBufferedImage(a.getImage().getImage());
-        BufferedImage imgB = toBufferedImage(b.getImage().getImage());
+        BufferedImage bufferedImgA = toBufferedImage(imageA);
+        BufferedImage bufferedImgB = toBufferedImage(imageB);
 
         for (int y = intersection.y; y < intersection.y + intersection.height; y++) {
             for (int x = intersection.x; x < intersection.x + intersection.width; x++) {
@@ -41,13 +69,13 @@ public class CollisionManager {
                 int by = y - b.getY();
 
                 if (ax < 0 || ay < 0 || bx < 0 || by < 0 ||
-                        ax >= imgA.getWidth() || ay >= imgA.getHeight() ||
-                        bx >= imgB.getWidth() || by >= imgB.getHeight()) {
+                        ax >= bufferedImgA.getWidth() || ay >= bufferedImgA.getHeight() ||
+                        bx >= bufferedImgB.getWidth() || by >= bufferedImgB.getHeight()) {
                     continue;
                 }
 
-                int pixelA = imgA.getRGB(ax, ay);
-                int pixelB = imgB.getRGB(bx, by);
+                int pixelA = bufferedImgA.getRGB(ax, ay);
+                int pixelB = bufferedImgB.getRGB(bx, by);
 
                 // Check if both pixels are not transparent
                 if (((pixelA >> 24) & 0xff) != 0 && ((pixelB >> 24) & 0xff) != 0) {
