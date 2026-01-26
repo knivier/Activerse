@@ -258,10 +258,26 @@ public class World extends JPanel implements ActionListener, KeyListener {
      * @see Actor
      */
     public void removeObject(Actor actor) {
-        actors.remove(actor);
-        if (actor.getImage() != null) {
-            loadedImages.remove(actor.getImage().getPath());
+        if (actor != null) {
+            actors.remove(actor);
+            if (actor.getImage() != null) {
+                loadedImages.remove(actor.getImage().getPath());
+            }
+            actor.setWorld(null); // Clear world reference
         }
+    }
+    
+    /**
+     * Clears all actors from the world and cleans up resources.
+     */
+    public void clear() {
+        for (Actor actor : actors) {
+            if (actor != null) {
+                actor.setWorld(null);
+            }
+        }
+        actors.clear();
+        loadedImages.clear();
     }
 
     /**
@@ -284,12 +300,19 @@ public class World extends JPanel implements ActionListener, KeyListener {
     }
 
     /**
-     * Stops the world timer
+     * Stops the world timer and cleans up resources
      *
      * @see Timer
      */
     public void stop() {
         timer.stop();
+        // Clean up sounds
+        for (ActiverseSound sound : sounds) {
+            if (sound != null) {
+                sound.dispose();
+            }
+        }
+        sounds.clear();
     }
 
     /**
@@ -337,9 +360,8 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
         if (backgroundImage != null) {
             g.drawImage(backgroundImage, 0, 0, fixedWidth, fixedHeight, this);
-        } else if (backgroundImage == null) {
-            throw new NullPointerException("Background image not found");
         }
+        // Background image is optional - if null, just use the default background color
 
         if (dynamicLighting) {
             applyDynamicLighting(g);
@@ -490,6 +512,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
         gLighting.dispose();
         g2d.dispose();
+        lightingBuffer = null; // Help GC
     }
 
     /**
@@ -596,8 +619,8 @@ public class World extends JPanel implements ActionListener, KeyListener {
         g.drawString("Active Keys:", 10, y);
         y += 20;
         StringBuilder keysInfo = new StringBuilder();
-        for (int i = 0; i < KeyboardInfo.keys.length; i++) {
-            if (KeyboardInfo.keys[i]) {
+        for (int i = 0; i < 256; i++) {
+            if (KeyboardInfo.isKeyDown(i)) {
                 keysInfo.append(KeyEvent.getKeyText(i)).append(" ");
             }
         }
@@ -636,7 +659,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
      */
     @Override
     public void keyPressed(KeyEvent e) {
-        KeyboardInfo.keys[e.getKeyCode()] = true;
+        KeyboardInfo.setKeyState(e.getKeyCode(), true);
     }
 
     /**
@@ -644,7 +667,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
      */
     @Override
     public void keyReleased(KeyEvent e) {
-        KeyboardInfo.keys[e.getKeyCode()] = false;
+        KeyboardInfo.setKeyState(e.getKeyCode(), false);
     }
 
     /**

@@ -231,12 +231,9 @@ public abstract class Actor {
      * Gets the image of the actor.
      *
      * @return The image of the actor, or null if no image is set.
+     *         Returns null if the actor uses shapes instead of images.
      */
     public ActiverseImage getImage() {
-        if (image == null) {
-            System.err.println("Warning: Image not set for actor.");
-            return null;
-        }
         return image;
     }
 
@@ -251,6 +248,8 @@ public abstract class Actor {
 
     /**
      * Draws the actor on the given graphics context.
+     * If no image is set, this method does nothing. Subclasses should override
+     * this method to draw shapes or custom graphics when not using images.
      *
      * @param g The graphics context to draw on.
      */
@@ -265,9 +264,8 @@ public abstract class Actor {
             g2d.drawImage(image.getImage(), x, y, null);
 
             g2d.setTransform(old);
-        } else { // Can't throw nullpointerexception for lack of image, because this is meant to be played without an image on offchance
-            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: paint(Graphics g) - ACEHS Error thrown; image is null. Please check the image path and try again.");
         }
+        // If image is null, the actor should override paint() to draw shapes
     }
 
     /**
@@ -305,12 +303,19 @@ public abstract class Actor {
      *
      * @return The bounding box of the actor.
      */
-    protected Rectangle getBoundingBox() {
+    public Rectangle getBoundingBox() {
         ActiverseImage img = getImage();
-        if (img != null) {
-            return new Rectangle(x, y, img.getImage().getWidth(null), img.getImage().getHeight(null));
+        if (img != null && img.getImage() != null) {
+            Image image = img.getImage();
+            int imgWidth = image.getWidth(null);
+            int imgHeight = image.getHeight(null);
+            // If image dimensions not available, use stored dimensions
+            if (imgWidth < 0) imgWidth = width;
+            if (imgHeight < 0) imgHeight = height;
+            return new Rectangle(x, y, imgWidth, imgHeight);
         } else {
-            return new Rectangle(x, y, 0, 0);
+            // Use stored dimensions if image not available
+            return new Rectangle(x, y, width > 0 ? width : 0, height > 0 ? height : 0);
         }
     }
 
@@ -320,13 +325,33 @@ public abstract class Actor {
      * @param distance The distance to move the actor.
      */
     public void move(int distance) {
+        if (world == null) {
+            return; // Cannot move without a world
+        }
+        
         int dx = (int) (distance * Math.cos(direction));
         int dy = (int) (distance * Math.sin(direction));
         int newX = x + dx;
         int newY = y + dy;
+        
+        // Get image dimensions safely
+        int actorWidth = 0;
+        int actorHeight = 0;
+        if (image != null && image.getImage() != null) {
+            actorWidth = image.getImage().getWidth(null);
+            actorHeight = image.getImage().getHeight(null);
+            // If image not loaded yet, use stored width/height if available
+            if (actorWidth < 0) actorWidth = this.width;
+            if (actorHeight < 0) actorHeight = this.height;
+        } else {
+            // Use stored dimensions if image not available
+            actorWidth = this.width;
+            actorHeight = this.height;
+        }
+        
         // Check if the new position exceeds the world limits
-        if (newX >= 0 && newX + getImage().getImage().getWidth(null) <= world.getWidth() &&
-                newY >= 0 && newY + getImage().getImage().getHeight(null) <= world.getHeight()) {
+        if (newX >= 0 && newX + actorWidth <= world.getWidth() &&
+                newY >= 0 && newY + actorHeight <= world.getHeight()) {
             x = newX;
             y = newY;
         }
@@ -339,6 +364,10 @@ public abstract class Actor {
      */
     public void turn(double angle) {
         direction = (direction + angle) % (2 * Math.PI);
+        // Normalize to [0, 2π) range
+        if (direction < 0) {
+            direction += 2 * Math.PI;
+        }
     }
 
     /**
@@ -360,18 +389,32 @@ public abstract class Actor {
 
     /**
      * Delays the execution of the next action by the specified milliseconds.
+     * WARNING: This method creates a new thread for each delay. For frequent delays,
+     * consider using ActiverseUtils.Timer instead.
      *
      * @param ms The delay in milliseconds.
      */
     public void delayNext(int ms) {
-        new Thread(() -> {
+        if (ms < 0) {
+            System.out.println("5A.IN:(LN: delayNext(int ms) - ACEHS Error thrown; delay cannot be negative.");
+            return;
+        }
+        
+        // Use a daemon thread to avoid preventing JVM shutdown
+        Thread delayThread = new Thread(() -> {
             try {
                 Thread.sleep(ms);
+                // Only call act() if actor is still in a world
+                if (world != null) {
+                    act();
+                }
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 System.err.println("5A.IO:(LN: delayNext(int ms) - ACEHS Error thrown; an error occurred while delaying the next action.");
             }
-            act();
-        }).start();
+        });
+        delayThread.setDaemon(true);
+        delayThread.start();
     }
 
     /**
@@ -523,11 +566,11 @@ public abstract class Actor {
             this.setX(currentNode.x);
             this.setY(currentNode.y);
 
-            // Adjust movement direction
-            if (directionX == 1) this.turn(0); // right
-            if (directionX == -1) this.turn(180); // left
-            if (directionY == 1) this.turn(90); // down
-            if (directionY == -1) this.turn(270); // up
+            // Adjust movement direction (convert degrees to radians)
+            if (directionX == 1) this.direction = 0; // right (0 radians)
+            else if (directionX == -1) this.direction = Math.PI; // left (π radians)
+            else if (directionY == 1) this.direction = Math.PI / 2; // down (π/2 radians)
+            else if (directionY == -1) this.direction = -Math.PI / 2; // up (-π/2 radians)
 
             this.move(1); // move to the next cell
 

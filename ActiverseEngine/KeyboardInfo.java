@@ -11,7 +11,8 @@ import java.awt.event.KeyListener;
  * @version 1.3.2
  */
 public class KeyboardInfo implements KeyListener {
-    public static boolean[] keys = new boolean[256];
+    private static final boolean[] keys = new boolean[256];
+    private static final Object keysLock = new Object();
 
     /**
      * Checks if a specific key is currently pressed.
@@ -20,7 +21,23 @@ public class KeyboardInfo implements KeyListener {
      * @return true if the key is currently pressed, false otherwise.
      */
     public static boolean isKeyDown(int keyCode) {
-        return keys[keyCode];
+        if (keyCode < 0 || keyCode >= keys.length) {
+            return false;
+        }
+        synchronized (keysLock) {
+            return keys[keyCode];
+        }
+    }
+    
+    /**
+     * Internal method to set key state. Package-private for use by World.
+     */
+    static void setKeyState(int keyCode, boolean pressed) {
+        if (keyCode >= 0 && keyCode < keys.length) {
+            synchronized (keysLock) {
+                keys[keyCode] = pressed;
+            }
+        }
     }
 
     /**
@@ -31,7 +48,7 @@ public class KeyboardInfo implements KeyListener {
      */
     @Override
     public void keyPressed(KeyEvent e) {
-        keys[e.getKeyCode()] = true;
+        setKeyState(e.getKeyCode(), true);
     }
 
     /**
@@ -42,7 +59,7 @@ public class KeyboardInfo implements KeyListener {
      */
     @Override
     public void keyReleased(KeyEvent e) {
-        keys[e.getKeyCode()] = false;
+        setKeyState(e.getKeyCode(), false);
     }
 
     /**

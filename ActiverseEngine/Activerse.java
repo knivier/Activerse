@@ -2,6 +2,8 @@ package ActiverseEngine;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Provides utility methods to start and stop the Activerse application.
@@ -62,18 +64,46 @@ public class Activerse {
         }
         if (currentWorld != null) {
             stop(currentWorld);
-            frame.getContentPane().remove(currentWorld);
+            if (frame != null) {
+                frame.getContentPane().remove(currentWorld);
+            }
+        }
+        if (gameLoop != null) {
+            gameLoop.stop();
+            gameLoop = null;
         }
         currentWorld = world;
-        frame.getContentPane().add(currentWorld, BorderLayout.CENTER);
-        frame.getContentPane().revalidate();
-        frame.getContentPane().repaint();
-
-        if (gameLoop != null) {
-            gameLoop = new GameLoop(currentWorld);
-            new Thread(gameLoop).start();
+        if (frame != null) {
+            frame.getContentPane().removeAll(); // Remove all components
+            frame.getContentPane().add(currentWorld, BorderLayout.CENTER);
+            frame.getContentPane().revalidate();
+            frame.getContentPane().repaint();
         }
+        
+        // Create and start game loop
+        gameLoop = new GameLoop(currentWorld);
+        new Thread(gameLoop).start();
+        
+        // Start the world
         currentWorld.start();
+        
+        // Ensure the new world gets focus for keyboard input (must be done after adding to frame)
+        // Use invokeLater to ensure this happens after the component is fully added and visible
+        SwingUtilities.invokeLater(() -> {
+            currentWorld.setFocusable(true);
+            if (!currentWorld.requestFocusInWindow()) {
+                // If focus request fails, try again after a short delay
+                Timer focusTimer = new Timer(100, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        currentWorld.requestFocusInWindow();
+                        ((Timer) e.getSource()).stop();
+                    }
+                });
+                focusTimer.setRepeats(false);
+                focusTimer.start();
+            }
+        });
     }
 
     /**

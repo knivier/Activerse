@@ -189,7 +189,30 @@ public class ActiverseSound {
      */
     public void dispose() {
         if (clip != null) {
-            clip.close();
+            try {
+                if (clip.isRunning()) {
+                    clip.stop();
+                }
+                clip.close();
+            } catch (Exception e) {
+                System.out.println("4A.IO:(LN: dispose() - ACEHS Error thrown; an error occurred while disposing audio clip.");
+                e.printStackTrace();
+            } finally {
+                clip = null;
+                volumeControl = null;
+            }
+        }
+    }
+    
+    /**
+     * Ensures resources are cleaned up when object is garbage collected.
+     */
+    @Override
+    protected void finalize() throws Throwable {
+        try {
+            dispose();
+        } finally {
+            super.finalize();
         }
     }
 
