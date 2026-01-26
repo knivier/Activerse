@@ -7,7 +7,7 @@ import java.awt.Point;
  * Essential for infinite world generation and smooth camera movement
  * 
  * @author Knivier
- * @version 1.4.0
+ * @version 1.4.1
  */
 public class Camera {
     private double offsetX;

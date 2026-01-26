@@ -5,7 +5,7 @@ package ActiverseUtils;
  * Ensures consistent error output across ActiverseEngine and ActiverseUtils.
  *
  * @author Knivier
- * @version 1.4.0
+ * @version 1.4.1
  */
 public final class ErrorLogger {
     private ErrorLogger() {

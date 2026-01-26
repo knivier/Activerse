@@ -12,7 +12,7 @@ import java.util.List;
  * It provides convenient methods with robust error handling and verbose comments.
  *
  * @author Knivier
- * @version 1.4.0
+ * @version 1.4.1
  */
 public class FileUtils {
 

@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
  * This class contains static methods to manage the application lifecycle.
  *
  * @author Knivier
- * @version 1.4.0
+ * @version 1.4.1
  */
 public class Activerse {
     private static World currentWorld;
@@ -34,7 +34,7 @@ public class Activerse {
         new Thread(gameLoop).start();
         SwingUtilities.invokeLater(() -> {
             try {
-                frame = new JFrame("Activerse Instance v1.4.0");
+                frame = new JFrame("Activerse Instance v1.4.1");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.getContentPane().add(currentWorld, BorderLayout.CENTER);
                 frame.pack();

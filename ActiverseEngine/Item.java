@@ -5,7 +5,7 @@ package ActiverseEngine;
  * Each item has a name, type, and value.
  *
  * @author Knivier
- * @version 1.4.0
+ * @version 1.4.1
  */
 public abstract class Item {
     private final String name;

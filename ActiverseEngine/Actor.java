@@ -14,7 +14,7 @@ import java.util.List;
  * The base class for all actors in the world.
  *
  * @author Knivier
- * @version 1.4.0
+ * @version 1.4.1
  */
 public abstract class Actor {
     protected double direction;
