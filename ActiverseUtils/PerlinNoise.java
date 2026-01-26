@@ -39,7 +39,7 @@ public class PerlinNoise {
                 p[i] = permutation[i % 256];
             }
         } catch (Exception e) {
-            reportACESH("3B", "IN", "PerlinNoise", e);
+            ErrorLogger.reportException("3B", "IN", "PerlinNoise(long seed)", e);
         }
     }
 
@@ -47,7 +47,7 @@ public class PerlinNoise {
         try {
             return noise(x, 0, 0);
         } catch (Exception e) {
-            reportACESH("3B", "IN", "noise", e);
+            ErrorLogger.reportException("3B", "IN", "noise(double x)", e);
             return 0;
         }
     }
@@ -56,7 +56,7 @@ public class PerlinNoise {
         try {
             return noise(x, y, 0);
         } catch (Exception e) {
-            reportACESH("3B", "IN", "noise", e);
+            ErrorLogger.reportException("3B", "IN", "noise(double x, double y)", e);
             return 0;
         }
     }
@@ -82,16 +82,18 @@ public class PerlinNoise {
             int BA = p[B] + Z;
             int BB = p[B + 1] + Z;
 
-            return lerp(w, lerp(v, lerp(u, grad(p[AA], x, y, z),
-                                    grad(p[BA], x - 1, y, z)),
-                            lerp(u, grad(p[AB], x, y - 1, z),
-                                    grad(p[BB], x - 1, y - 1, z))),
-                    lerp(v, lerp(u, grad(p[AA + 1], x, y, z - 1),
-                                    grad(p[BA + 1], x - 1, y, z - 1)),
-                            lerp(u, grad(p[AB + 1], x, y - 1, z - 1),
-                                    grad(p[BB + 1], x - 1, y - 1, z - 1))));
+            return MathUtils.lerp(
+                    MathUtils.lerp(
+                            MathUtils.lerp(grad(p[AA], x, y, z), grad(p[BA], x - 1, y, z), u),
+                            MathUtils.lerp(grad(p[AB], x, y - 1, z), grad(p[BB], x - 1, y - 1, z), u),
+                            v),
+                    MathUtils.lerp(
+                            MathUtils.lerp(grad(p[AA + 1], x, y, z - 1), grad(p[BA + 1], x - 1, y, z - 1), u),
+                            MathUtils.lerp(grad(p[AB + 1], x, y - 1, z - 1), grad(p[BB + 1], x - 1, y - 1, z - 1), u),
+                            v),
+                    w);
         } catch (Exception e) {
-            reportACESH("3B", "IN", "noise", e);
+            ErrorLogger.reportException("3B", "IN", "noise(double x, double y, double z)", e);
             return 0;
         }
     }
@@ -112,7 +114,7 @@ public class PerlinNoise {
 
             return total / maxAmplitude;
         } catch (Exception e) {
-            reportACESH("3B", "IN", "octaveNoise", e);
+            ErrorLogger.reportException("3B", "IN", "octaveNoise(double x, int octaves, double persistence)", e);
             return 0;
         }
     }
@@ -133,7 +135,7 @@ public class PerlinNoise {
 
             return total / maxAmplitude;
         } catch (Exception e) {
-            reportACESH("3B", "IN", "octaveNoise", e);
+            ErrorLogger.reportException("3B", "IN", "octaveNoise(double x, double y, int octaves, double persistence)", e);
             return 0;
         }
     }
@@ -142,16 +144,7 @@ public class PerlinNoise {
         try {
             return t * t * t * (t * (t * 6 - 15) + 10);
         } catch (Exception e) {
-            reportACESH("3B", "IN", "fade", e);
-            return 0;
-        }
-    }
-
-    private double lerp(double t, double a, double b) {
-        try {
-            return a + t * (b - a);
-        } catch (Exception e) {
-            reportACESH("3B", "IN", "lerp", e);
+            ErrorLogger.reportException("3B", "IN", "fade(double t)", e);
             return 0;
         }
     }
@@ -164,19 +157,8 @@ public class PerlinNoise {
             return ((h & 1) == 0 ? u : -u) +
                     ((h & 2) == 0 ? v : -v);
         } catch (Exception e) {
-            reportACESH("3B", "IN", "grad", e);
+            ErrorLogger.reportException("3B", "IN", "grad(int hash, double x, double y, double z)", e);
             return 0;
         }
-    }
-
-    /**
-     * ACESH error reporting utility.
-     * @param fileCode The file code (e.g., "3B" for PerlinNoise.java)
-     * @param errorType The error type (e.g., "LN", "IN", "OUT", etc.)
-     * @param method The method where the error occurred
-     * @param e The exception
-     */
-    private static void reportACESH(String fileCode, String errorType, String method, Exception e) {
-        System.out.println(fileCode + "." + errorType + "." + method + " :(LN: " + method + "() - ACESH Error thrown; " + e.getClass().getSimpleName() + ": " + e.getMessage() + ")");
     }
 }

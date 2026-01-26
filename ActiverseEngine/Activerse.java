@@ -1,5 +1,7 @@
 package ActiverseEngine;
 
+import ActiverseUtils.ErrorLogger;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -37,16 +39,15 @@ public class Activerse {
                 frame.getContentPane().add(currentWorld, BorderLayout.CENTER);
                 frame.pack();
                 frame.setVisible(true);
-                frame.setResizable(false); // Prevent resizing of the window
-                frame.setLocationRelativeTo(null); // Center the window on the screen
-                currentWorld.start(); // Start the world
+                frame.setResizable(false); 
+                frame.setLocationRelativeTo(null);
+                currentWorld.start(); 
             } catch (HeadlessException | IllegalArgumentException e) {
-                System.out.println("1A.IO:(LN: SwingUtilities.invokeLater caught Exception at Activerse.start()) - ACEHS Error fetched and thrown; a specific error occurred. Please see the stack trace for more information. Contact ActiverseEngine support for bugs.");
-                e.printStackTrace();
+                ErrorLogger.report("1A", "IO", "Activerse.start()",
+                        "a specific error occurred. Please check the error details and ensure the environment supports windowed rendering.");
                 stop(currentWorld);
             } catch (Exception e) {
-                System.out.println("1A.IO:(LN: SwingUtilities.invokeLater caught Exception at Activerse.start()) - ACEHS Error fetched and thrown; an unidentified error occurred. Please see the stack trace for more information. Contact ActiverseEngine support for bugs.");
-                e.printStackTrace();
+                ErrorLogger.reportException("1A", "IO", "Activerse.start()", e);
                 stop(currentWorld);
             }
         });
@@ -116,8 +117,7 @@ public class Activerse {
             try {
                 world.stop();
             } catch (Exception e) {
-                System.out.println("1A.IO:(LN: stop(World world)) - ACEHS Error fetched and thrown; an unidentified error occurred. Please see the stack trace for more information. Contact ActiverseEngine support for bugs.");
-                e.printStackTrace();
+                ErrorLogger.reportException("1A", "IO", "stop(World world)", e);
                 System.exit(0);
             }
         }

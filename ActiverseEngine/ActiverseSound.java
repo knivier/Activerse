@@ -1,5 +1,7 @@
 package ActiverseEngine;
 
+import ActiverseUtils.ErrorLogger;
+
 import java.io.File;
 import java.io.IOException;
 import javax.sound.sampled.*;
@@ -29,8 +31,8 @@ public class ActiverseSound {
             clip.open(audioInputStream);
             volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            System.out.println("4A.IN:(LN: ActiverseSound(String filename) - ACEHS Error thrown; an error occurred while loading the audio file (type: INTO). Please check the file path and try again. WAV files are only supported at this time.");
-            e.printStackTrace();
+            ErrorLogger.report("4A", "IN", "ActiverseSound(String filename)",
+                    "an error occurred while loading the audio file (type: INTO). Please check the file path and try again. WAV files are only supported at this time.");
         }
     }
 
@@ -42,7 +44,8 @@ public class ActiverseSound {
             clip.setFramePosition(0);
             clip.start();
         } else {
-            throw new NullPointerException("4A.OUT:(LN: play() - ACEHS Error thrown; audio file is null. Please check the file path and try again.");
+            throw new NullPointerException(
+                    ErrorLogger.format("4A", "OUT", "play()", "audio file is null. Please check the file path and try again."));
         }
     }
 
@@ -53,7 +56,8 @@ public class ActiverseSound {
         if (clip != null) {
             clip.stop();
         } else {
-            throw new NullPointerException("4A.OUT:(LN: stop() - ACEHS Error thrown; audio file is null. Please check the file path and try again.");
+            throw new NullPointerException(
+                    ErrorLogger.format("4A", "OUT", "stop()", "audio file is null. Please check the file path and try again."));
         }
     }
 
@@ -112,7 +116,8 @@ public class ActiverseSound {
             clip.setFramePosition(0);
             clip.loop(Clip.LOOP_CONTINUOUSLY);
         } else {
-            throw new NullPointerException("4A.OUT:(LN: loop() - ACEHS Error thrown; audio file is null. Cannot loop audio.");
+            throw new NullPointerException(
+                    ErrorLogger.format("4A", "OUT", "loop()", "audio file is null. Cannot loop audio."));
         }
     }
 
@@ -126,7 +131,8 @@ public class ActiverseSound {
             clip.setFramePosition(0);
             clip.loop(count);
         } else {
-            throw new NullPointerException("4A.OUT:(LN: loop(int count) - ACEHS Error thrown; audio file is null. Cannot loop audio.");
+            throw new NullPointerException(
+                    ErrorLogger.format("4A", "OUT", "loop(int count)", "audio file is null. Cannot loop audio."));
         }
     }
 
@@ -195,8 +201,7 @@ public class ActiverseSound {
                 }
                 clip.close();
             } catch (Exception e) {
-                System.out.println("4A.IO:(LN: dispose() - ACEHS Error thrown; an error occurred while disposing audio clip.");
-                e.printStackTrace();
+                ErrorLogger.reportException("4A", "IO", "dispose()", e);
             } finally {
                 clip = null;
                 volumeControl = null;

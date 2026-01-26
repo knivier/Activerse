@@ -1,5 +1,7 @@
 package ActiverseEngine;
 
+import ActiverseUtils.ImageUtils;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
@@ -27,30 +29,27 @@ public class CollisionManager {
         ActiverseImage imgA = a.getImage();
         ActiverseImage imgB = b.getImage();
         
+        Rectangle boundsA = a.getBoundingBox();
+        Rectangle boundsB = b.getBoundingBox();
+
         if (imgA == null || imgB == null || imgA.getImage() == null || imgB.getImage() == null) {
             // Fall back to bounding box collision if images are not available
-            Rectangle r1 = a.getBoundingBox();
-            Rectangle r2 = b.getBoundingBox();
-            return r1.intersects(r2);
+            return boundsA.intersects(boundsB);
         }
         
         // Get bounding rectangles
         Image imageA = imgA.getImage();
         Image imageB = imgB.getImage();
-        int widthA = imageA.getWidth(null);
-        int heightA = imageA.getHeight(null);
-        int widthB = imageB.getWidth(null);
-        int heightB = imageB.getHeight(null);
-        
-        if (widthA < 0 || heightA < 0 || widthB < 0 || heightB < 0) {
+        Dimension dimA = ImageUtils.getImageDimensions(imgA, boundsA.width, boundsA.height);
+        Dimension dimB = ImageUtils.getImageDimensions(imgB, boundsB.width, boundsB.height);
+
+        if (dimA.width <= 0 || dimA.height <= 0 || dimB.width <= 0 || dimB.height <= 0) {
             // Image not loaded yet, use bounding box
-            Rectangle r1 = a.getBoundingBox();
-            Rectangle r2 = b.getBoundingBox();
-            return r1.intersects(r2);
+            return boundsA.intersects(boundsB);
         }
         
-        Rectangle r1 = new Rectangle(a.getX(), a.getY(), widthA, heightA);
-        Rectangle r2 = new Rectangle(b.getX(), b.getY(), widthB, heightB);
+        Rectangle r1 = new Rectangle(boundsA.x, boundsA.y, dimA.width, dimA.height);
+        Rectangle r2 = new Rectangle(boundsB.x, boundsB.y, dimB.width, dimB.height);
         Rectangle intersection = r1.intersection(r2);
 
         if (intersection.isEmpty()) {
@@ -63,10 +62,10 @@ public class CollisionManager {
 
         for (int y = intersection.y; y < intersection.y + intersection.height; y++) {
             for (int x = intersection.x; x < intersection.x + intersection.width; x++) {
-                int ax = x - a.getX();
-                int ay = y - a.getY();
-                int bx = x - b.getX();
-                int by = y - b.getY();
+                int ax = x - r1.x;
+                int ay = y - r1.y;
+                int bx = x - r2.x;
+                int by = y - r2.y;
 
                 if (ax < 0 || ay < 0 || bx < 0 || by < 0 ||
                         ax >= bufferedImgA.getWidth() || ay >= bufferedImgA.getHeight() ||
