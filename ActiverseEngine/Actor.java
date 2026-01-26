@@ -1,5 +1,9 @@
 package ActiverseEngine;
 
+import ActiverseUtils.ErrorLogger;
+import ActiverseUtils.ImageUtils;
+import ActiverseUtils.MathUtils;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
@@ -15,6 +19,8 @@ import java.util.List;
 public abstract class Actor {
     protected double direction;
     private int x, y;
+    private double preciseX, preciseY; // Float positions for smooth movement
+    private boolean usePrecisePosition = false;
     private World world;
     private ActiverseImage image;
     private double velocityX, velocityY;
@@ -55,9 +61,11 @@ public abstract class Actor {
      * Enables inventory for the actor. By default, it is disabled.
      */
     public void enableInventory() {
-        if (inventory == null) inventory = new java.util.ArrayList<>();
-        else
-            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: enableInventory() - ACEHS Error thrown; inventory is already enabled.");
+        if (inventory == null) {
+            inventory = new java.util.ArrayList<>();
+        } else {
+            ErrorLogger.report("5A", "OUT", "enableInventory()", "inventory is already enabled.", "2A", "OUT");
+        }
     }
 
     /**
@@ -69,7 +77,7 @@ public abstract class Actor {
             inventory.clear();
             inventory = null;
         } else {
-            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: disableInventory() - ACEHS Error thrown; inventory is already disabled.");
+            ErrorLogger.report("5A", "OUT", "disableInventory()", "inventory is already disabled.", "2A", "OUT");
         }
     }
 
@@ -79,10 +87,7 @@ public abstract class Actor {
      * @return The maximum size of the inventory.
      */
     public int getInventorySize() {
-        if (inventory == null) {
-            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: getInventorySize() - ACEHS Error thrown; inventory is not enabled.");
-            return 0;
-        }
+        if (!ensureInventoryEnabled("getInventorySize()")) return 0;
         return inventory.size();
     }
 
@@ -92,15 +97,22 @@ public abstract class Actor {
      * @param size the maximum inventory size (maximum number of type Item)
      */
     public void setInventorySize(int size) {
-        if (inventory == null) {
-            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: setInventorySize(int size) - ACEHS Error thrown; inventory is not enabled.");
-            return;
-        }
+        if (!ensureInventoryEnabled("setInventorySize(int size)")) return;
         if (size < 0) {
-            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: setInventorySize(int size) - ACEHS Error thrown; size cannot be negative.");
+            ErrorLogger.report("5A", "OUT", "setInventorySize(int size)", "size cannot be negative.", "2A", "OUT");
             return;
         }
         maxInventory = size;
+    }
+    
+    /**
+     * Gets the maximum inventory size
+     *
+     * @return The maximum number of items the inventory can hold
+     */
+    public int getMaxInventorySize() {
+        if (!ensureInventoryEnabled("getMaxInventorySize()")) return 0;
+        return maxInventory;
     }
 
     /**
@@ -119,15 +131,12 @@ public abstract class Actor {
      * @return Boolean the success of adding the item
      */
     public boolean addItem(Item item) {
-        if (inventory == null) {
-            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: addItem(Item item) - ACEHS Error thrown; inventory is not enabled.");
-            return false;
-        }
+        if (!ensureInventoryEnabled("addItem(Item item)")) return false;
         if (inventory.size() < maxInventory) { // Assuming a maximum of 10 items
             inventory.add(item);
             return true;
         } else {
-            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: addItem(Item item) - ACEHS Error thrown; inventory is full.");
+            ErrorLogger.report("5A", "OUT", "addItem(Item item)", "inventory is full.", "2A", "OUT");
             return false;
         }
     }
@@ -138,14 +147,11 @@ public abstract class Actor {
      * @param item The item to remove from the inventory.
      */
     public void removeItem(Item item) {
-        if (inventory == null) {
-            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: removeItem(Item item) - ACEHS Error thrown; inventory is not enabled.");
-            return;
-        }
+        if (!ensureInventoryEnabled("removeItem(Item item)")) return;
         if (inventory.contains(item)) {
             inventory.remove(item);
         } else {
-            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: removeItem(Item item) - ACEHS Error thrown; item not found in inventory.");
+            ErrorLogger.report("5A", "OUT", "removeItem(Item item)", "item not found in inventory.", "2A", "OUT");
         }
     }
 
@@ -155,11 +161,53 @@ public abstract class Actor {
      * @return The list of items in the actor's inventory, or null if inventory is not enabled.
      */
     public List<Item> getInventory() {
-        if (inventory == null) {
-            System.out.println("5A.OUT-CONNTO-2A.OUT:(LN: getInventory() - ACEHS Error thrown; inventory is not enabled.");
-            return null;
-        }
+        if (!ensureInventoryEnabled("getInventory()")) return null;
         return inventory;
+    }
+
+    /**
+     * Enables precise float positioning for smooth sub-pixel movement
+     */
+    public void enablePrecisePosition() {
+        usePrecisePosition = true;
+        preciseX = x;
+        preciseY = y;
+    }
+    
+    /**
+     * Sets the precise location using floats
+     *
+     * @param x The x-coordinate
+     * @param y The y-coordinate
+     */
+    public void setPreciseLocation(double x, double y) {
+        if (usePrecisePosition) {
+            this.preciseX = x;
+            this.preciseY = y;
+            this.x = (int)Math.round(x);
+            this.y = (int)Math.round(y);
+        } else {
+            this.x = (int)Math.round(x);
+            this.y = (int)Math.round(y);
+        }
+    }
+    
+    /**
+     * Gets the precise X position
+     *
+     * @return The precise x-coordinate
+     */
+    public double getPreciseX() {
+        return usePrecisePosition ? preciseX : x;
+    }
+    
+    /**
+     * Gets the precise Y position
+     *
+     * @return The precise y-coordinate
+     */
+    public double getPreciseY() {
+        return usePrecisePosition ? preciseY : y;
     }
 
     /**
@@ -169,6 +217,7 @@ public abstract class Actor {
      * @param y The y-coordinate of the new location.
      */
     public void setLocation(int x, int y) {
+        updatePrecisePosition(x, y);
         this.x = x;
         this.y = y;
     }
@@ -188,6 +237,7 @@ public abstract class Actor {
      * @param x The x-coordinate to set.
      */
     public void setX(int x) {
+        updatePrecisePosition(x, null);
         this.x = x;
     }
 
@@ -206,6 +256,7 @@ public abstract class Actor {
      * @param y The y-coordinate to set.
      */
     public void setY(int y) {
+        updatePrecisePosition(null, y);
         this.y = y;
     }
 
@@ -254,16 +305,21 @@ public abstract class Actor {
      * @param g The graphics context to draw on.
      */
     public void paint(Graphics g) {
-        if (image != null) {
+        if (image == null) return;
+        try {
+            Image awtImage = image.getImage();
             Graphics2D g2d = (Graphics2D) g;
-            width = image.getImage().getWidth(null);
-            int height = image.getImage().getHeight(null);
+            Dimension dims = ImageUtils.getImageDimensions(image, width, height);
+            width = dims.width;
+            height = dims.height;
             AffineTransform old = g2d.getTransform();
 
-            g2d.rotate(direction, x + (double) width / 2, y + (double) height / 2);
-            g2d.drawImage(image.getImage(), x, y, null);
+            g2d.rotate(direction, x + (double) dims.width / 2, y + (double) dims.height / 2);
+            g2d.drawImage(awtImage, x, y, null);
 
             g2d.setTransform(old);
+        } catch (Exception e) {
+            ErrorLogger.reportException("5A", "OUT", "paint(Graphics g)", e, "2A", "OUT");
         }
         // If image is null, the actor should override paint() to draw shapes
     }
@@ -304,19 +360,8 @@ public abstract class Actor {
      * @return The bounding box of the actor.
      */
     public Rectangle getBoundingBox() {
-        ActiverseImage img = getImage();
-        if (img != null && img.getImage() != null) {
-            Image image = img.getImage();
-            int imgWidth = image.getWidth(null);
-            int imgHeight = image.getHeight(null);
-            // If image dimensions not available, use stored dimensions
-            if (imgWidth < 0) imgWidth = width;
-            if (imgHeight < 0) imgHeight = height;
-            return new Rectangle(x, y, imgWidth, imgHeight);
-        } else {
-            // Use stored dimensions if image not available
-            return new Rectangle(x, y, width > 0 ? width : 0, height > 0 ? height : 0);
-        }
+        Dimension dims = ImageUtils.getImageDimensions(getImage(), width, height);
+        return new Rectangle(x, y, dims.width, dims.height);
     }
 
     /**
@@ -334,20 +379,9 @@ public abstract class Actor {
         int newX = x + dx;
         int newY = y + dy;
         
-        // Get image dimensions safely
-        int actorWidth = 0;
-        int actorHeight = 0;
-        if (image != null && image.getImage() != null) {
-            actorWidth = image.getImage().getWidth(null);
-            actorHeight = image.getImage().getHeight(null);
-            // If image not loaded yet, use stored width/height if available
-            if (actorWidth < 0) actorWidth = this.width;
-            if (actorHeight < 0) actorHeight = this.height;
-        } else {
-            // Use stored dimensions if image not available
-            actorWidth = this.width;
-            actorHeight = this.height;
-        }
+        Dimension dims = ImageUtils.getImageDimensions(image, width, height);
+        int actorWidth = dims.width;
+        int actorHeight = dims.height;
         
         // Check if the new position exceeds the world limits
         if (newX >= 0 && newX + actorWidth <= world.getWidth() &&
@@ -396,7 +430,7 @@ public abstract class Actor {
      */
     public void delayNext(int ms) {
         if (ms < 0) {
-            System.out.println("5A.IN:(LN: delayNext(int ms) - ACEHS Error thrown; delay cannot be negative.");
+            ErrorLogger.report("5A", "IN", "delayNext(int ms)", "delay cannot be negative.");
             return;
         }
         
@@ -410,7 +444,7 @@ public abstract class Actor {
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                System.err.println("5A.IO:(LN: delayNext(int ms) - ACEHS Error thrown; an error occurred while delaying the next action.");
+                ErrorLogger.reportException("5A", "IO", "delayNext(int ms)", e);
             }
         });
         delayThread.setDaemon(true);
@@ -575,6 +609,61 @@ public abstract class Actor {
             this.move(1); // move to the next cell
 
             currentNode = currentNode.parent;
+        }
+    }
+    
+    /**
+     * Gets the distance to another actor
+     *
+     * @param other The other actor
+     * @return The distance in pixels
+     */
+    public double getDistanceTo(Actor other) {
+        if (other == null) return Double.MAX_VALUE;
+        return MathUtils.distance(getX(), getY(), other.getX(), other.getY());
+    }
+    
+    /**
+     * Gets the angle to another actor in radians
+     *
+     * @param other The other actor
+     * @return The angle in radians from this actor to the other
+     */
+    public double getAngleTo(Actor other) {
+        if (other == null) return 0;
+        int dx = other.getX() - this.getX();
+        int dy = other.getY() - this.getY();
+        return Math.atan2(dy, dx);
+    }
+    
+    /**
+     * Applies knockback to this actor
+     *
+     * @param angle The angle of knockback in radians
+     * @param force The force/distance of knockback
+     */
+    public void knockback(double angle, double force) {
+        int dx = (int)(Math.cos(angle) * force);
+        int dy = (int)(Math.sin(angle) * force);
+        setX(getX() + dx);
+        setY(getY() + dy);
+    }
+
+    private boolean ensureInventoryEnabled(String methodSignature) {
+        if (inventory == null) {
+            ErrorLogger.report("5A", "OUT", methodSignature, "inventory is not enabled.", "2A", "OUT");
+            return false;
+        }
+        return true;
+    }
+
+    private void updatePrecisePosition(Integer newX, Integer newY) {
+        if (!usePrecisePosition) return;
+        if (newX != null) {
+            preciseX = newX;
+        }
+        if (newY != null) {
+            preciseY = newY;
         }
     }
 

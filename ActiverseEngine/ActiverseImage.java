@@ -1,5 +1,7 @@
 package ActiverseEngine;
 
+import ActiverseUtils.ErrorLogger;
+
 import java.awt.*;
 
 /**
@@ -21,14 +23,16 @@ public class ActiverseImage {
      */
     public ActiverseImage(String filename) {
         if (filename == null || filename.trim().isEmpty()) {
-            throw new IllegalArgumentException("2A.IN:(LN: ActiverseImage(String filename) - ACEHS Error thrown; filename cannot be null or empty.");
+            throw new IllegalArgumentException(
+                    ErrorLogger.format("2A", "IN", "ActiverseImage(String filename)", "filename cannot be null or empty."));
         }
         
         path = filename;
         image = Toolkit.getDefaultToolkit().getImage(filename);
         
         if (image == null) {
-            throw new NullPointerException("2A.IN:(LN: ActiverseImage(String filename) - ACEHS Error thrown; image is null (Report: INTO). Please check the image path and try again.");
+            throw new NullPointerException(
+                    ErrorLogger.format("2A", "IN", "ActiverseImage(String filename)", "image is null (Report: INTO). Please check the image path and try again."));
         }
         
         // Use MediaTracker to ensure image is loaded synchronously
@@ -41,7 +45,7 @@ public class ActiverseImage {
             tracker.waitForID(0);
             loaded = !tracker.isErrorID(0);
         } catch (InterruptedException e) {
-            System.out.println("2A.IN:(LN: ActiverseImage(String filename) - ACEHS Error thrown; image loading was interrupted.");
+            ErrorLogger.report("2A", "IN", "ActiverseImage(String filename)", "image loading was interrupted.");
             Thread.currentThread().interrupt();
             loaded = false;
         } finally {
@@ -49,7 +53,8 @@ public class ActiverseImage {
         }
         
         if (!loaded) {
-            throw new RuntimeException("2A.IN:(LN: ActiverseImage(String filename) - ACEHS Error thrown; failed to load image from path: " + filename);
+            throw new RuntimeException(
+                    ErrorLogger.format("2A", "IN", "ActiverseImage(String filename)", "failed to load image from path: " + filename));
         }
     }
     
@@ -69,7 +74,8 @@ public class ActiverseImage {
      */
     public Image getImage() {
         if (image == null) {
-            throw new NullPointerException("2A.OUT:(LN: getImage() - ACEHS Error thrown; image is null. Please check the image path and try again.");
+            throw new NullPointerException(
+                    ErrorLogger.format("2A", "OUT", "getImage()", "image is null. Please check the image path and try again."));
         }
         return image;
     }
@@ -81,7 +87,8 @@ public class ActiverseImage {
      */
     public String getPath() {
         if (path == null) {
-            throw new NullPointerException("2A.IN.OUT:(LN: getPath() - ACEHS Error thrown; path is null. Please check the image path and try again.");
+            throw new NullPointerException(
+                    ErrorLogger.format("2A", "IN.OUT", "getPath()", "path is null. Please check the image path and try again."));
         }
         return path;
     }

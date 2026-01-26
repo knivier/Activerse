@@ -1,8 +1,5 @@
 package ActiverseEngine;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -29,34 +26,10 @@ public class GameLoop implements Runnable {
 
     public GameLoop(World world) {
         this.world = world;
-        loadProperties();
+        TARGET_FPS = ConfigPuller.getInt("fps", 60);
+        dynamicLighting = ConfigPuller.getBoolean("dynamicLighting", false);
         FRAME_TIME_NANOS = 1_000_000_000L / TARGET_FPS;
         lastFpsTime = System.nanoTime();
-    }
-
-    /**
-     * Loads properties from Activerse.properties file.
-     * This file should be located in the classpath.
-     * If the file is not found or an error occurs,
-     * default values are used:
-     */
-    private void loadProperties() {
-        Properties props = new Properties();
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("Activerse.properties")) {
-            if (input != null) {
-                props.load(input);
-                TARGET_FPS = Integer.parseInt(props.getProperty("fps", "60"));
-                dynamicLighting = Boolean.parseBoolean(props.getProperty("dynamicLighting", "false"));
-            } else {
-                System.err.println("[Activerse] Properties file not found. Using default settings.");
-                TARGET_FPS = 60;
-                dynamicLighting = false;
-            }
-        } catch (IOException e) {
-            System.err.println("[Activerse] Error loading properties. Using default settings.");
-            TARGET_FPS = 60;
-            dynamicLighting = false;
-        }
     }
 
     /**

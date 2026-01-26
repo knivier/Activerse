@@ -10,7 +10,7 @@ import java.lang.management.MemoryUsage;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Properties;
+import ActiverseUtils.ErrorLogger;
 
 /**
  * MemoryTracker class is used to track memory usage of the game along with other statistics
@@ -50,18 +50,8 @@ public class MemoryTracker {
      * Loads properties from the Activerse.properties file.
      */
     private void loadProperties() {
-        Properties props = new Properties();
-        try {
-            String propertiesFile = "Activerse.properties";
-            props.load(getClass().getClassLoader().getResourceAsStream(propertiesFile));
-            loggingEnabled = Boolean.parseBoolean(props.getProperty("logging", "false"));
-            targetFPS = Integer.parseInt(props.getProperty("fps", "60"));
-        } catch (IOException e) {
-            System.err.println("9A.IN:(LN: loadProperties() - ACEHS Error thrown; an error occurred while loading properties. Default values will be used. Contact ActiverseEngine support for bugs. Otherwise, please provide a properties file.");
-            e.printStackTrace();
-            loggingEnabled = false;
-            targetFPS = 60;
-        }
+        loggingEnabled = ConfigPuller.getBoolean("logging", false);
+        targetFPS = ConfigPuller.getInt("fps", 60);
     }
 
 
@@ -173,8 +163,7 @@ public class MemoryTracker {
             writer.println(logNum + " | " + formattedTime + " | " + getMemoryUsagePerSecond() + " | Heap: " + heapMemoryUsage.getUsed() / (1024 * 1024) + " MB | Non-Heap: " + nonHeapMemoryUsage.getUsed() / (1024 * 1024) + " MB | GC Time: " + gcTime + " ms | FPS: " + World.getFPS() + " targeting " + targetFPS + " | Sys Time " + System.currentTimeMillis() + " | Interval " + World.getTicksDone());
             logNum++;
         } catch (IOException e) {
-            System.err.println("9A.IO.OUT:(LN: writeMemoryUsageToFile()) - ACEHS Error thrown (IO Netty & an output write); an error occurred while writing to the log file. Contact ActiverseEngine support for bugs.");
-            e.printStackTrace();
+            ErrorLogger.reportException("9A", "IO.OUT", "writeMemoryUsageToFile()", e);
         }
     }
 }

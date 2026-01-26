@@ -40,9 +40,9 @@ public class ActorVector {
 
     public double magnitude() {
         try {
-            return Math.sqrt(x * x + y * y);
+            return MathUtils.distance(0, 0, x, y);
         } catch (Exception e) {
-            reportACESH("1B", "LN", "magnitude", e);
+            ErrorLogger.reportException("1B", "LN", "magnitude()", e);
             return 0;
         }
     }
@@ -53,7 +53,7 @@ public class ActorVector {
             if (mag == 0) return new ActorVector(0, 0);
             return new ActorVector(x / mag, y / mag);
         } catch (Exception e) {
-            reportACESH("1B", "LN", "normalize", e);
+            ErrorLogger.reportException("1B", "LN", "normalize()", e);
             return new ActorVector(0, 0);
         }
     }
@@ -62,7 +62,7 @@ public class ActorVector {
         try {
             return new ActorVector(x * scalar, y * scalar);
         } catch (Exception e) {
-            reportACESH("1B", "LN", "scale", e);
+            ErrorLogger.reportException("1B", "LN", "scale(double scalar)", e);
             return new ActorVector(0, 0);
         }
     }
@@ -71,7 +71,7 @@ public class ActorVector {
         try {
             return new ActorVector(this.x + other.x, this.y + other.y);
         } catch (Exception e) {
-            reportACESH("1B", "LN", "add", e);
+            ErrorLogger.reportException("1B", "LN", "add(ActorVector other)", e);
             return new ActorVector(0, 0);
         }
     }
@@ -80,7 +80,7 @@ public class ActorVector {
         try {
             return new ActorVector(this.x - other.x, this.y - other.y);
         } catch (Exception e) {
-            reportACESH("1B", "LN", "subtract", e);
+            ErrorLogger.reportException("1B", "LN", "subtract(ActorVector other)", e);
             return new ActorVector(0, 0);
         }
     }
@@ -89,7 +89,7 @@ public class ActorVector {
         try {
             return this.x * other.x + this.y * other.y;
         } catch (Exception e) {
-            reportACESH("1B", "LN", "dot", e);
+            ErrorLogger.reportException("1B", "LN", "dot(ActorVector other)", e);
             return 0;
         }
     }
@@ -101,7 +101,7 @@ public class ActorVector {
             if (magProduct == 0) return 0;
             return Math.toDegrees(Math.acos(dot / magProduct));
         } catch (Exception e) {
-            reportACESH("1B", "LN", "angleBetween", e);
+            ErrorLogger.reportException("1B", "LN", "angleBetween(ActorVector other)", e);
             return 0;
         }
     }
@@ -111,17 +111,17 @@ public class ActorVector {
             if (mass == 0) throw new ArithmeticException("Division by zero (mass=0)");
             return new ActorVector(x / mass, y / mass);
         } catch (Exception e) {
-            reportACESH("1B", "IN", "toAcceleration", e);
+            ErrorLogger.reportException("1B", "IN", "toAcceleration(double mass)", e);
             return new ActorVector(0, 0);
         }
     }
 
     public double toKineticEnergy(double mass) {
         try {
-            double speedSquared = x * x + y * y;
-            return 0.5 * mass * speedSquared;
+            double speed = MathUtils.distance(0, 0, x, y);
+            return Physics.calculateKineticEnergy(mass, speed);
         } catch (Exception e) {
-            reportACESH("1B", "LN", "toKineticEnergy", e);
+            ErrorLogger.reportException("1B", "LN", "toKineticEnergy(double mass)", e);
             return 0;
         }
     }
@@ -144,14 +144,4 @@ public class ActorVector {
         return Double.hashCode(x) * 31 + Double.hashCode(y);
     }
 
-    /**
-     * ACESH error reporting utility.
-     * @param fileCode The file code (e.g., "1B" for ActorVector.java)
-     * @param errorType The error type (e.g., "LN", "IN", "OUT", etc.)
-     * @param method The method where the error occurred
-     * @param e The exception
-     */
-    private static void reportACESH(String fileCode, String errorType, String method, Exception e) {
-        System.out.println(fileCode + "." + errorType + "." + method + " :(LN: " + method + "() - ACESH Error thrown; " + e.getClass().getSimpleName() + ": " + e.getMessage() + ")");
-    }
 }

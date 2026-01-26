@@ -17,17 +17,6 @@ import java.util.List;
 public class FileUtils {
 
     /**
-     * ACESH error reporting utility.
-     * @param fileCode The file code (e.g., "1B" for ActorVector.java)
-     * @param errorType The error type (e.g., "LN", "IN", "OUT", etc.)
-     * @param method The method where the error occurred
-     * @param e The exception
-     */
-    private static void reportACESH(String fileCode, String errorType, String method, Exception e) {
-        System.out.println(fileCode + "." + errorType + "." + method + " :(LN: " + method + "() - ACESH Error thrown; " + e.getClass().getSimpleName() + ": " + e.getMessage() + ")");
-    }
-
-    /**
      * Writes a string content to a file, overwriting if it exists.
      *
      * @param filePath The path to the file to write.
@@ -39,7 +28,7 @@ public class FileUtils {
             writer.write(content);
             return true;
         } catch (IOException e) {
-            reportACESH("2B", "OUT", "writeFile", e);
+            ErrorLogger.reportException("2B", "OUT", "writeFile(String filePath, String content)", e);
             return false;
         }
     }
@@ -57,7 +46,7 @@ public class FileUtils {
             writer.write(content);
             return true;
         } catch (IOException e) {
-            reportACESH("2B", "OUT", "appendToFile", e);
+            ErrorLogger.reportException("2B", "OUT", "appendToFile(String filePath, String content)", e);
             return false;
         }
     }
@@ -72,7 +61,7 @@ public class FileUtils {
         try {
             return Files.readAllLines(Paths.get(filePath));
         } catch (IOException e) {
-            reportACESH("2B", "IN", "readAllLines", e);
+            ErrorLogger.reportException("2B", "IN", "readAllLines(String filePath)", e);
             return new ArrayList<>();
         }
     }
@@ -87,7 +76,7 @@ public class FileUtils {
         try {
             return Files.readString(Paths.get(filePath));
         } catch (IOException e) {
-            reportACESH("2B", "IN", "readFileAsString", e);
+            ErrorLogger.reportException("2B", "IN", "readFileAsString(String filePath)", e);
             return "";
         }
     }
@@ -113,7 +102,7 @@ public class FileUtils {
             Files.createDirectories(Paths.get(dirPath));
             return true;
         } catch (IOException e) {
-            reportACESH("2B", "OUT", "createDirectories", e);
+            ErrorLogger.reportException("2B", "OUT", "createDirectories(String dirPath)", e);
             return false;
         }
     }
@@ -128,7 +117,7 @@ public class FileUtils {
         try {
             return Files.deleteIfExists(Paths.get(filePath));
         } catch (IOException e) {
-            reportACESH("2B", "OUT", "deleteFile", e);
+            ErrorLogger.reportException("2B", "OUT", "deleteFile(String filePath)", e);
             return false;
         }
     }
@@ -145,7 +134,7 @@ public class FileUtils {
             Files.copy(Paths.get(sourcePath), Paths.get(targetPath), StandardCopyOption.REPLACE_EXISTING);
             return true;
         } catch (IOException e) {
-            reportACESH("2B", "OUT", "copyFile", e);
+            ErrorLogger.reportException("2B", "OUT", "copyFile(String sourcePath, String targetPath)", e);
             return false;
         }
     }
@@ -162,7 +151,7 @@ public class FileUtils {
             Files.move(Paths.get(sourcePath), Paths.get(targetPath), StandardCopyOption.REPLACE_EXISTING);
             return true;
         } catch (IOException e) {
-            reportACESH("2B", "OUT", "moveFile", e);
+            ErrorLogger.reportException("2B", "OUT", "moveFile(String sourcePath, String targetPath)", e);
             return false;
         }
     }
@@ -180,7 +169,7 @@ public class FileUtils {
             Files.write(Paths.get(filePath), lines);
             return true;
         } catch (IOException e) {
-            reportACESH("2B", "OUT", "saveLinesToFile", e);
+            ErrorLogger.reportException("2B", "OUT", "saveLinesToFile(String filePath, List<String> lines)", e);
             return false;
         }
     }
@@ -217,7 +206,7 @@ public class FileUtils {
         try (InputStream input = Files.newInputStream(Paths.get(filePath))) {
             props.load(input);
         } catch (IOException e) {
-            reportACESH("2B", "IN", "loadProperties", e);
+            ErrorLogger.reportException("2B", "IN", "loadProperties(String filePath)", e);
         }
         return props;
     }
@@ -235,7 +224,7 @@ public class FileUtils {
             properties.store(output, comments);
             return true;
         } catch (IOException e) {
-            reportACESH("2B", "OUT", "saveProperties", e);
+            ErrorLogger.reportException("2B", "OUT", "saveProperties(String filePath, Properties properties, String comments)", e);
             return false;
         }
     }
