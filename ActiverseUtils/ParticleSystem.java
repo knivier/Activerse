@@ -91,7 +91,9 @@ public class ParticleSystem extends Actor {
     
     @Override
     public void paint(Graphics g) {
-        for (Particle p : particles) {
+        // Create a copy to avoid ConcurrentModificationException
+        List<Particle> particlesCopy = new ArrayList<>(particles);
+        for (Particle p : particlesCopy) {
             p.render(g);
         }
     }

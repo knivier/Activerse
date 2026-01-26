@@ -666,6 +666,7 @@ public abstract class Actor {
             preciseY = newY;
         }
     }
+    
 
 // Node class for A* pathfinding
 

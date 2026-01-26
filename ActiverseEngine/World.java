@@ -640,6 +640,10 @@ public class World extends JPanel implements ActionListener, KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         KeyboardInfo.setKeyState(e.getKeyCode(), true);
+        // Also update shift key tracking in KeyboardInfo
+        if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+            KeyboardInfo.setShiftPressed(true);
+        }
     }
 
     /**
@@ -648,6 +652,10 @@ public class World extends JPanel implements ActionListener, KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
         KeyboardInfo.setKeyState(e.getKeyCode(), false);
+        // Also update shift key tracking in KeyboardInfo
+        if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+            KeyboardInfo.setShiftPressed(false);
+        }
     }
 
     /**
