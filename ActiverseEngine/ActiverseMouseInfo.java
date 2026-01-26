@@ -16,6 +16,7 @@ public class ActiverseMouseInfo implements MouseListener {
     private static volatile boolean leftClick = false;
     private static volatile boolean rightClick = false;
     private static final Object clickLock = new Object();
+    private static Component componentReference = null;
 
     /**
      * @param component Constructor for the ActiverseMouseInfo class.
@@ -36,12 +37,44 @@ public class ActiverseMouseInfo implements MouseListener {
     }
 
     /**
+     * Sets the component reference for accurate mouse positioning
+     *
+     * @param component The component to use for mouse positioning
+     */
+    public static void setComponentReference(Component component) {
+        componentReference = component;
+    }
+
+    /**
      * Retrieves the current location of the mouse pointer on the screen.
      *
      * @return A Point object representing the coordinates of the mouse pointer.
      */
     public static Point getMouseLocation() {
         return MouseInfo.getPointerInfo().getLocation();
+    }
+    
+    /**
+     * Gets the mouse location relative to the component, prioritizing offset issues
+     *
+     * @return The mouse location relative to the game component, or null if not available
+     */
+    public static Point getMouseLocationOnComponent() {
+        if (componentReference == null) {
+            return getMouseLocation();
+        }
+        
+        try {
+            Point screenLocation = MouseInfo.getPointerInfo().getLocation();
+            Point componentLocation = componentReference.getLocationOnScreen();
+            
+            return new Point(
+                screenLocation.x - componentLocation.x,
+                screenLocation.y - componentLocation.y
+            );
+        } catch (Exception e) {
+            return getMouseLocation();
+        }
     }
 
     /**

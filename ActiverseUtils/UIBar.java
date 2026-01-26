@@ -1,4 +1,4 @@
-package ActiverseEngine;
+package ActiverseUtils;
 
 import java.awt.*;
 
@@ -7,7 +7,7 @@ import java.awt.*;
  * Allows drawing bars without using Graphics2D directly in game code
  * 
  * @author Knivier
- * @version 1.4.1
+ * @version 1.4.0
  */
 public class UIBar {
     private int x;
