@@ -1,5 +1,7 @@
 package ActiverseEngine;
 
+import ActiverseUtils.ErrorLogger;
+
 import java.awt.*;
 
 /**
@@ -7,11 +9,12 @@ import java.awt.*;
  * This class provides methods to load an image and retrieve it.
  *
  * @author Knivier
- * @version 1.3.2
+ * @version 1.4.1
  */
 public class ActiverseImage {
     private final Image image; // Image object to store the loaded image
     private final String path; // Store the image path
+    private boolean loaded = false; // Track if image is fully loaded
 
     /**
      * Constructs a new ActiverseImage object with the image loaded from the specified file.
@@ -19,11 +22,49 @@ public class ActiverseImage {
      * @param filename The path to the image file via (jpg/jpeg, png, gif, bmp, wbmp)
      */
     public ActiverseImage(String filename) {
-        image = Toolkit.getDefaultToolkit().getImage(filename);
-        path = filename;
-        if (image == null) {
-            throw new NullPointerException("2A.IN:(LN: ActiverseImage(String filename) - ACEHS Error thrown; image is null (Report: INTO). Please check the image path and try again.");
+        if (filename == null || filename.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    ErrorLogger.format("2A", "IN", "ActiverseImage(String filename)", "filename cannot be null or empty."));
         }
+        
+        path = filename;
+        image = Toolkit.getDefaultToolkit().getImage(filename);
+        
+        if (image == null) {
+            throw new NullPointerException(
+                    ErrorLogger.format("2A", "IN", "ActiverseImage(String filename)", "image is null (Report: INTO). Please check the image path and try again."));
+        }
+        
+        // Use MediaTracker to ensure image is loaded synchronously
+        // Create a temporary frame for MediaTracker (it needs a Component)
+        Frame tempFrame = new Frame();
+        tempFrame.setVisible(false);
+        MediaTracker tracker = new MediaTracker(tempFrame);
+        tracker.addImage(image, 0);
+        try {
+            tracker.waitForID(0);
+            loaded = !tracker.isErrorID(0);
+        } catch (InterruptedException e) {
+            ErrorLogger.report("2A", "IN", "ActiverseImage(String filename)", "image loading was interrupted.");
+            Thread.currentThread().interrupt();
+            loaded = false;
+        } finally {
+            tempFrame.dispose(); // Clean up temporary frame
+        }
+        
+        if (!loaded) {
+            throw new RuntimeException(
+                    ErrorLogger.format("2A", "IN", "ActiverseImage(String filename)", "failed to load image from path: " + filename));
+        }
+    }
+    
+    /**
+     * Checks if the image has been fully loaded.
+     *
+     * @return true if the image is loaded, false otherwise.
+     */
+    public boolean isLoaded() {
+        return loaded;
     }
 
     /**
@@ -33,7 +74,8 @@ public class ActiverseImage {
      */
     public Image getImage() {
         if (image == null) {
-            throw new NullPointerException("2A.OUT:(LN: getImage() - ACEHS Error thrown; image is null. Please check the image path and try again.");
+            throw new NullPointerException(
+                    ErrorLogger.format("2A", "OUT", "getImage()", "image is null. Please check the image path and try again."));
         }
         return image;
     }
@@ -45,7 +87,8 @@ public class ActiverseImage {
      */
     public String getPath() {
         if (path == null) {
-            throw new NullPointerException("2A.IN.OUT:(LN: getPath() - ACEHS Error thrown; path is null. Please check the image path and try again.");
+            throw new NullPointerException(
+                    ErrorLogger.format("2A", "IN.OUT", "getPath()", "path is null. Please check the image path and try again."));
         }
         return path;
     }

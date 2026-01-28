@@ -8,7 +8,7 @@ package ActiverseUtils;
  * energy, motion, circular dynamics, and more.
  *
  * @author Knivier
- * @version 1.4.0
+ * @version 1.4.1
  */
 public class Physics {
 
@@ -70,7 +70,7 @@ public class Physics {
      * @return Speed (m/s)
      */
     public static double calculateSpeed(double dx, double dy) {
-        return Math.sqrt(dx * dx + dy * dy);
+        return MathUtils.distance(0, 0, dx, dy);
     }
 
     /**

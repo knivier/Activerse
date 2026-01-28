@@ -5,12 +5,12 @@ package ActiverseEngine;
  * Each item has a name, type, and value.
  *
  * @author Knivier
- * @version 1.4.0
+ * @version 1.4.1
  */
 public abstract class Item {
     private final String name;
     private final String type;
-    private final int value;
+    private int value; // Changed from final to allow stacking
 
     /**
      * Constructor for items inside an inventory. All inventory items must go under the Item class
@@ -50,6 +50,40 @@ public abstract class Item {
      */
     public int getValue() {
         return value;
+    }
+    
+    /**
+     * Sets the value of the item (for stacking, quantity changes, etc.)
+     *
+     * @param value The new value to set
+     */
+    public void setValue(int value) {
+        this.value = value;
+    }
+    
+    /**
+     * Checks if this item can stack with another item
+     *
+     * @param other The other item to check
+     * @return true if items can be stacked together
+     */
+    public boolean canStack(Item other) {
+        if (other == null) return false;
+        // Items can stack if they have same name and type
+        return this.name.equals(other.getName()) && 
+               this.type.equals(other.getType());
+    }
+    
+    /**
+     * Stacks another item with this one by adding quantities
+     *
+     * @param other The item to stack with this one
+     * @return true if stacking was successful
+     */
+    public boolean stack(Item other) {
+        if (!canStack(other)) return false;
+        this.value += other.getValue();
+        return true;
     }
 
     @Override

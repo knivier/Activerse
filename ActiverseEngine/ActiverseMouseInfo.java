@@ -13,8 +13,10 @@ import java.awt.event.MouseListener;
  * @version 1.3.2
  */
 public class ActiverseMouseInfo implements MouseListener {
-    private static boolean leftClick = false;
-    private static boolean rightClick = false;
+    private static volatile boolean leftClick = false;
+    private static volatile boolean rightClick = false;
+    private static final Object clickLock = new Object();
+    private static Component componentReference = null;
 
     /**
      * @param component Constructor for the ActiverseMouseInfo class.
@@ -31,8 +33,16 @@ public class ActiverseMouseInfo implements MouseListener {
      */
     public static ActiverseMouseInfo createInstance(Component component) {
         ActiverseMouseInfo instance = new ActiverseMouseInfo(component);
-        component.addMouseListener(instance);
         return instance;
+    }
+
+    /**
+     * Sets the component reference for accurate mouse positioning
+     *
+     * @param component The component to use for mouse positioning
+     */
+    public static void setComponentReference(Component component) {
+        componentReference = component;
     }
 
     /**
@@ -43,6 +53,29 @@ public class ActiverseMouseInfo implements MouseListener {
     public static Point getMouseLocation() {
         return MouseInfo.getPointerInfo().getLocation();
     }
+    
+    /**
+     * Gets the mouse location relative to the component, prioritizing offset issues
+     *
+     * @return The mouse location relative to the game component, or null if not available
+     */
+    public static Point getMouseLocationOnComponent() {
+        if (componentReference == null) {
+            return getMouseLocation();
+        }
+        
+        try {
+            Point screenLocation = MouseInfo.getPointerInfo().getLocation();
+            Point componentLocation = componentReference.getLocationOnScreen();
+            
+            return new Point(
+                screenLocation.x - componentLocation.x,
+                screenLocation.y - componentLocation.y
+            );
+        } catch (Exception e) {
+            return getMouseLocation();
+        }
+    }
 
     /**
      * Checks if the left mouse button is clicked.
@@ -50,7 +83,9 @@ public class ActiverseMouseInfo implements MouseListener {
      * @return true if the left mouse button is clicked, false otherwise.
      */
     public static boolean isLeftClick() {
-        return leftClick;
+        synchronized (clickLock) {
+            return leftClick;
+        }
     }
 
     /**
@@ -59,7 +94,9 @@ public class ActiverseMouseInfo implements MouseListener {
      * @return true if the right mouse button is clicked, false otherwise.
      */
     public static boolean isRightClick() {
-        return rightClick;
+        synchronized (clickLock) {
+            return rightClick;
+        }
     }
 
     /**
@@ -87,10 +124,12 @@ public class ActiverseMouseInfo implements MouseListener {
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        if (SwingUtilities.isLeftMouseButton(e)) {
-            leftClick = true;
-        } else if (SwingUtilities.isRightMouseButton(e)) {
-            rightClick = true;
+        synchronized (clickLock) {
+            if (SwingUtilities.isLeftMouseButton(e)) {
+                leftClick = true;
+            } else if (SwingUtilities.isRightMouseButton(e)) {
+                rightClick = true;
+            }
         }
     }
 
@@ -103,10 +142,12 @@ public class ActiverseMouseInfo implements MouseListener {
      */
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (SwingUtilities.isLeftMouseButton(e)) {
-            leftClick = false;
-        } else if (SwingUtilities.isRightMouseButton(e)) {
-            rightClick = false;
+        synchronized (clickLock) {
+            if (SwingUtilities.isLeftMouseButton(e)) {
+                leftClick = false;
+            } else if (SwingUtilities.isRightMouseButton(e)) {
+                rightClick = false;
+            }
         }
     }
 
