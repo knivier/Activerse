@@ -12,7 +12,7 @@ import java.util.Random;
  * structure placement, and world serialization.
  *
  * @author Knivier
- * @version 1.4.0
+ * @version 1.4.1
  */
 public class WorldGeneration {
     // Dimensions of the world
@@ -27,17 +27,6 @@ public class WorldGeneration {
 
     // Instance of Perlin noise generator for terrain
     protected final PerlinNoise perlin;
-
-    /**
-     * ACESH error reporting utility.
-     * @param fileCode The file code (e.g., "1B" for ActorVector.java)
-     * @param errorType The error type (e.g., "LN", "IN", "OUT", etc.)
-     * @param method The method where the error occurred
-     * @param e The exception
-     */
-    private static void reportACESH(String fileCode, String errorType, String method, Exception e) {
-        System.out.println(fileCode + "." + errorType + "." + method + " :(LN: " + method + "() - ACESH Error thrown; " + e.getClass().getSimpleName() + ": " + e.getMessage() + ")");
-    }
 
     /**
      * Constructs a world with the given dimensions using current time as seed.
@@ -261,7 +250,7 @@ public class WorldGeneration {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path))) {
             oos.writeObject(tileMap);
         } catch (IOException e) {
-            reportACESH("6B", "OUT", "saveToFile", e);
+            ErrorLogger.reportException("6B", "OUT", "saveToFile(String path)", e);
             throw e;
         }
     }
@@ -276,7 +265,7 @@ public class WorldGeneration {
             for (int x = 0; x < width; x++)
                 if (height >= 0) System.arraycopy(loaded[x], 0, tileMap[x], 0, height);
         } catch (IOException | ClassNotFoundException e) {
-            reportACESH("6B", "IN", "loadFromFile", e);
+            ErrorLogger.reportException("6B", "IN", "loadFromFile(String path)", e);
             throw e;
         }
     }

@@ -1,5 +1,8 @@
 package ActiverseEngine;
 
+import ActiverseUtils.ErrorLogger;
+import ActiverseUtils.MathUtils;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -8,10 +11,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -20,7 +21,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * The world has a fixed size and a black border, and can display a background image.
  *
  * @author Knivier
- * @version 1.4.0
+ * @version 1.4.1
  */
 public class World extends JPanel implements ActionListener, KeyListener {
     /**
@@ -121,9 +122,8 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
         memoryTracker = new MemoryTracker();
 
-        Properties props = loadProperties();
-        boolean showDebug = Boolean.parseBoolean(props.getProperty("show_debug", "true"));
-        dynamicLighting = Boolean.parseBoolean(props.getProperty("dynamic_lighting", "false"));
+        boolean showDebug = ConfigPuller.getBoolean("show_debug", true);
+        dynamicLighting = ConfigPuller.getBoolean("dynamic_lighting", false);
 
         if (showDebug) {
             debugButton = new JButton("Debug");
@@ -191,26 +191,6 @@ public class World extends JPanel implements ActionListener, KeyListener {
     }
 
     /**
-     * Attempts to load the properties file using the class loader and stream systems
-     *
-     * @return Properties
-     */
-    private Properties loadProperties() {
-        Properties props = new Properties();
-        try (InputStream inStream = getClass().getClassLoader().getResourceAsStream("Activerse.properties")) {
-            if (inStream != null) {
-                props.load(inStream);
-            } else {
-                System.err.println("Activerse.properties not found or could not be loaded.");
-            }
-        } catch (IOException e) {
-            System.out.println("10A.IN:(LN: loadProperties() - ACEHS Error thrown; an error occurred while loading properties. Default values will be used. Contact ActiverseEngine support for bugs. Otherwise, please provide a properties file.");
-            e.printStackTrace();
-        }
-        return props;
-    }
-
-    /**
      * Sets background image of world subclasses
      *
      * @param imagePath Relative path for image to load as background image
@@ -258,10 +238,26 @@ public class World extends JPanel implements ActionListener, KeyListener {
      * @see Actor
      */
     public void removeObject(Actor actor) {
-        actors.remove(actor);
-        if (actor.getImage() != null) {
-            loadedImages.remove(actor.getImage().getPath());
+        if (actor != null) {
+            actors.remove(actor);
+            if (actor.getImage() != null) {
+                loadedImages.remove(actor.getImage().getPath());
+            }
+            actor.setWorld(null); // Clear world reference
         }
+    }
+    
+    /**
+     * Clears all actors from the world and cleans up resources.
+     */
+    public void clear() {
+        for (Actor actor : actors) {
+            if (actor != null) {
+                actor.setWorld(null);
+            }
+        }
+        actors.clear();
+        loadedImages.clear();
     }
 
     /**
@@ -284,12 +280,19 @@ public class World extends JPanel implements ActionListener, KeyListener {
     }
 
     /**
-     * Stops the world timer
+     * Stops the world timer and cleans up resources
      *
      * @see Timer
      */
     public void stop() {
         timer.stop();
+        // Clean up sounds
+        for (ActiverseSound sound : sounds) {
+            if (sound != null) {
+                sound.dispose();
+            }
+        }
+        sounds.clear();
     }
 
     /**
@@ -337,9 +340,8 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
         if (backgroundImage != null) {
             g.drawImage(backgroundImage, 0, 0, fixedWidth, fixedHeight, this);
-        } else if (backgroundImage == null) {
-            throw new NullPointerException("Background image not found");
         }
+        // Background image is optional - if null, just use the default background color
 
         if (dynamicLighting) {
             applyDynamicLighting(g);
@@ -449,7 +451,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
             for (LightSource light : lightSources) {
                 double dx = actorCenterX - light.x;
                 double dy = actorCenterY - light.y;
-                double distance = Math.sqrt(dx * dx + dy * dy);
+                double distance = MathUtils.distance(0, 0, dx, dy);
 
                 if (distance < light.radius && light.isWithinCone(actorCenterX, actorCenterY)) {
                     // Shadow direction: away from light
@@ -490,6 +492,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
         gLighting.dispose();
         g2d.dispose();
+        lightingBuffer = null; // Help GC
     }
 
     /**
@@ -524,7 +527,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
      * @return int Distance between two points as an Activerse unit relative
      */
     public float calculateDistance(int x1, int y1, int x2, int y2) {
-        return (float) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        return (float) MathUtils.distance(x1, y1, x2, y2);
     }
 
     /**
@@ -573,7 +576,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
             imagesInfo.append(imageName);
             if (!exists) {
                 imagesInfo.append("x MIA");
-                System.out.println("10A.IN.CONNTO.2A :(LN: drawDebugInfo() - ACEHS Error thrown; an image file is missing from the classpath: " + imageName + ". Please ensure the image exists in the resources directory.");
+                ErrorLogger.report("10A", "IN", "drawDebugInfo()", "an image file is missing from the classpath: " + imageName + ". Please ensure the image exists in the resources directory.", "2A", "OUT");
             }
             if (entry.getValue() > 1) {
                 imagesInfo.append("x").append(entry.getValue());
@@ -596,8 +599,8 @@ public class World extends JPanel implements ActionListener, KeyListener {
         g.drawString("Active Keys:", 10, y);
         y += 20;
         StringBuilder keysInfo = new StringBuilder();
-        for (int i = 0; i < KeyboardInfo.keys.length; i++) {
-            if (KeyboardInfo.keys[i]) {
+        for (int i = 0; i < 256; i++) {
+            if (KeyboardInfo.isKeyDown(i)) {
                 keysInfo.append(KeyEvent.getKeyText(i)).append(" ");
             }
         }
@@ -636,7 +639,11 @@ public class World extends JPanel implements ActionListener, KeyListener {
      */
     @Override
     public void keyPressed(KeyEvent e) {
-        KeyboardInfo.keys[e.getKeyCode()] = true;
+        KeyboardInfo.setKeyState(e.getKeyCode(), true);
+        // Also update shift key tracking in KeyboardInfo
+        if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+            KeyboardInfo.setShiftPressed(true);
+        }
     }
 
     /**
@@ -644,7 +651,11 @@ public class World extends JPanel implements ActionListener, KeyListener {
      */
     @Override
     public void keyReleased(KeyEvent e) {
-        KeyboardInfo.keys[e.getKeyCode()] = false;
+        KeyboardInfo.setKeyState(e.getKeyCode(), false);
+        // Also update shift key tracking in KeyboardInfo
+        if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+            KeyboardInfo.setShiftPressed(false);
+        }
     }
 
     /**
@@ -663,6 +674,70 @@ public class World extends JPanel implements ActionListener, KeyListener {
      */
     public List<Actor> getActors() {
         return actors;
+    }
+    
+    /**
+     * Returns all actors of a specific type
+     *
+     * @param type The class type to filter by
+     * @return List of actors matching the type
+     */
+    public <T extends Actor> List<T> getActorsByType(Class<T> type) {
+        List<T> result = new ArrayList<>();
+        for (Actor actor : actors) {
+            if (type.isInstance(actor)) {
+                result.add(type.cast(actor));
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Gets actors within a specific region
+     *
+     * @param x X coordinate of region
+     * @param y Y coordinate of region
+     * @param width Width of region
+     * @param height Height of region
+     * @return List of actors in the region
+     */
+    public List<Actor> getActorsInRegion(int x, int y, int width, int height) {
+        List<Actor> result = new ArrayList<>();
+        Rectangle region = new Rectangle(x, y, width, height);
+        for (Actor actor : actors) {
+            if (region.intersects(actor.getBoundingBox())) {
+                result.add(actor);
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Finds the nearest actor of a specific type to a given position
+     *
+     * @param x X coordinate
+     * @param y Y coordinate
+     * @param type The class type to search for
+     * @param maxDistance Maximum search distance (0 for unlimited)
+     * @return The nearest actor of the type, or null if none found
+     */
+    public <T extends Actor> T getNearestActor(int x, int y, Class<T> type, double maxDistance) {
+        T nearest = null;
+        double nearestDist = maxDistance > 0 ? maxDistance : Double.MAX_VALUE;
+        
+        for (Actor actor : actors) {
+            if (type.isInstance(actor)) {
+                int dx = actor.getX() - x;
+                int dy = actor.getY() - y;
+                double dist = MathUtils.distance(0, 0, dx, dy);
+                
+                if (dist < nearestDist) {
+                    nearestDist = dist;
+                    nearest = type.cast(actor);
+                }
+            }
+        }
+        return nearest;
     }
 
     /**
