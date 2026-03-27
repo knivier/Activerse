@@ -1,5 +1,6 @@
 package ActiverseEngine;
 
+import ActiverseUtils.DelayScheduler;
 import ActiverseUtils.ErrorLogger;
 import ActiverseUtils.ImageUtils;
 import ActiverseUtils.MathUtils;
@@ -50,6 +51,14 @@ public abstract class Actor {
     public boolean setStatic(boolean isStatic) {
         this.isStatic = isStatic;
         return true;
+    }
+
+    /**
+     * When true, {@link World#update} skips {@link #act()} each tick. Use for actors with no
+     * per-frame logic (saves huge cost when thousands of terrain tiles exist).
+     */
+    public boolean isTickInert() {
+        return false;
     }
 
     /**
@@ -422,9 +431,8 @@ public abstract class Actor {
     }
 
     /**
-     * Delays the execution of the next action by the specified milliseconds.
-     * WARNING: This method creates a new thread for each delay. For frequent delays,
-     * consider using ActiverseUtils.Timer instead.
+     * Delays the execution of the next {@link #act()} by the specified milliseconds.
+     * Uses a shared daemon scheduler (not one thread per call).
      *
      * @param ms The delay in milliseconds.
      */
@@ -433,22 +441,11 @@ public abstract class Actor {
             ErrorLogger.report("5A", "IN", "delayNext(int ms)", "delay cannot be negative.");
             return;
         }
-        
-        // Use a daemon thread to avoid preventing JVM shutdown
-        Thread delayThread = new Thread(() -> {
-            try {
-                Thread.sleep(ms);
-                // Only call act() if actor is still in a world
-                if (world != null) {
-                    act();
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                ErrorLogger.reportException("5A", "IO", "delayNext(int ms)", e);
+        DelayScheduler.runAfterMillis(ms, () -> {
+            if (world != null) {
+                act();
             }
         });
-        delayThread.setDaemon(true);
-        delayThread.start();
     }
 
     /**

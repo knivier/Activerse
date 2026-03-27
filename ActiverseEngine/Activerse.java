@@ -6,6 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * Provides utility methods to start and stop the Activerse application.
@@ -36,6 +38,14 @@ public class Activerse {
             try {
                 frame = new JFrame("Activerse Instance v1.4.1");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        if (currentWorld != null) {
+                            currentWorld.saveBeforeHalt();
+                        }
+                    }
+                });
                 frame.getContentPane().add(currentWorld, BorderLayout.CENTER);
                 frame.pack();
                 frame.setVisible(true);
@@ -64,6 +74,7 @@ public class Activerse {
             throw new IllegalArgumentException("World cannot be null");
         }
         if (currentWorld != null) {
+            currentWorld.saveBeforeHalt();
             stop(currentWorld);
             if (frame != null) {
                 frame.getContentPane().remove(currentWorld);

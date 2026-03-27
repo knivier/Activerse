@@ -12,6 +12,7 @@ import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -127,6 +128,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
         if (showDebug) {
             debugButton = new JButton("Debug");
+            debugButton.setFocusable(false); // keep keyboard focus on World for gameplay / menus
             debugButton.addActionListener(e -> {
                 debugMode = !debugMode;
                 requestFocusInWindow();
@@ -139,16 +141,21 @@ public class World extends JPanel implements ActionListener, KeyListener {
         }
 
         JButton terminateButton = new JButton("End");
+        terminateButton.setFocusable(false);
         terminateButton.setFont(new Font("Arial", Font.PLAIN, 10));
         terminateButton.setPreferredSize(new Dimension(60, 20));
         terminateButton.setBounds(this.fixedWidth - 90, 50, 60, 20);
         terminateButton.addActionListener(e -> {
+            saveBeforeHalt();
             stop();
             System.exit(0);
         });
         add(terminateButton);
 
         setFocusable(true);
+        // Tab must not trigger Swing focus traversal — otherwise focus jumps to child
+        // JButtons and the World's KeyListener stops receiving letter keys (e.g. create-world name).
+        setFocusTraversalKeysEnabled(false);
         requestFocusInWindow();
         initializeKeyListener();
     }
@@ -201,6 +208,22 @@ public class World extends JPanel implements ActionListener, KeyListener {
     }
 
     /**
+     * Called before the JVM exits, the window closes, or this world is replaced by another.
+     * Subclasses override to persist player/world state synchronously.
+     */
+    public void saveBeforeHalt() {
+    }
+
+    /**
+     * When true, {@link GameLoop} does not call {@link #update()}; the world's Swing {@link Timer}
+     * on the EDT drives simulation instead. Subclasses that share mutable state between timer ticks
+     * and the loop thread should return true to avoid concurrent double-updates.
+     */
+    protected boolean isSimulationDrivenBySwingTimer() {
+        return false;
+    }
+
+    /**
      * Updates the world by calling the act method of each actor at a tick interval
      * Updates memory tracker
      *
@@ -208,8 +231,12 @@ public class World extends JPanel implements ActionListener, KeyListener {
      */
     public void update() {
         ticksDone++;
+        // Copy-on-write: iterator snapshot is safe even if act() removes actors; do not wrap in
+        // synchronized(this) — that would serialize the update thread with EDT paint and destroy FPS.
         for (Actor actor : actors) {
-            actor.act();
+            if (!actor.isTickInert()) {
+                actor.act();
+            }
         }
         memoryTracker.update();
     }
@@ -246,6 +273,25 @@ public class World extends JPanel implements ActionListener, KeyListener {
             actor.setWorld(null); // Clear world reference
         }
     }
+
+    /**
+     * Removes many actors in one batch (used for chunk unload). Prefer over many {@link #removeObject} calls.
+     */
+    protected void removeActorsBulk(Collection<Actor> toRemove) {
+        if (toRemove == null || toRemove.isEmpty()) {
+            return;
+        }
+        for (Actor actor : toRemove) {
+            if (actor == null) {
+                continue;
+            }
+            if (actor.getImage() != null) {
+                loadedImages.remove(actor.getImage().getPath());
+            }
+            actor.setWorld(null);
+        }
+        actors.removeAll(toRemove);
+    }
     
     /**
      * Clears all actors from the world and cleans up resources.
@@ -276,7 +322,9 @@ public class World extends JPanel implements ActionListener, KeyListener {
      * @see Timer
      */
     public void start() {
-        timer.start();
+        if (isSimulationDrivenBySwingTimer()) {
+            timer.start();
+        }
     }
 
     /**
@@ -628,10 +676,14 @@ public class World extends JPanel implements ActionListener, KeyListener {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() != debugButton) {
-            update();
-            repaint();
+        if (!isSimulationDrivenBySwingTimer()) {
+            return;
         }
+        if (e.getSource() == debugButton) {
+            return;
+        }
+        update();
+        repaint();
     }
 
     /**
@@ -724,13 +776,13 @@ public class World extends JPanel implements ActionListener, KeyListener {
     public <T extends Actor> T getNearestActor(int x, int y, Class<T> type, double maxDistance) {
         T nearest = null;
         double nearestDist = maxDistance > 0 ? maxDistance : Double.MAX_VALUE;
-        
+
         for (Actor actor : actors) {
             if (type.isInstance(actor)) {
                 int dx = actor.getX() - x;
                 int dy = actor.getY() - y;
                 double dist = MathUtils.distance(0, 0, dx, dy);
-                
+
                 if (dist < nearestDist) {
                     nearestDist = dist;
                     nearest = type.cast(actor);
