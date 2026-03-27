@@ -17,6 +17,8 @@ public class ActiverseMouseInfo implements MouseListener {
     private static volatile boolean rightClick = false;
     private static final Object clickLock = new Object();
     private static Component componentReference = null;
+    /** Previous listener instance so we do not stack duplicate listeners on the same component. */
+    private static volatile ActiverseMouseInfo installedOnComponent = null;
 
     /**
      * @param component Constructor for the ActiverseMouseInfo class.
@@ -32,8 +34,29 @@ public class ActiverseMouseInfo implements MouseListener {
      * @return Returns the instance of the current mouse info
      */
     public static ActiverseMouseInfo createInstance(Component component) {
-        ActiverseMouseInfo instance = new ActiverseMouseInfo(component);
-        return instance;
+        synchronized (ActiverseMouseInfo.class) {
+            if (installedOnComponent != null) {
+                Component prev = installedOnComponent.getRegisteredComponent();
+                if (prev != null) {
+                    prev.removeMouseListener(installedOnComponent);
+                }
+                installedOnComponent = null;
+            }
+            ActiverseMouseInfo instance = new ActiverseMouseInfo(component);
+            installedOnComponent = instance;
+            return instance;
+        }
+    }
+
+    private Component registeredComponent;
+
+    private void addMouseListenerToComponent(Component component) {
+        this.registeredComponent = component;
+        component.addMouseListener(this);
+    }
+
+    Component getRegisteredComponent() {
+        return registeredComponent;
     }
 
     /**
@@ -99,12 +122,6 @@ public class ActiverseMouseInfo implements MouseListener {
         }
     }
 
-    /**
-     * @param component Adds a mouse listener to the specified component.
-     */
-    private void addMouseListenerToComponent(Component component) {
-        component.addMouseListener(this);
-    }
 
     /**
      * Not in use method (built on in the future)

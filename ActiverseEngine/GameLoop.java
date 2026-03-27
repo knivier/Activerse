@@ -91,7 +91,9 @@ public class GameLoop implements Runnable {
             // Process all update ticks necessary
             while (delta >= 1) {
                 synchronized (world) {
-                    world.update(); // Update game state
+                    if (!world.isSimulationDrivenBySwingTimer()) {
+                        world.update();
+                    }
                 }
                 updates++;
                 delta--;
@@ -109,10 +111,8 @@ public class GameLoop implements Runnable {
     private void renderLoop() {
         while (running.get()) {
             long start = System.nanoTime();
-
-            synchronized (world) {
-                world.repaint(); // Safe rendering
-            }
+            // repaint() is thread-safe; don't take the world lock here or it will contend with update().
+            world.repaint();
 
             frames++;
             calculateFPS(start);

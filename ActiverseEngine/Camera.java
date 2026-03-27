@@ -19,6 +19,13 @@ public class Camera {
     private double targetOffsetX;
     private double targetOffsetY;
     
+    /** Zoom scale: 1.0 = default, >1 = zoom in, <1 = zoom out */
+    private double zoom = 1.0;
+    private static final double ZOOM_MIN = 0.6;
+    private static final double ZOOM_MAX = 1.4;
+    /** Multiplicative zoom step (logarithmic feel); each key press multiplies/divides by this */
+    private static final double ZOOM_STEP_RATIO = 1.08;
+    
     // World bounds (optional, for clamping)
     private int worldWidth;
     private int worldHeight;
@@ -63,6 +70,14 @@ public class Camera {
         this.worldHeight = worldHeight;
         this.clampToWorld = true;
     }
+
+    /**
+     * Enables or disables clamping the view to {@link #setWorldBounds(int, int)}.
+     * Use {@code false} for effectively infinite worlds.
+     */
+    public void setClampToWorldBounds(boolean clamp) {
+        this.clampToWorld = clamp;
+    }
     
     /**
      * Sets the target actor for the camera to follow
@@ -74,19 +89,26 @@ public class Camera {
     }
     
     /**
-     * Updates the camera position (call each frame)
+     * Updates the camera position (call each frame).
+     * Keeps the target centered; when target is null, offset does not change.
      */
     public void update() {
         if (target != null) {
-            // Center camera on target
-            targetOffsetX = target.getX() - viewWidth / 2.0;
-            targetOffsetY = target.getY() - viewHeight / 2.0;
+            // Center camera on target; visible world size is viewSize/zoom
+            double halfViewW = viewWidth / (2.0 * zoom);
+            double halfViewH = viewHeight / (2.0 * zoom);
+            double centerX = target.getX() + target.getWidth() / 2.0;
+            double centerY = target.getY() + target.getHeight() / 2.0;
+            targetOffsetX = centerX - halfViewW;
+            targetOffsetY = centerY - halfViewH;
         }
         
         // Clamp to world bounds if enabled
         if (clampToWorld) {
-            targetOffsetX = Math.max(0, Math.min(targetOffsetX, worldWidth - viewWidth));
-            targetOffsetY = Math.max(0, Math.min(targetOffsetY, worldHeight - viewHeight));
+            double visibleW = viewWidth / zoom;
+            double visibleH = viewHeight / zoom;
+            targetOffsetX = MathUtils.clamp(targetOffsetX, 0, Math.max(0, worldWidth - visibleW));
+            targetOffsetY = MathUtils.clamp(targetOffsetY, 0, Math.max(0, worldHeight - visibleH));
         }
         
         // Smooth camera movement
@@ -108,7 +130,7 @@ public class Camera {
     }
     
     /**
-     * Converts world coordinates to screen coordinates
+     * Converts world coordinates to screen coordinates (accounts for zoom).
      *
      * @param worldX World X coordinate
      * @param worldY World Y coordinate
@@ -116,13 +138,13 @@ public class Camera {
      */
     public Point worldToScreen(int worldX, int worldY) {
         return new Point(
-            (int)(worldX - offsetX),
-            (int)(worldY - offsetY)
+            (int)((worldX - offsetX) * zoom),
+            (int)((worldY - offsetY) * zoom)
         );
     }
     
     /**
-     * Converts screen coordinates to world coordinates
+     * Converts screen coordinates to world coordinates (accounts for zoom).
      *
      * @param screenX Screen X coordinate
      * @param screenY Screen Y coordinate
@@ -130,37 +152,31 @@ public class Camera {
      */
     public Point screenToWorld(int screenX, int screenY) {
         return new Point(
-            (int)(screenX + offsetX),
-            (int)(screenY + offsetY)
+            (int)(offsetX + screenX / zoom),
+            (int)(offsetY + screenY / zoom)
         );
     }
     
     /**
-     * Checks if a point is visible in the viewport
-     *
-     * @param worldX World X coordinate
-     * @param worldY World Y coordinate
-     * @return true if point is visible
+     * Checks if a point is visible in the viewport (accounts for zoom).
      */
     public boolean isVisible(int worldX, int worldY) {
-        return worldX >= offsetX && worldX <= offsetX + viewWidth &&
-               worldY >= offsetY && worldY <= offsetY + viewHeight;
+        double visibleW = viewWidth / zoom;
+        double visibleH = viewHeight / zoom;
+        return worldX >= offsetX && worldX <= offsetX + visibleW &&
+               worldY >= offsetY && worldY <= offsetY + visibleH;
     }
     
     /**
-     * Checks if a rectangular area is visible in the viewport
-     *
-     * @param worldX World X coordinate
-     * @param worldY World Y coordinate
-     * @param width Width of area
-     * @param height Height of area
-     * @return true if area intersects viewport
+     * Checks if a rectangular area is visible in the viewport (accounts for zoom).
      */
     public boolean isVisible(int worldX, int worldY, int width, int height) {
-        return !(worldX + width < offsetX || 
-                 worldX > offsetX + viewWidth ||
-                 worldY + height < offsetY || 
-                 worldY > offsetY + viewHeight);
+        double visibleW = viewWidth / zoom;
+        double visibleH = viewHeight / zoom;
+        return !(worldX + width < offsetX ||
+                 worldX > offsetX + visibleW ||
+                 worldY + height < offsetY ||
+                 worldY > offsetY + visibleH);
     }
     
     // Getters
@@ -168,6 +184,34 @@ public class Camera {
     public double getOffsetY() { return offsetY; }
     public int getViewWidth() { return viewWidth; }
     public int getViewHeight() { return viewHeight; }
+    public double getZoom() { return zoom; }
+    
+    /**
+     * Sets zoom level (clamped between ZOOM_MIN and ZOOM_MAX).
+     * @param zoom Scale factor; 1.0 = default, &gt;1 = zoom in, &lt;1 = zoom out
+     */
+    public void setZoom(double zoom) {
+        this.zoom = MathUtils.clamp(zoom, ZOOM_MIN, ZOOM_MAX);
+    }
+    
+    /** Zoom in by a scaled factor (multiplicative / logarithmic feel). */
+    public void zoomIn() {
+        setZoom(zoom * ZOOM_STEP_RATIO);
+    }
+    
+    /** Zoom out by a scaled factor (multiplicative / logarithmic feel). */
+    public void zoomOut() {
+        setZoom(zoom / ZOOM_STEP_RATIO);
+    }
+    
+    /**
+     * Apply a per-frame zoom factor for smooth continuous zoom while key is held.
+     * Call every frame: factor &gt; 1 to zoom in, factor &lt; 1 to zoom out.
+     * e.g. applySmoothZoom(1.012) when T held, applySmoothZoom(0.988) when G held
+     */
+    public void applySmoothZoom(double factor) {
+        setZoom(zoom * factor);
+    }
     
     // Setters
     public void setSmoothness(float smoothness) {
