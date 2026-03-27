@@ -30,7 +30,7 @@ javadoc \
     -windowtitle "Activerse API Documentation" \
     -doctitle "Activerse API Documentation" \
     -header "Activerse API" \
-    -footer "Activerse © 2025 by Knivier / Agniva" \
+    -footer "Activerse © 2026 by Knivier / Agniva" \
     -bottom "Licensed under CC BY-NC-SA 4.0" \
     -charset UTF-8 \
     -encoding UTF-8 \
