@@ -199,7 +199,13 @@ public class World extends JPanel implements ActionListener, KeyListener {
      * @param imagePath Relative path for image to load as background image
      */
     public void setBackgroundImage(String imagePath) {
-        backgroundImage = Toolkit.getDefaultToolkit().getImage(imagePath);
+        java.net.URL url = ActiverseUtils.ResourcePaths.resolveUrl(imagePath);
+        if (url == null) {
+            throw new RuntimeException(
+                    ErrorLogger.format("2A", "IN", "setBackgroundImage(String imagePath)",
+                            "could not resolve background image: " + imagePath));
+        }
+        backgroundImage = Toolkit.getDefaultToolkit().getImage(url);
         loadedImages.add(imagePath);
     }
 
