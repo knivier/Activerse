@@ -9,13 +9,17 @@ import java.util.concurrent.TimeUnit;
  */
 public final class DelayScheduler {
 
-    private static final ScheduledExecutorService SCHED = Executors.newSingleThreadScheduledExecutor(r -> {
-        Thread t = new Thread(r, "ActiverseDelay");
-        t.setDaemon(true);
-        return t;
-    });
+    private static volatile ScheduledExecutorService sched = createExecutor();
 
     private DelayScheduler() {}
+
+    private static ScheduledExecutorService createExecutor() {
+        return Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "ActiverseDelay");
+            t.setDaemon(true);
+            return t;
+        });
+    }
 
     /**
      * Runs {@code task} after {@code delayMs} on a background thread (or immediately if {@code delayMs <= 0}).
@@ -28,22 +32,32 @@ public final class DelayScheduler {
             task.run();
             return;
         }
-        SCHED.schedule(task, delayMs, TimeUnit.MILLISECONDS);
+        synchronized (DelayScheduler.class) {
+            if (sched == null || sched.isShutdown()) {
+                sched = createExecutor();
+            }
+            sched.schedule(task, delayMs, TimeUnit.MILLISECONDS);
+        }
     }
 
     /**
      * Stops delayed tasks (e.g. on JVM exit). Safe to call more than once.
      */
     public static void shutdown() {
-        SCHED.shutdown();
+        ScheduledExecutorService local;
+        synchronized (DelayScheduler.class) {
+            local = sched;
+        }
+        if (local == null) return;
+        local.shutdown();
         try {
-            if (!SCHED.awaitTermination(2, TimeUnit.SECONDS)) {
-                SCHED.shutdownNow();
-                SCHED.awaitTermination(2, TimeUnit.SECONDS);
+            if (!local.awaitTermination(2, TimeUnit.SECONDS)) {
+                local.shutdownNow();
+                local.awaitTermination(2, TimeUnit.SECONDS);
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            SCHED.shutdownNow();
+            local.shutdownNow();
         }
     }
 }

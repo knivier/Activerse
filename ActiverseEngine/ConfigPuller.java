@@ -41,7 +41,7 @@ public class ConfigPuller {
     /**
      * Loads the properties file if not already loaded
      */
-    private static void loadProperties() {
+    private static synchronized void loadProperties() {
         if (properties == null) {
             properties = new Properties();
             try (InputStream input = ConfigPuller.class.getClassLoader().getResourceAsStream(CONFIG_FILE)) {

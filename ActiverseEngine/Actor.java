@@ -690,7 +690,7 @@ public abstract class Actor {
      * @param fCost  The total cost of the current node.
      * @return The node object.
      */
-    class Node {
+    static class Node {
         int x, y;
         Node parent;
         double gCost, fCost;

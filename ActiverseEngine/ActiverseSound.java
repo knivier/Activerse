@@ -232,16 +232,4 @@ public class ActiverseSound {
         }
     }
     
-    /**
-     * Ensures resources are cleaned up when object is garbage collected.
-     */
-    @Override
-    protected void finalize() throws Throwable {
-        try {
-            dispose();
-        } finally {
-            super.finalize();
-        }
-    }
-
 }

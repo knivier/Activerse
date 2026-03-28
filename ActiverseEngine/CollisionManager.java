@@ -4,6 +4,9 @@ import ActiverseUtils.ImageUtils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.lang.ref.SoftReference;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Manages collision detection between actors in the world.
@@ -13,6 +16,8 @@ import java.awt.image.BufferedImage;
  * @version 1.4.1
  */
 public class CollisionManager {
+
+    private static final Map<Image, SoftReference<BufferedImage>> imageCache = new WeakHashMap<>();
 
     /**
      * Checks if two actors intersect using pixel-perfect collision detection.
@@ -85,10 +90,16 @@ public class CollisionManager {
         return false;
     }
 
-    // Utility method to convert Image to BufferedImage
     private static BufferedImage toBufferedImage(Image img) {
         if (img instanceof BufferedImage) {
             return (BufferedImage) img;
+        }
+        SoftReference<BufferedImage> ref = imageCache.get(img);
+        if (ref != null) {
+            BufferedImage cached = ref.get();
+            if (cached != null) {
+                return cached;
+            }
         }
         BufferedImage bimage = new BufferedImage(
                 img.getWidth(null), img.getHeight(null),
@@ -96,6 +107,7 @@ public class CollisionManager {
         Graphics2D bGr = bimage.createGraphics();
         bGr.drawImage(img, 0, 0, null);
         bGr.dispose();
+        imageCache.put(img, new SoftReference<>(bimage));
         return bimage;
     }
 }

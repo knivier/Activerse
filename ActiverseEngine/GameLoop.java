@@ -86,68 +86,72 @@ public class GameLoop implements Runnable {
     }
 
     /**
-     * Main update loop that runs at a fixed frame rate.
-     * This method processes game updates at the target FPS,
-     * ensuring smooth game state updates without blocking rendering.
+     * Update loop synchronized to system monotonic clock. Each tick is scheduled relative
+     * to a fixed epoch so timing drift cannot accumulate. If the loop falls behind, missed
+     * ticks are skipped rather than burst-processed, preventing spiral-of-death hitching.
      */
     private void updateLoop() {
-        long lastTime = System.nanoTime();
-        double delta = 0;
+        final long epoch = System.nanoTime();
+        long lastTickNumber = -1;
 
         while (running.get()) {
             long now = System.nanoTime();
-            delta += (now - lastTime) / (double) FRAME_TIME_NANOS;
-            lastTime = now;
+            long currentTickNumber = (now - epoch) / FRAME_TIME_NANOS;
 
-            // Process all update ticks necessary
-            int catchUpSteps = 0;
-            while (delta >= 1 && catchUpSteps < 5) {
-                synchronized (world) {
-                    if (!world.isSimulationDrivenBySwingTimer()) {
-                        world.update();
+            if (currentTickNumber <= lastTickNumber) {
+                long nextTickAt = epoch + (lastTickNumber + 1) * FRAME_TIME_NANOS;
+                long sleepNanos = nextTickAt - System.nanoTime();
+                if (sleepNanos > 0) {
+                    if (sleepNanos > 2_000_000L) {
+                        try { Thread.sleep(sleepNanos / 1_000_000L, (int) (sleepNanos % 1_000_000L)); }
+                        catch (InterruptedException e) { Thread.currentThread().interrupt(); break; }
+                    } else {
+                        LockSupport.parkNanos(sleepNanos);
                     }
                 }
-                updates++;
-                delta--;
-                catchUpSteps++;
-            }
-            if (delta >= 1) {
-                // Prevent unbounded catch-up under heavy load (spiral-of-death hitching).
-                delta = 0;
+                continue;
             }
 
-            pauseNanos(250_000);
+            synchronized (world) {
+                if (!world.isSimulationDrivenBySwingTimer()) {
+                    world.update();
+                }
+            }
+            updates++;
+            lastTickNumber = currentTickNumber;
         }
     }
 
     /**
-     * Main render loop that runs at a fixed frame rate.
-     * This method handles rendering the game world at the target FPS,
-     * ensuring smooth visual updates without blocking game logic.
+     * Render loop synchronized to system monotonic clock, matching the update loop's
+     * epoch-based scheduling for smooth, consistent frame pacing.
      */
     private void renderLoop() {
+        final long epoch = System.nanoTime();
+        long lastFrameNumber = -1;
+
         while (running.get()) {
-            long start = System.nanoTime();
-            // repaint() is thread-safe; don't take the world lock here or it will contend with update().
-            world.repaint();
+            long now = System.nanoTime();
+            long currentFrameNumber = (now - epoch) / FRAME_TIME_NANOS;
 
-            frames++;
-            calculateFPS(start);
-
-            long frameTime = System.nanoTime() - start;
-            long sleepTime = FRAME_TIME_NANOS - frameTime;
-
-            if (sleepTime > 0) {
-                try {
-                    Thread.sleep(sleepTime / 1_000_000L, (int) (sleepTime % 1_000_000L));
-                } catch (InterruptedException ignored) {
-                    Thread.currentThread().interrupt();
-                    break;
+            if (currentFrameNumber <= lastFrameNumber) {
+                long nextFrameAt = epoch + (lastFrameNumber + 1) * FRAME_TIME_NANOS;
+                long sleepNanos = nextFrameAt - System.nanoTime();
+                if (sleepNanos > 0) {
+                    if (sleepNanos > 2_000_000L) {
+                        try { Thread.sleep(sleepNanos / 1_000_000L, (int) (sleepNanos % 1_000_000L)); }
+                        catch (InterruptedException e) { Thread.currentThread().interrupt(); break; }
+                    } else {
+                        LockSupport.parkNanos(sleepNanos);
+                    }
                 }
-            } else {
-                // Frame overran; yield CPU briefly to avoid complete spin
-                Thread.yield();
+                continue;
             }
+
+            world.repaint();
+            frames++;
+            calculateFPS(now);
+            lastFrameNumber = currentFrameNumber;
         }
     }
 
@@ -164,14 +168,6 @@ public class GameLoop implements Runnable {
             updates = 0;
             lastFpsTime = now;
         }
-    }
-
-    /**
-     * Uses a short busy-wait to lightly throttle CPU in tight loops.
-     * Useful for high-frequency loops without costly sleep overhead.
-     */
-    private void pauseNanos(long duration) {
-        LockSupport.parkNanos(duration);
     }
 
     @Override

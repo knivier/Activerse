@@ -43,8 +43,6 @@ public class Activerse {
             throw new IllegalArgumentException("World cannot be null");
         }
         currentWorld = world;
-        gameLoop = new GameLoop(currentWorld);
-        new Thread(gameLoop).start();
         SwingUtilities.invokeLater(() -> {
             try {
                 frame = new JFrame("Activerse Instance v1.4.1");
@@ -60,7 +58,9 @@ public class Activerse {
                 frame.setVisible(true);
                 frame.setResizable(false); 
                 frame.setLocationRelativeTo(null);
-                currentWorld.start(); 
+                currentWorld.start();
+                gameLoop = new GameLoop(currentWorld);
+                gameLoop.start();
             } catch (HeadlessException | IllegalArgumentException e) {
                 ErrorLogger.report("1A", "IO", "Activerse.start()",
                         "a specific error occurred. Please check the error details and ensure the environment supports windowed rendering.");
@@ -85,35 +85,25 @@ public class Activerse {
         if (currentWorld != null) {
             currentWorld.saveBeforeHalt();
             stop(currentWorld);
-            if (frame != null) {
-                frame.getContentPane().remove(currentWorld);
-            }
         }
         if (gameLoop != null) {
             gameLoop.stop();
             gameLoop = null;
         }
         currentWorld = world;
-        if (frame != null) {
-            frame.getContentPane().removeAll(); // Remove all components
-            frame.getContentPane().add(currentWorld, BorderLayout.CENTER);
-            frame.getContentPane().revalidate();
-            frame.getContentPane().repaint();
-        }
-        
-        // Create and start game loop
-        gameLoop = new GameLoop(currentWorld);
-        new Thread(gameLoop).start();
-        
-        // Start the world
-        currentWorld.start();
-        
-        // Ensure the new world gets focus for keyboard input (must be done after adding to frame)
-        // Use invokeLater to ensure this happens after the component is fully added and visible
-        SwingUtilities.invokeLater(() -> {
+
+        Runnable setupOnEDT = () -> {
+            if (frame != null) {
+                frame.getContentPane().removeAll();
+                frame.getContentPane().add(currentWorld, BorderLayout.CENTER);
+                frame.getContentPane().revalidate();
+                frame.getContentPane().repaint();
+            }
+            currentWorld.start();
+            gameLoop = new GameLoop(currentWorld);
+            gameLoop.start();
             currentWorld.setFocusable(true);
             if (!currentWorld.requestFocusInWindow()) {
-                // If focus request fails, try again after a short delay
                 Timer focusTimer = new Timer(100, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -124,7 +114,12 @@ public class Activerse {
                 focusTimer.setRepeats(false);
                 focusTimer.start();
             }
-        });
+        };
+        if (SwingUtilities.isEventDispatchThread()) {
+            setupOnEDT.run();
+        } else {
+            SwingUtilities.invokeLater(setupOnEDT);
+        }
     }
 
     /**
