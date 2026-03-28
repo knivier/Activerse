@@ -30,4 +30,20 @@ public final class DelayScheduler {
         }
         SCHED.schedule(task, delayMs, TimeUnit.MILLISECONDS);
     }
+
+    /**
+     * Stops delayed tasks (e.g. on JVM exit). Safe to call more than once.
+     */
+    public static void shutdown() {
+        SCHED.shutdown();
+        try {
+            if (!SCHED.awaitTermination(2, TimeUnit.SECONDS)) {
+                SCHED.shutdownNow();
+                SCHED.awaitTermination(2, TimeUnit.SECONDS);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            SCHED.shutdownNow();
+        }
+    }
 }

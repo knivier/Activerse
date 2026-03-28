@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * WorldManager - Handles saving and loading world data
@@ -119,7 +120,8 @@ public class WorldManager {
      * Saves world data to world.json, including total game ticks elapsed.
      */
     public static void saveWorldData(String worldName, long seed, int tileSize, int worldWidth, int worldHeight, long totalGameTicks) {
-        saveWorldData(worldName, seed, tileSize, worldWidth, worldHeight, totalGameTicks, false, 32);
+        saveWorldData(worldName, seed, tileSize, worldWidth, worldHeight, totalGameTicks, false, 32,
+                0L, false, 0L);
     }
 
     /**
@@ -127,6 +129,16 @@ public class WorldManager {
      */
     public static void saveWorldData(String worldName, long seed, int tileSize, int worldWidth, int worldHeight,
                                      long totalGameTicks, boolean infinite, int chunkTiles) {
+        saveWorldData(worldName, seed, tileSize, worldWidth, worldHeight, totalGameTicks, infinite, chunkTiles,
+                0L, false, 0L);
+    }
+
+    /**
+     * Saves world.json including time-offset state used by console time controls.
+     */
+    public static void saveWorldData(String worldName, long seed, int tileSize, int worldWidth, int worldHeight,
+                                     long totalGameTicks, boolean infinite, int chunkTiles,
+                                     long dayNightDisplayOffset, boolean timeFrozen, long frozenDayNightTicks) {
         ensureWorldsDirectory();
         String worldPath = getWorldPath(worldName);
         File worldDir = new File(worldPath);
@@ -143,9 +155,13 @@ public class WorldManager {
                 "  \"worldHeight\": %d,\n" +
                 "  \"totalGameTicks\": %d,\n" +
                 "  \"infinite\": %b,\n" +
-                "  \"chunkTiles\": %d\n" +
+                "  \"chunkTiles\": %d,\n" +
+                "  \"dayNightDisplayOffset\": %d,\n" +
+                "  \"timeFrozen\": %b,\n" +
+                "  \"frozenDayNightTicks\": %d\n" +
                 "}",
-                seed, tileSize, worldWidth, worldHeight, totalGameTicks, infinite, chunkTiles
+                seed, tileSize, worldWidth, worldHeight, totalGameTicks, infinite, chunkTiles,
+                dayNightDisplayOffset, timeFrozen, frozenDayNightTicks
             );
             
             Files.write(Paths.get(getWorldJsonPath(worldName)), json.getBytes());
@@ -306,6 +322,9 @@ public class WorldManager {
             data.totalGameTicks = extractLong(json, "totalGameTicks");
             data.infinite       = extractBooleanOptional(json, "infinite", false);
             data.chunkTiles     = extractIntOptional(json, "chunkTiles", 32);
+            data.dayNightDisplayOffset = extractLongOptional(json, "dayNightDisplayOffset", 0L);
+            data.timeFrozen = extractBooleanOptional(json, "timeFrozen", false);
+            data.frozenDayNightTicks = extractLongOptional(json, "frozenDayNightTicks", 0L);
             if (data.chunkTiles <= 0) data.chunkTiles = 32;
             return data;
         } catch (Exception e) {
@@ -314,6 +333,68 @@ public class WorldManager {
         }
     }
     
+    /**
+     * Index of the {@code ]} that closes the array starting at {@code arrayStart} ({@code [}),
+     * respecting strings and escapes. Returns {@code -1} if not found.
+     */
+    private static int indexOfClosingBracketForArray(String json, int arrayStart) {
+        if (arrayStart < 0 || arrayStart >= json.length() || json.charAt(arrayStart) != '[') {
+            return -1;
+        }
+        int depth = 0;
+        boolean inString = false;
+        boolean escape = false;
+        for (int i = arrayStart; i < json.length(); i++) {
+            char c = json.charAt(i);
+            if (escape) {
+                escape = false;
+                continue;
+            }
+            if (inString) {
+                if (c == '\\') {
+                    escape = true;
+                } else if (c == '"') {
+                    inString = false;
+                }
+                continue;
+            }
+            if (c == '"') {
+                inString = true;
+                continue;
+            }
+            if (c == '[') {
+                depth++;
+            } else if (c == ']') {
+                depth--;
+                if (depth == 0) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Drops adjacent duplicate inventory rows (same name, type, value). Repairs saves that were
+     * written with each slot duplicated once; does not affect normal stacks (resources use one row).
+     */
+    private static void normalizeAdjacentDuplicateInventoryEntries(List<ItemData> inv) {
+        if (inv == null || inv.size() < 2) {
+            return;
+        }
+        for (int i = 0; i + 1 < inv.size(); ) {
+            ItemData a = inv.get(i);
+            ItemData b = inv.get(i + 1);
+            if (Objects.equals(a.name, b.name)
+                    && Objects.equals(a.type, b.type)
+                    && a.value == b.value) {
+                inv.remove(i + 1);
+            } else {
+                i++;
+            }
+        }
+    }
+
     private static PlayerData parsePlayerJson(String json) {
         PlayerData data = new PlayerData();
         try {
@@ -329,20 +410,23 @@ public class WorldManager {
             int inventoryStart = json.indexOf("\"inventory\": [");
             if (inventoryStart >= 0) {
                 int arrayStart = json.indexOf("[", inventoryStart);
-                int arrayEnd = json.lastIndexOf("]");
-                String inventoryStr = json.substring(arrayStart + 1, arrayEnd);
+                int arrayEnd = arrayStart >= 0 ? indexOfClosingBracketForArray(json, arrayStart) : -1;
+                if (arrayStart >= 0 && arrayEnd > arrayStart) {
+                    String inventoryStr = json.substring(arrayStart + 1, arrayEnd);
                 
-                // Split by items (look for { ... } patterns)
-                String[] items = inventoryStr.split("\\},\\s*\\{");
-                for (String itemStr : items) {
-                    itemStr = itemStr.replace("{", "").replace("}", "").trim();
-                    if (itemStr.isEmpty()) continue;
+                    // Split by items (look for { ... } patterns)
+                    String[] items = inventoryStr.split("\\},\\s*\\{");
+                    for (String itemStr : items) {
+                        itemStr = itemStr.replace("{", "").replace("}", "").trim();
+                        if (itemStr.isEmpty()) continue;
                     
-                    ItemData item = new ItemData();
-                    item.name = extractString(itemStr, "name");
-                    item.type = extractString(itemStr, "type");
-                    item.value = extractInt(itemStr, "value");
-                    data.inventory.add(item);
+                        ItemData item = new ItemData();
+                        item.name = extractString(itemStr, "name");
+                        item.type = extractString(itemStr, "type");
+                        item.value = extractInt(itemStr, "value");
+                        data.inventory.add(item);
+                    }
+                    normalizeAdjacentDuplicateInventoryEntries(data.inventory);
                 }
             }
             
@@ -450,6 +534,16 @@ public class WorldManager {
         java.util.regex.Matcher m = p.matcher(json);
         if (m.find()) {
             return Integer.parseInt(m.group(1));
+        }
+        return defaultValue;
+    }
+
+    private static long extractLongOptional(String json, String key, long defaultValue) {
+        String pattern = "\"" + key + "\"\\s*:\\s*(-?\\d+)";
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile(pattern);
+        java.util.regex.Matcher m = p.matcher(json);
+        if (m.find()) {
+            return Long.parseLong(m.group(1));
         }
         return defaultValue;
     }
@@ -768,6 +862,12 @@ public class WorldManager {
         public boolean infinite;
         /** Edge length of one chunk in tile units (e.g. 32 = 32×32 tiles per chunk). */
         public int chunkTiles = 32;
+        /** Additive offset on top of raw day/night ticks (console time set commands). */
+        public long dayNightDisplayOffset;
+        /** True when the day/night clock is frozen. */
+        public boolean timeFrozen;
+        /** Effective day/night ticks while frozen. */
+        public long frozenDayNightTicks;
     }
     
     public static class PlayerData {

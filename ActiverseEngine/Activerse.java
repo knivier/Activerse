@@ -1,10 +1,12 @@
 package ActiverseEngine;
 
+import ActiverseUtils.DelayScheduler;
 import ActiverseUtils.ErrorLogger;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -20,6 +22,15 @@ public class Activerse {
     private static World currentWorld;
     private static JFrame frame;
     private static GameLoop gameLoop;
+
+    private static final AtomicBoolean exitInProgress = new AtomicBoolean(false);
+
+    /**
+     * The main window, or null before the UI is created on the EDT.
+     */
+    public static JFrame getFrame() {
+        return frame;
+    }
 
     /**
      * Starts the Activerse application with the specified world.
@@ -37,13 +48,11 @@ public class Activerse {
         SwingUtilities.invokeLater(() -> {
             try {
                 frame = new JFrame("Activerse Instance v1.4.1");
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
                 frame.addWindowListener(new WindowAdapter() {
                     @Override
                     public void windowClosing(WindowEvent e) {
-                        if (currentWorld != null) {
-                            currentWorld.saveBeforeHalt();
-                        }
+                        shutdownApplication();
                     }
                 });
                 frame.getContentPane().add(currentWorld, BorderLayout.CENTER);
@@ -131,6 +140,70 @@ public class Activerse {
                 ErrorLogger.reportException("1A", "IO", "stop(World world)", e);
                 System.exit(0);
             }
+        }
+    }
+
+    /**
+     * Full process teardown: save, stop simulation, release thread pools, close the window, exit JVM.
+     * May be called from the EDT, the game-loop thread, or elsewhere; work always runs on a dedicated thread
+     * so this never joins the current thread (avoids deadlock).
+     */
+    public static void shutdownApplication() {
+        new Thread(Activerse::runShutdownSequence, "ActiverseShutdown").start();
+    }
+
+    private static void runShutdownSequence() {
+        if (!exitInProgress.compareAndSet(false, true)) {
+            return;
+        }
+        try {
+            World world = currentWorld;
+            if (world != null) {
+                try {
+                    world.saveBeforeHalt();
+                } catch (Exception e) {
+                    ErrorLogger.reportException("1A", "IO", "shutdownApplication saveBeforeHalt", e);
+                }
+            }
+            if (gameLoop != null) {
+                gameLoop.stop();
+                gameLoop = null;
+            }
+            if (world != null) {
+                try {
+                    world.stop();
+                } catch (Exception e) {
+                    ErrorLogger.reportException("1A", "IO", "shutdownApplication world.stop", e);
+                }
+                try {
+                    world.shutdownApplicationResources();
+                } catch (Exception e) {
+                    ErrorLogger.reportException("1A", "IO", "shutdownApplicationResources", e);
+                }
+            }
+            currentWorld = null;
+            try {
+                DelayScheduler.shutdown();
+            } catch (Exception e) {
+                ErrorLogger.reportException("1A", "IO", "DelayScheduler.shutdown", e);
+            }
+            if (frame != null) {
+                try {
+                    SwingUtilities.invokeAndWait(() -> {
+                        frame.dispose();
+                    });
+                } catch (Exception e) {
+                    ErrorLogger.reportException("1A", "IO", "frame.dispose", e);
+                    frame.dispose();
+                }
+                frame = null;
+            }
+        } catch (Exception e) {
+            ErrorLogger.reportException("1A", "IO", "shutdownApplication", e);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        } finally {
+            System.exit(0);
         }
     }
 }
