@@ -145,11 +145,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
         terminateButton.setFont(new Font("Arial", Font.PLAIN, 10));
         terminateButton.setPreferredSize(new Dimension(60, 20));
         terminateButton.setBounds(this.fixedWidth - 90, 50, 60, 20);
-        terminateButton.addActionListener(e -> {
-            saveBeforeHalt();
-            stop();
-            System.exit(0);
-        });
+        terminateButton.addActionListener(e -> Activerse.shutdownApplication());
         add(terminateButton);
 
         setFocusable(true);
@@ -212,6 +208,13 @@ public class World extends JPanel implements ActionListener, KeyListener {
      * Subclasses override to persist player/world state synchronously.
      */
     public void saveBeforeHalt() {
+    }
+
+    /**
+     * Called once during full application shutdown (after {@link #saveBeforeHalt()} and {@link #stop()}).
+     * Override to release process-wide resources (e.g. thread pools).
+     */
+    protected void shutdownApplicationResources() {
     }
 
     /**

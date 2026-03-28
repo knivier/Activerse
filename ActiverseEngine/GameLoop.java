@@ -1,6 +1,7 @@
 package ActiverseEngine;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.LockSupport;
 
 /**
  * Represents a highly parallelized game loop maximizing CPU usage while maintaining stability.
@@ -53,15 +54,23 @@ public class GameLoop implements Runnable {
      */
     public void stop() {
         running.set(false);
+        Thread current = Thread.currentThread();
+        if (updateThread != null && updateThread != current) {
+            updateThread.interrupt();
+        }
+        if (renderThread != null && renderThread != current) {
+            renderThread.interrupt();
+        }
         try {
-            if (updateThread != null && updateThread.isAlive()) {
-                updateThread.join(1000); // Wait up to 1 second
+            // Never join the current thread (e.g. stop() from world.update() on UpdateThread deadlocks).
+            if (updateThread != null && updateThread.isAlive() && updateThread != current) {
+                updateThread.join(2000);
                 if (updateThread.isAlive()) {
                     System.err.println("[Activerse] Warning: Update thread did not terminate in time.");
                 }
             }
-            if (renderThread != null && renderThread.isAlive()) {
-                renderThread.join(1000); // Wait up to 1 second
+            if (renderThread != null && renderThread.isAlive() && renderThread != current) {
+                renderThread.join(2000);
                 if (renderThread.isAlive()) {
                     System.err.println("[Activerse] Warning: Render thread did not terminate in time.");
                 }
@@ -71,6 +80,8 @@ public class GameLoop implements Runnable {
             System.err.println("[Activerse] Error stopping game loop threads.");
             e.printStackTrace();
         }
+        updateThread = null;
+        renderThread = null;
         System.out.println("[Activerse] Game loop stopped.");
     }
 
@@ -89,7 +100,8 @@ public class GameLoop implements Runnable {
             lastTime = now;
 
             // Process all update ticks necessary
-            while (delta >= 1) {
+            int catchUpSteps = 0;
+            while (delta >= 1 && catchUpSteps < 5) {
                 synchronized (world) {
                     if (!world.isSimulationDrivenBySwingTimer()) {
                         world.update();
@@ -97,9 +109,14 @@ public class GameLoop implements Runnable {
                 }
                 updates++;
                 delta--;
+                catchUpSteps++;
+            }
+            if (delta >= 1) {
+                // Prevent unbounded catch-up under heavy load (spiral-of-death hitching).
+                delta = 0;
             }
 
-            spinWaitNano(250_000); // short delay to reduce wasted CPU
+            pauseNanos(250_000);
         }
     }
 
@@ -124,6 +141,8 @@ public class GameLoop implements Runnable {
                 try {
                     Thread.sleep(sleepTime / 1_000_000L, (int) (sleepTime % 1_000_000L));
                 } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
+                    break;
                 }
             } else {
                 // Frame overran; yield CPU briefly to avoid complete spin
@@ -151,11 +170,8 @@ public class GameLoop implements Runnable {
      * Uses a short busy-wait to lightly throttle CPU in tight loops.
      * Useful for high-frequency loops without costly sleep overhead.
      */
-    private void spinWaitNano(long duration) {
-        long target = System.nanoTime() + duration;
-        while (System.nanoTime() < target) {
-            // Minimal wait – burn a bit of CPU but improves timing precision
-        }
+    private void pauseNanos(long duration) {
+        LockSupport.parkNanos(duration);
     }
 
     @Override

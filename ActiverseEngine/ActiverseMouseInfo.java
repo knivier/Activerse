@@ -1,16 +1,16 @@
 package ActiverseEngine;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import javax.swing.*;
 
 /**
  * Provides utility methods to retrieve information about the mouse pointer location
  * and detect mouse clicks.
  *
  * @author Knivier
- * @version 1.4.1
+ * @version 1.3.2
  */
 public class ActiverseMouseInfo implements MouseListener {
     private static volatile boolean leftClick = false;

@@ -1,6 +1,5 @@
 package ActiverseEngine;
 
-import ActiverseUtils.ErrorLogger;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -11,12 +10,13 @@ import java.lang.management.MemoryUsage;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import ActiverseUtils.ErrorLogger;
 
 /**
  * MemoryTracker class is used to track memory usage of the game along with other statistics
  *
  * @author Knivier
- * @version 1.4.1
+ * @version 1.3.2
  */
 public class MemoryTracker {
     private long lastTime;
@@ -47,7 +47,7 @@ public class MemoryTracker {
     }
 
     /**
-     * Loads properties from the Activerse.properties file.
+     * Loads logging/FPS preferences via {@link ConfigPuller} ({@code Activerse.properties} engine keys).
      */
     private void loadProperties() {
         loggingEnabled = ConfigPuller.getBoolean("logging", false);

@@ -5,24 +5,39 @@ import ActiverseUtils.IniUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
- * ConfigPuller - Utility for loading configuration from Activerse.properties
- * Provides centralized configuration management for ActiverseEngine applications
- * 
+ * ConfigPuller — {@code game.*} from {@code settings.ini}, then bundled {@code Activerse.properties}.
+ * Engine keys ({@code fps}, {@code show_debug}, {@code logging}, dynamic lighting) are read only from
+ * {@code Activerse.properties}, never from {@code settings.ini}.
+ *
  * @author Knivier
- * @version 1.4.1
+ * @version 1.6.0
  */
 public class ConfigPuller {
     private static Properties properties = null;
     private static final String CONFIG_FILE = "Activerse.properties";
 
-    // Global system settings (game-wide, not world specific).
-    // Loaded from the working directory (e.g. project root) so users can edit it.
-    private static final String SYSTEM_INI_FILE = "system.ini";
-    private static Properties systemIniProperties = null;
-    
+    private static final String SETTINGS_INI_FILE = "settings.ini";
+    private static Properties settingsIniProperties = null;
+
+    private static boolean isEnginePropertyKey(String key) {
+        if (key == null) {
+            return false;
+        }
+        if ("fps".equals(key) || "show_debug".equals(key) || "logging".equals(key)) {
+            return true;
+        }
+        return isDynamicLightingAlias(key);
+    }
+
     /**
      * Loads the properties file if not already loaded
      */
@@ -34,17 +49,17 @@ public class ConfigPuller {
                     ErrorLogger.report("PROP", "IN.OUT.IO", "loadProperties()", "Activerse.properties not found. Using defaults.");
                     return;
                 }
-                properties.load(input);
+                properties.load(new InputStreamReader(input, StandardCharsets.UTF_8));
             } catch (IOException e) {
                 ErrorLogger.reportException("PROP", "IN.OUT.IO", "loadProperties()", e);
             }
         }
 
-        if (systemIniProperties == null) {
-            systemIniProperties = IniUtils.loadIni(SYSTEM_INI_FILE);
+        if (settingsIniProperties == null) {
+            settingsIniProperties = IniUtils.loadIni(SETTINGS_INI_FILE);
         }
     }
-    
+
     /**
      * Gets a string property value
      * @param key Property key
@@ -53,24 +68,10 @@ public class ConfigPuller {
      */
     public static String getString(String key, String defaultValue) {
         loadProperties();
-        String v = null;
-
-        // Allow both spellings for dynamic lighting since the repo uses inconsistent keys.
-        if (key != null && isDynamicLightingAlias(key)) {
-            v = systemIniProperties.getProperty(key);
-            if (v == null) v = systemIniProperties.getProperty(dynamicLightingAliasFor(key));
-            if (v != null) return v;
-
-            v = properties.getProperty(key);
-            if (v == null) v = properties.getProperty(dynamicLightingAliasFor(key));
-            return v != null ? v : defaultValue;
-        }
-
-        v = systemIniProperties.getProperty(key);
-        if (v == null) v = properties.getProperty(key);
+        String v = getStringInternal(key);
         return v != null ? v : defaultValue;
     }
-    
+
     /**
      * Gets an integer property value
      * @param key Property key
@@ -81,7 +82,7 @@ public class ConfigPuller {
         loadProperties();
         String value = getStringInternal(key);
         if (value == null) return defaultValue;
-        
+
         try {
             return Integer.parseInt(value.trim());
         } catch (NumberFormatException e) {
@@ -89,7 +90,7 @@ public class ConfigPuller {
             return defaultValue;
         }
     }
-    
+
     /**
      * Gets a boolean property value
      * @param key Property key
@@ -100,10 +101,10 @@ public class ConfigPuller {
         loadProperties();
         String value = getStringInternal(key);
         if (value == null) return defaultValue;
-        
+
         return Boolean.parseBoolean(value.trim());
     }
-    
+
     /**
      * Gets a double property value
      * @param key Property key
@@ -114,7 +115,7 @@ public class ConfigPuller {
         loadProperties();
         String value = getStringInternal(key);
         if (value == null) return defaultValue;
-        
+
         try {
             return Double.parseDouble(value.trim());
         } catch (NumberFormatException e) {
@@ -139,28 +140,86 @@ public class ConfigPuller {
 
         loadProperties();
 
-        // Prefer system.ini overrides.
-        if (isDynamicLightingAlias(key)) {
-            String v = systemIniProperties.getProperty(key);
-            if (v == null) v = systemIniProperties.getProperty(dynamicLightingAliasFor(key));
-            if (v != null) return v;
-
-            v = properties.getProperty(key);
-            if (v == null) v = properties.getProperty(dynamicLightingAliasFor(key));
-            return v;
+        if (isEnginePropertyKey(key)) {
+            if (isDynamicLightingAlias(key)) {
+                return getPropertyWithLightingAliases(properties, key);
+            }
+            return properties.getProperty(key);
         }
 
-        String v = systemIniProperties.getProperty(key);
-        if (v == null) v = properties.getProperty(key);
+        if (isDynamicLightingAlias(key)) {
+            String v = getPropertyWithLightingAliases(settingsIniProperties, key);
+            if (v != null) return v;
+            return getPropertyWithLightingAliases(properties, key);
+        }
+
+        String v = settingsIniProperties.getProperty(key);
+        if (v != null) return v;
+        return properties.getProperty(key);
+    }
+
+    private static String getPropertyWithLightingAliases(Properties p, String key) {
+        String v = p.getProperty(key);
+        if (v == null) {
+            v = p.getProperty(dynamicLightingAliasFor(key));
+        }
         return v;
     }
-    
+
     /**
-     * Reloads the properties file from disk
+     * Persists engine toggles from the Settings menu to {@code Activerse.properties} on disk
+     * ({@code src/Activerse.properties} when a {@code src} directory exists in the working directory,
+     * otherwise {@code Activerse.properties} in the working directory). Does not modify {@code settings.ini}.
+     */
+    public static void saveEngineSettings(int fps, boolean showDebug, boolean logging, boolean dynamicLighting) {
+        Path path = resolveWritableActiversePropertiesPath();
+        Properties disk = new Properties();
+        if (Files.isRegularFile(path)) {
+            try (InputStream in = Files.newInputStream(path)) {
+                disk.load(new InputStreamReader(in, StandardCharsets.UTF_8));
+            } catch (IOException e) {
+                ErrorLogger.reportException("PROP", "IN.OUT.IO", "saveEngineSettings load disk", e);
+            }
+        } else {
+            loadProperties();
+            for (String n : properties.stringPropertyNames()) {
+                disk.setProperty(n, properties.getProperty(n));
+            }
+        }
+        disk.setProperty("fps", Integer.toString(fps));
+        disk.setProperty("show_debug", Boolean.toString(showDebug));
+        disk.setProperty("logging", Boolean.toString(logging));
+        disk.setProperty("dynamicLighting", Boolean.toString(dynamicLighting));
+        disk.setProperty("dynamic_lighting", Boolean.toString(dynamicLighting));
+        try {
+            Path parent = path.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+            try (Writer w = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+                disk.store(w, "Activerse Engine — engine-only (game keys live in settings.ini)");
+            }
+        } catch (IOException e) {
+            ErrorLogger.reportException("PROP", "IN.OUT.IO", "saveEngineSettings store", e);
+        }
+        reload();
+    }
+
+    private static Path resolveWritableActiversePropertiesPath() {
+        Path cwd = Paths.get(System.getProperty("user.dir", "."));
+        Path srcFile = cwd.resolve("src").resolve("Activerse.properties");
+        if (Files.isDirectory(cwd.resolve("src"))) {
+            return srcFile;
+        }
+        return cwd.resolve("Activerse.properties");
+    }
+
+    /**
+     * Reloads configuration from disk
      */
     public static void reload() {
         properties = null;
-        systemIniProperties = null;
+        settingsIniProperties = null;
         loadProperties();
     }
 }
