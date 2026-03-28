@@ -1,8 +1,10 @@
 package ActiverseEngine;
 
 import ActiverseUtils.ErrorLogger;
+import ActiverseUtils.ResourcePaths;
 
 import java.awt.*;
+import java.net.URL;
 
 /**
  * Represents an image loader for loading images from files.
@@ -28,8 +30,14 @@ public class ActiverseImage {
         }
         
         path = filename;
-        image = Toolkit.getDefaultToolkit().getImage(filename);
-        
+        URL url = ResourcePaths.resolveUrl(filename);
+        if (url == null) {
+            throw new RuntimeException(
+                    ErrorLogger.format("2A", "IN", "ActiverseImage(String filename)",
+                            "could not resolve image path: " + filename));
+        }
+        image = Toolkit.getDefaultToolkit().getImage(url);
+
         if (image == null) {
             throw new NullPointerException(
                     ErrorLogger.format("2A", "IN", "ActiverseImage(String filename)", "image is null (Report: INTO). Please check the image path and try again."));

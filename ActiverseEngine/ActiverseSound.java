@@ -1,9 +1,11 @@
 package ActiverseEngine;
 
 import ActiverseUtils.ErrorLogger;
+import ActiverseUtils.ResourcePaths;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import javax.sound.sampled.*;
 
 /**
@@ -25,14 +27,35 @@ public class ActiverseSound {
     public ActiverseSound(String filename) {
         this.filename = filename;
         try {
-            // Load the audio file
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(filename));
-            clip = AudioSystem.getClip();
-            clip.open(audioInputStream);
-            volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            AudioInputStream audioInputStream = openAudioInputStream(filename);
+            try {
+                clip = AudioSystem.getClip();
+                clip.open(audioInputStream);
+                volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            } finally {
+                audioInputStream.close();
+            }
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             ErrorLogger.report("4A", "IN", "ActiverseSound(String filename)",
                     "an error occurred while loading the audio file (type: INTO). Please check the file path and try again. WAV files are only supported at this time.");
+        }
+    }
+
+    private static AudioInputStream openAudioInputStream(String filename)
+            throws IOException, UnsupportedAudioFileException {
+        File file = new File(filename);
+        if (file.isFile()) {
+            return AudioSystem.getAudioInputStream(file);
+        }
+        InputStream in = ResourcePaths.openInputStream(filename);
+        try {
+            return AudioSystem.getAudioInputStream(in);
+        } catch (UnsupportedAudioFileException | IOException e) {
+            try {
+                in.close();
+            } catch (IOException ignored) {
+            }
+            throw e;
         }
     }
 
