@@ -2,9 +2,9 @@ package ActiverseUtils;
 
 import ActiverseEngine.Actor;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * ParticleSystem - System for creating and managing visual particle effects
@@ -17,9 +17,9 @@ public class ParticleSystem extends Actor {
     private Random random;
     
     public ParticleSystem() {
-        particles = new ArrayList<>();
+        particles = new CopyOnWriteArrayList<>();
         random = new Random();
-        setStatic(true); // Particle system doesn't move
+        setStatic(true);
     }
     
     /**
@@ -78,22 +78,15 @@ public class ParticleSystem extends Actor {
     
     @Override
     public void act() {
-        // Update and remove dead particles
-        List<Particle> toRemove = new ArrayList<>();
         for (Particle p : particles) {
             p.update();
-            if (p.isDead()) {
-                toRemove.add(p);
-            }
         }
-        particles.removeAll(toRemove);
+        particles.removeIf(Particle::isDead);
     }
     
     @Override
     public void paint(Graphics g) {
-        // Create a copy to avoid ConcurrentModificationException
-        List<Particle> particlesCopy = new ArrayList<>(particles);
-        for (Particle p : particlesCopy) {
+        for (Particle p : particles) {
             p.render(g);
         }
     }

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Represents the world where actors interact.
@@ -28,11 +29,11 @@ public class World extends JPanel implements ActionListener, KeyListener {
     /**
      * Frames per second for the world update/render loop
      */
-    private static int fps;
+    private static volatile int fps;
     /**
      * Number of update ticks completed since world start
      */
-    private static int ticksDone = 0;
+    private static final AtomicInteger ticksDone = new AtomicInteger(0);
     /**
      * Fixed pixel width of the world
      */
@@ -93,6 +94,9 @@ public class World extends JPanel implements ActionListener, KeyListener {
     private long lastFrameTime = System.currentTimeMillis();
     private int frameCount = 0;
     private int actualFPS = 0;
+
+    private BufferedImage lightingBuffer;
+    private BufferedImage spotlightBuffer;
 
     /**
      * Constructor for the World class.
@@ -186,7 +190,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
      * @return int Ticks done
      */
     public static int getTicksDone() {
-        return ticksDone;
+        return ticksDone.get();
     }
 
     private void initializeKeyListener() {
@@ -239,7 +243,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
      * @see MemoryTracker
      */
     public void update() {
-        ticksDone++;
+        ticksDone.incrementAndGet();
         // Copy-on-write: iterator snapshot is safe even if act() removes actors; do not wrap in
         // synchronized(this) — that would serialize the update thread with EDT paint and destroy FPS.
         for (Actor actor : actors) {
@@ -343,7 +347,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
      */
     public void stop() {
         timer.stop();
-        // Clean up sounds
+        memoryTracker.close();
         for (ActiverseSound sound : sounds) {
             if (sound != null) {
                 sound.dispose();
@@ -437,8 +441,9 @@ public class World extends JPanel implements ActionListener, KeyListener {
     private void applyDynamicLighting(Graphics g) {
         Graphics2D g2d = (Graphics2D) g.create();
 
-        // Lighting buffer for compositing
-        BufferedImage lightingBuffer = new BufferedImage(fixedWidth, fixedHeight, BufferedImage.TYPE_INT_ARGB);
+        if (lightingBuffer == null || lightingBuffer.getWidth() != fixedWidth || lightingBuffer.getHeight() != fixedHeight) {
+            lightingBuffer = new BufferedImage(fixedWidth, fixedHeight, BufferedImage.TYPE_INT_ARGB);
+        }
         Graphics2D gLighting = lightingBuffer.createGraphics();
 
         // Clear buffer
@@ -462,9 +467,13 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
             // Spotlight or omni
             if (light.spread < 2 * Math.PI) {
-                // Draw spotlight as a pie-shaped radial gradient
-                BufferedImage spot = new BufferedImage(fixedWidth, fixedHeight, BufferedImage.TYPE_INT_ARGB);
-                Graphics2D gSpot = spot.createGraphics();
+                if (spotlightBuffer == null || spotlightBuffer.getWidth() != fixedWidth || spotlightBuffer.getHeight() != fixedHeight) {
+                    spotlightBuffer = new BufferedImage(fixedWidth, fixedHeight, BufferedImage.TYPE_INT_ARGB);
+                }
+                Graphics2D gSpot = spotlightBuffer.createGraphics();
+                gSpot.setComposite(AlphaComposite.Clear);
+                gSpot.fillRect(0, 0, fixedWidth, fixedHeight);
+                gSpot.setComposite(AlphaComposite.SrcOver);
                 gSpot.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
                 // Create a radial gradient for the cone
@@ -483,7 +492,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
                 gSpot.fillRect(light.x - light.radius, light.y - light.radius, light.radius * 2, light.radius * 2);
                 gSpot.dispose();
 
-                gLighting.drawImage(spot, 0, 0, null);
+                gLighting.drawImage(spotlightBuffer, 0, 0, null);
             } else {
                 // Omni light as radial gradient
                 RadialGradientPaint gradient = new RadialGradientPaint(
@@ -549,7 +558,6 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
         gLighting.dispose();
         g2d.dispose();
-        lightingBuffer = null; // Help GC
     }
 
     /**
@@ -603,7 +611,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
         g.drawString("FPS: " + actualFPS, 10, y);
         y += 15;
         y += 20;
-        g.drawString(" Ticks: " + ticksDone, 10, 60);
+        g.drawString(" Ticks: " + ticksDone.get(), 10, 60);
 
         g.drawString(memoryTracker.getMemoryUsagePerSecond(), 10, y);
         y += 20;

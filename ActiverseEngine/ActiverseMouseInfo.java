@@ -16,7 +16,7 @@ public class ActiverseMouseInfo implements MouseListener {
     private static volatile boolean leftClick = false;
     private static volatile boolean rightClick = false;
     private static final Object clickLock = new Object();
-    private static Component componentReference = null;
+    private static volatile Component componentReference = null;
     /** Previous listener instance so we do not stack duplicate listeners on the same component. */
     private static volatile ActiverseMouseInfo installedOnComponent = null;
 

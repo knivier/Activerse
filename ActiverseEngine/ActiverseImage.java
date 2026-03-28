@@ -14,9 +14,11 @@ import java.net.URL;
  * @version 1.4.1
  */
 public class ActiverseImage {
-    private final Image image; // Image object to store the loaded image
-    private final String path; // Store the image path
-    private boolean loaded = false; // Track if image is fully loaded
+    private static final Component MEDIA_TRACKER_PEER = new Canvas();
+
+    private final Image image;
+    private final String path;
+    private boolean loaded = false;
 
     /**
      * Constructs a new ActiverseImage object with the image loaded from the specified file.
@@ -43,11 +45,7 @@ public class ActiverseImage {
                     ErrorLogger.format("2A", "IN", "ActiverseImage(String filename)", "image is null (Report: INTO). Please check the image path and try again."));
         }
         
-        // Use MediaTracker to ensure image is loaded synchronously
-        // Create a temporary frame for MediaTracker (it needs a Component)
-        Frame tempFrame = new Frame();
-        tempFrame.setVisible(false);
-        MediaTracker tracker = new MediaTracker(tempFrame);
+        MediaTracker tracker = new MediaTracker(MEDIA_TRACKER_PEER);
         tracker.addImage(image, 0);
         try {
             tracker.waitForID(0);
@@ -56,8 +54,6 @@ public class ActiverseImage {
             ErrorLogger.report("2A", "IN", "ActiverseImage(String filename)", "image loading was interrupted.");
             Thread.currentThread().interrupt();
             loaded = false;
-        } finally {
-            tempFrame.dispose(); // Clean up temporary frame
         }
         
         if (!loaded) {

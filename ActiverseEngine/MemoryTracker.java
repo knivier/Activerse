@@ -26,6 +26,7 @@ public class MemoryTracker {
     private int targetFPS;
     private boolean newSessionNotified = false;
     private int logNum = 0;
+    private PrintWriter logWriter;
 
     /**
      * Constructor for MemoryTracker class
@@ -34,6 +35,14 @@ public class MemoryTracker {
         loadProperties();
         lastTime = System.nanoTime();
         lastMemoryUsed = getMemoryUsed();
+        if (loggingEnabled) {
+            try {
+                logWriter = new PrintWriter(new FileWriter("logs.log", true));
+            } catch (IOException e) {
+                ErrorLogger.reportException("9A", "IO.OUT", "MemoryTracker()", e);
+                logWriter = null;
+            }
+        }
     }
 
 
@@ -145,12 +154,12 @@ public class MemoryTracker {
      * @see #System.currentTimeMillis()
      */
     private void writeMemoryUsageToFile() {
-        try (PrintWriter writer = new PrintWriter(new FileWriter("logs.log", true))) {
-            LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            String formattedDateTime = now.format(formatter);
+        if (logWriter == null) return;
+        try {
             if (!newSessionNotified) {
-                writer.println("New Log Session @ " + formattedDateTime);
+                LocalDateTime now = LocalDateTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                logWriter.println("New Log Session @ " + now.format(formatter));
                 newSessionNotified = true;
             }
 
@@ -160,10 +169,24 @@ public class MemoryTracker {
             MemoryUsage heapMemoryUsage = getHeapMemoryUsage();
             MemoryUsage nonHeapMemoryUsage = getNonHeapMemoryUsage();
             long gcTime = getGarbageCollectionTime();
-            writer.println(logNum + " | " + formattedTime + " | " + getMemoryUsagePerSecond() + " | Heap: " + heapMemoryUsage.getUsed() / (1024 * 1024) + " MB | Non-Heap: " + nonHeapMemoryUsage.getUsed() / (1024 * 1024) + " MB | GC Time: " + gcTime + " ms | FPS: " + World.getFPS() + " targeting " + targetFPS + " | Sys Time " + System.currentTimeMillis() + " | Interval " + World.getTicksDone());
+            logWriter.println(logNum + " | " + formattedTime + " | " + getMemoryUsagePerSecond() + " | Heap: " + heapMemoryUsage.getUsed() / (1024 * 1024) + " MB | Non-Heap: " + nonHeapMemoryUsage.getUsed() / (1024 * 1024) + " MB | GC Time: " + gcTime + " ms | FPS: " + World.getFPS() + " targeting " + targetFPS + " | Sys Time " + System.currentTimeMillis() + " | Interval " + World.getTicksDone());
+            logWriter.flush();
             logNum++;
-        } catch (IOException e) {
+        } catch (Exception e) {
             ErrorLogger.reportException("9A", "IO.OUT", "writeMemoryUsageToFile()", e);
+        }
+    }
+
+    /**
+     * Closes the persistent log writer. Called from {@link World#stop()}.
+     */
+    public void close() {
+        if (logWriter != null) {
+            try {
+                logWriter.close();
+            } catch (Exception ignored) {
+            }
+            logWriter = null;
         }
     }
 }
