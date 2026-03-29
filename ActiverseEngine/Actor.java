@@ -25,6 +25,9 @@ public abstract class Actor {
     private World world;
     private ActiverseImage image;
     private double velocityX, velocityY;
+    private int prevX, prevY;
+    private double prevPreciseX, prevPreciseY;
+    private double prevDirection;
     private int height;
     private int width;
     private List<Item> inventory; // List of items the actor can hold
@@ -307,7 +310,78 @@ public abstract class Actor {
     }
 
     /**
-     * Draws the actor on the given graphics context.
+     * Copies the current state into the previous-state fields. Called once per tick
+     * by {@link World#update()} before any actor mutation, so that rendering can
+     * interpolate between the previous and current simulation snapshots.
+     */
+    void snapshotState() {
+        prevX = x;
+        prevY = y;
+        prevPreciseX = preciseX;
+        prevPreciseY = preciseY;
+        prevDirection = direction;
+    }
+
+    /**
+     * Returns the interpolated X position for rendering (blends previous and current
+     * state using the world's render alpha). Simulation code should use {@link #getX()}.
+     */
+    public int getRenderX() {
+        double alpha = (world != null) ? world.getRenderAlpha() : 1.0;
+        if (usePrecisePosition) {
+            return (int) Math.round(prevPreciseX + (preciseX - prevPreciseX) * alpha);
+        }
+        return (int) Math.round(prevX + (x - prevX) * alpha);
+    }
+
+    /**
+     * Returns the interpolated Y position for rendering (blends previous and current
+     * state using the world's render alpha). Simulation code should use {@link #getY()}.
+     */
+    public int getRenderY() {
+        double alpha = (world != null) ? world.getRenderAlpha() : 1.0;
+        if (usePrecisePosition) {
+            return (int) Math.round(prevPreciseY + (preciseY - prevPreciseY) * alpha);
+        }
+        return (int) Math.round(prevY + (y - prevY) * alpha);
+    }
+
+    /**
+     * Returns the interpolated precise X position as a double for sub-pixel rendering.
+     */
+    public double getRenderPreciseX() {
+        double alpha = (world != null) ? world.getRenderAlpha() : 1.0;
+        return prevPreciseX + (preciseX - prevPreciseX) * alpha;
+    }
+
+    /**
+     * Returns the interpolated precise Y position as a double for sub-pixel rendering.
+     */
+    public double getRenderPreciseY() {
+        double alpha = (world != null) ? world.getRenderAlpha() : 1.0;
+        return prevPreciseY + (preciseY - prevPreciseY) * alpha;
+    }
+
+    /**
+     * Returns the interpolated direction for rendering.
+     */
+    public double getRenderDirection() {
+        double alpha = (world != null) ? world.getRenderAlpha() : 1.0;
+        return prevDirection + (direction - prevDirection) * alpha;
+    }
+
+    /**
+     * Returns the bounding box at the interpolated render position.
+     * Use for visual hit-testing and shadow casting during paint;
+     * simulation collision should still use {@link #getBoundingBox()}.
+     */
+    public Rectangle getRenderBoundingBox() {
+        Dimension dims = ImageUtils.getImageDimensions(getImage(), width, height);
+        return new Rectangle(getRenderX(), getRenderY(), dims.width, dims.height);
+    }
+
+    /**
+     * Draws the actor on the given graphics context using interpolated state.
      * If no image is set, this method does nothing. Subclasses should override
      * this method to draw shapes or custom graphics when not using images.
      *
@@ -321,16 +395,18 @@ public abstract class Actor {
             Dimension dims = ImageUtils.getImageDimensions(image, width, height);
             width = dims.width;
             height = dims.height;
+
+            int renderX = getRenderX();
+            int renderY = getRenderY();
+            double renderDir = getRenderDirection();
+
             AffineTransform old = g2d.getTransform();
-
-            g2d.rotate(direction, x + (double) dims.width / 2, y + (double) dims.height / 2);
-            g2d.drawImage(awtImage, x, y, null);
-
+            g2d.rotate(renderDir, renderX + (double) dims.width / 2, renderY + (double) dims.height / 2);
+            g2d.drawImage(awtImage, renderX, renderY, null);
             g2d.setTransform(old);
         } catch (Exception e) {
             ErrorLogger.reportException("5A", "OUT", "paint(Graphics g)", e, "2A", "OUT");
         }
-        // If image is null, the actor should override paint() to draw shapes
     }
 
     /**
@@ -349,6 +425,13 @@ public abstract class Actor {
      */
     public void setWorld(World world) {
         this.world = world;
+        if (world != null) {
+            prevX = x;
+            prevY = y;
+            prevPreciseX = preciseX;
+            prevPreciseY = preciseY;
+            prevDirection = direction;
+        }
     }
 
     /**

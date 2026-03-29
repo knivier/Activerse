@@ -32,12 +32,12 @@ public class ActiverseImage {
         }
         
         path = filename;
-        URL url = ResourcePaths.resolveUrl(filename);
-        if (url == null) {
-            throw new RuntimeException(
-                    ErrorLogger.format("2A", "IN", "ActiverseImage(String filename)",
-                            "could not resolve image path: " + filename));
-        }
+        URL url = ResourcePaths.requireUrl(
+                filename,
+                () -> new RuntimeException(
+                        ErrorLogger.format("2A", "IN", "ActiverseImage(String filename)",
+                                "could not resolve image path: " + filename))
+        );
         image = Toolkit.getDefaultToolkit().getImage(url);
 
         if (image == null) {

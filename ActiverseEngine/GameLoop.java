@@ -19,6 +19,12 @@ public class GameLoop implements Runnable {
     private volatile int updates;
     private long lastFpsTime;
     private boolean dynamicLighting;
+    /**
+     * Scheduled time (relative to an epoch) of the last completed tick.
+     * Using the scheduled tick time (not "end of update()") prevents interpolation
+     * from appearing one-tick-behind when render and update threads are phase-locked.
+     */
+    private volatile long lastUpdateTimeNanos = System.nanoTime();
     private Thread updateThread;
     private Thread renderThread;
 
@@ -117,41 +123,41 @@ public class GameLoop implements Runnable {
                     world.update();
                 }
             }
+            // Use the fixed schedule time for this tick so render alpha represents
+            // the true fraction of time toward the next tick, independent of update cost.
+            lastUpdateTimeNanos = epoch + currentTickNumber * FRAME_TIME_NANOS;
             updates++;
             lastTickNumber = currentTickNumber;
         }
     }
 
     /**
-     * Render loop synchronized to system monotonic clock, matching the update loop's
-     * epoch-based scheduling for smooth, consistent frame pacing.
+     * Render loop operating as a time sampler. Reads the last update timestamp,
+     * computes an interpolation alpha (0..1 between previous and current simulation
+     * state), stores it in World, and requests a repaint. Rate-limited to target FPS.
      */
     private void renderLoop() {
-        final long epoch = System.nanoTime();
-        long lastFrameNumber = -1;
-
         while (running.get()) {
             long now = System.nanoTime();
-            long currentFrameNumber = (now - epoch) / FRAME_TIME_NANOS;
 
-            if (currentFrameNumber <= lastFrameNumber) {
-                long nextFrameAt = epoch + (lastFrameNumber + 1) * FRAME_TIME_NANOS;
-                long sleepNanos = nextFrameAt - System.nanoTime();
-                if (sleepNanos > 0) {
-                    if (sleepNanos > 2_000_000L) {
-                        try { Thread.sleep(sleepNanos / 1_000_000L, (int) (sleepNanos % 1_000_000L)); }
-                        catch (InterruptedException e) { Thread.currentThread().interrupt(); break; }
-                    } else {
-                        LockSupport.parkNanos(sleepNanos);
-                    }
-                }
-                continue;
-            }
+            double alpha = (double) (now - lastUpdateTimeNanos) / FRAME_TIME_NANOS;
+            alpha = Math.max(0.0, Math.min(1.0, alpha));
+            world.setRenderAlpha(alpha);
 
             world.repaint();
             frames++;
             calculateFPS(now);
-            lastFrameNumber = currentFrameNumber;
+
+            long elapsed = System.nanoTime() - now;
+            long sleepNanos = FRAME_TIME_NANOS - elapsed;
+            if (sleepNanos > 0) {
+                if (sleepNanos > 2_000_000L) {
+                    try { Thread.sleep(sleepNanos / 1_000_000L, (int) (sleepNanos % 1_000_000L)); }
+                    catch (InterruptedException e) { Thread.currentThread().interrupt(); break; }
+                } else {
+                    LockSupport.parkNanos(sleepNanos);
+                }
+            }
         }
     }
 
