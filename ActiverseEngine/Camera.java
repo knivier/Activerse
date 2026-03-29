@@ -12,6 +12,8 @@ import java.awt.Point;
 public class Camera {
     private double offsetX;
     private double offsetY;
+    private double prevOffsetX;
+    private double prevOffsetY;
     private int viewWidth;
     private int viewHeight;
     private Actor target;
@@ -93,6 +95,9 @@ public class Camera {
      * Keeps the target centered; when target is null, offset does not change.
      */
     public void update() {
+        prevOffsetX = offsetX;
+        prevOffsetY = offsetY;
+
         if (target != null) {
             // Center camera on target; visible world size is viewSize/zoom
             double halfViewW = viewWidth / (2.0 * zoom);
@@ -123,6 +128,8 @@ public class Camera {
      * @param y Y position
      */
     public void snapTo(double x, double y) {
+        prevOffsetX = x;
+        prevOffsetY = y;
         offsetX = x;
         offsetY = y;
         targetOffsetX = x;
@@ -178,7 +185,50 @@ public class Camera {
                  worldY + height < offsetY ||
                  worldY > offsetY + visibleH);
     }
+
+    /**
+     * Same as {@link #isVisible(int, int, int, int)} but uses interpolated camera offsets
+     * (match {@link #getInterpolatedOffsetX(double)} / {@link World#getRenderAlpha()}).
+     */
+    public boolean isVisible(int worldX, int worldY, int width, int height, double renderAlpha) {
+        double ox = getInterpolatedOffsetX(renderAlpha);
+        double oy = getInterpolatedOffsetY(renderAlpha);
+        double visibleW = viewWidth / zoom;
+        double visibleH = viewHeight / zoom;
+        return !(worldX + width < ox ||
+                 worldX > ox + visibleW ||
+                 worldY + height < oy ||
+                 worldY > oy + visibleH);
+    }
     
+    /**
+     * Returns the camera X offset interpolated between previous and current state.
+     * @param alpha Interpolation factor (0.0 = previous state, 1.0 = current state)
+     */
+    public double getInterpolatedOffsetX(double alpha) {
+        return prevOffsetX + (offsetX - prevOffsetX) * alpha;
+    }
+
+    /**
+     * Returns the camera Y offset interpolated between previous and current state.
+     * @param alpha Interpolation factor (0.0 = previous state, 1.0 = current state)
+     */
+    public double getInterpolatedOffsetY(double alpha) {
+        return prevOffsetY + (offsetY - prevOffsetY) * alpha;
+    }
+
+    /**
+     * Converts world coordinates to screen coordinates using interpolated camera position.
+     */
+    public Point worldToScreenInterpolated(int worldX, int worldY, double alpha) {
+        double interpX = getInterpolatedOffsetX(alpha);
+        double interpY = getInterpolatedOffsetY(alpha);
+        return new Point(
+            (int)((worldX - interpX) * zoom),
+            (int)((worldY - interpY) * zoom)
+        );
+    }
+
     // Getters
     public double getOffsetX() { return offsetX; }
     public double getOffsetY() { return offsetY; }

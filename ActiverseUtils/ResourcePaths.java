@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.function.Supplier;
 
 /**
  * Resolves game paths (e.g. {@code assets/images/foo.png}) to filesystem or classpath resources.
@@ -45,6 +46,26 @@ public final class ResourcePaths {
             return null;
         }
         return cl.getResource(key);
+    }
+
+    /**
+     * Resolves a URL and throws a caller-provided exception when the path cannot be resolved.
+     * This avoids repeating null-check and error-string boilerplate in resource-loading callers.
+     *
+     * @param path Resource path (filesystem or classpath key)
+     * @param exceptionFactory Factory used to create the failure exception
+     * @return Resolved URL
+     * @throws RuntimeException any exception created by {@code exceptionFactory}
+     */
+    public static URL requireUrl(String path, Supplier<? extends RuntimeException> exceptionFactory) {
+        URL url = resolveUrl(path);
+        if (url != null) {
+            return url;
+        }
+        if (exceptionFactory != null) {
+            throw exceptionFactory.get();
+        }
+        throw new IllegalArgumentException("resource not found: " + path);
     }
 
     /**

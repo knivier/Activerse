@@ -2,6 +2,7 @@ package ActiverseEngine;
 
 import ActiverseUtils.ErrorLogger;
 import ActiverseUtils.MathUtils;
+import ActiverseUtils.ResourcePaths;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,6 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -94,6 +96,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
     private long lastFrameTime = System.currentTimeMillis();
     private int frameCount = 0;
     private int actualFPS = 0;
+    private volatile double renderAlpha = 1.0;
 
     private BufferedImage lightingBuffer;
     private BufferedImage spotlightBuffer;
@@ -193,6 +196,18 @@ public class World extends JPanel implements ActionListener, KeyListener {
         return ticksDone.get();
     }
 
+    /**
+     * The interpolation factor (0.0 = previous tick state, 1.0 = current tick state)
+     * set by the render thread each frame. Read by actors during {@code paint()}.
+     */
+    public double getRenderAlpha() {
+        return renderAlpha;
+    }
+
+    void setRenderAlpha(double alpha) {
+        this.renderAlpha = alpha;
+    }
+
     private void initializeKeyListener() {
         addKeyListener(this);
     }
@@ -203,12 +218,12 @@ public class World extends JPanel implements ActionListener, KeyListener {
      * @param imagePath Relative path for image to load as background image
      */
     public void setBackgroundImage(String imagePath) {
-        java.net.URL url = ActiverseUtils.ResourcePaths.resolveUrl(imagePath);
-        if (url == null) {
-            throw new RuntimeException(
-                    ErrorLogger.format("2A", "IN", "setBackgroundImage(String imagePath)",
-                            "could not resolve background image: " + imagePath));
-        }
+        URL url = ResourcePaths.requireUrl(
+                imagePath,
+                () -> new RuntimeException(
+                        ErrorLogger.format("2A", "IN", "setBackgroundImage(String imagePath)",
+                                "could not resolve background image: " + imagePath))
+        );
         backgroundImage = Toolkit.getDefaultToolkit().getImage(url);
         loadedImages.add(imagePath);
     }
@@ -244,8 +259,9 @@ public class World extends JPanel implements ActionListener, KeyListener {
      */
     public void update() {
         ticksDone.incrementAndGet();
-        // Copy-on-write: iterator snapshot is safe even if act() removes actors; do not wrap in
-        // synchronized(this) — that would serialize the update thread with EDT paint and destroy FPS.
+        for (Actor actor : actors) {
+            actor.snapshotState();
+        }
         for (Actor actor : actors) {
             if (!actor.isTickInert()) {
                 actor.act();
@@ -510,7 +526,7 @@ public class World extends JPanel implements ActionListener, KeyListener {
 
         // Draw soft shadows for each actor and light
         for (Actor actor : actors) {
-            Rectangle bounds = actor.getBoundingBox();
+            Rectangle bounds = actor.getRenderBoundingBox();
             int actorCenterX = bounds.x + bounds.width / 2;
             int actorCenterY = bounds.y + bounds.height / 2;
 

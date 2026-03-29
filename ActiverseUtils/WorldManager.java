@@ -94,19 +94,40 @@ public class WorldManager {
         File worldsDir = getWorldsRootDirectory();
         return new File(worldsDir, worldName).getPath();
     }
+
+    /**
+     * Builds a file path under a world directory.
+     */
+    private static String getWorldFilePath(String worldName, String filename) {
+        return new File(getWorldPath(worldName), filename).getPath();
+    }
+
+    /**
+     * Ensures both the global worlds root and the specific world directory exist.
+     *
+     * @return Directory object for the world
+     */
+    private static File ensureWorldDirectory(String worldName) {
+        ensureWorldsDirectory();
+        File worldDir = new File(getWorldPath(worldName));
+        if (!worldDir.exists()) {
+            worldDir.mkdirs();
+        }
+        return worldDir;
+    }
     
     /**
      * Gets the path to world.json
      */
     public static String getWorldJsonPath(String worldName) {
-        return getWorldPath(worldName) + File.separator + "world.json";
+        return getWorldFilePath(worldName, "world.json");
     }
     
     /**
      * Gets the path to player.json
      */
     public static String getPlayerJsonPath(String worldName) {
-        return getWorldPath(worldName) + File.separator + "player.json";
+        return getWorldFilePath(worldName, "player.json");
     }
     
     /**
@@ -139,12 +160,7 @@ public class WorldManager {
     public static void saveWorldData(String worldName, long seed, int tileSize, int worldWidth, int worldHeight,
                                      long totalGameTicks, boolean infinite, int chunkTiles,
                                      long dayNightDisplayOffset, boolean timeFrozen, long frozenDayNightTicks) {
-        ensureWorldsDirectory();
-        String worldPath = getWorldPath(worldName);
-        File worldDir = new File(worldPath);
-        if (!worldDir.exists()) {
-            worldDir.mkdirs();
-        }
+        ensureWorldDirectory(worldName);
 
         try {
             String json = String.format(
@@ -193,12 +209,7 @@ public class WorldManager {
      * Saves player data to player.json
      */
     public static void savePlayerData(String worldName, PlayerData playerData) {
-        ensureWorldsDirectory();
-        String worldPath = getWorldPath(worldName);
-        File worldDir = new File(worldPath);
-        if (!worldDir.exists()) {
-            worldDir.mkdirs();
-        }
+        ensureWorldDirectory(worldName);
         
         try {
             StringBuilder json = new StringBuilder();
@@ -261,7 +272,7 @@ public class WorldManager {
      */
     public static void saveModifiedBlocks(String worldName, Map<String, BlockData> modifiedBlocks) {
         try {
-            String path = getWorldPath(worldName) + File.separator + "blocks.json";
+            String path = getWorldFilePath(worldName, "blocks.json");
             int est = Math.max(128, modifiedBlocks.size() * 80 + 48);
             StringBuilder json = new StringBuilder(est);
             json.append("{\n");
@@ -298,7 +309,7 @@ public class WorldManager {
      */
     public static Map<String, BlockData> loadModifiedBlocks(String worldName) {
         try {
-            String path = getWorldPath(worldName) + File.separator + "blocks.json";
+            String path = getWorldFilePath(worldName, "blocks.json");
             File file = new File(path);
             if (!file.exists()) {
                 return new HashMap<>();
