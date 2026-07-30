@@ -30,7 +30,7 @@ import java.util.Objects;
  * This is a significantly harder class to implement than the others, so don't mess with it unless you know what you're doing
  * 
  * @author Knivier
- * @version 1.4.1
+ * @version 1.4.2
  */
 public class WorldManager {
     private static final String WORLDS_DIR_NAME = "Worlds";

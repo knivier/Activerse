@@ -9,7 +9,7 @@ import java.awt.event.KeyListener;
  * Supports special keyword "shift" for any shift key.
  *
  * @author Knivier
- * @version 1.4.1
+ * @version 1.4.2
  */
 public class KeyboardInfo implements KeyListener {
     private static final boolean[] keys = new boolean[256];

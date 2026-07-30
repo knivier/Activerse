@@ -11,7 +11,7 @@ import java.net.URL;
  * This class provides methods to load an image and retrieve it.
  *
  * @author Knivier
- * @version 1.4.1
+ * @version 1.4.2
  */
 public class ActiverseImage {
     private static final Component MEDIA_TRACKER_PEER = new Canvas();

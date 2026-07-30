@@ -8,7 +8,7 @@ package ActiverseUtils;
  * energy, motion, circular dynamics, and more.
  *
  * @author Knivier
- * @version 1.4.1
+ * @version 1.4.2
  */
 public class Physics {
 
