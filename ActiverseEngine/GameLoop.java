@@ -8,7 +8,7 @@ import java.util.concurrent.locks.LockSupport;
  * Threads are split across update/render responsibilities with precise frame pacing.
  *
  * @author Knivier
- * @version 1.4.1
+ * @version 1.4.2
  */
 public class GameLoop implements Runnable {
     private final World world;

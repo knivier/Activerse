@@ -16,7 +16,7 @@ import java.awt.event.WindowEvent;
  * This class contains static methods to manage the application lifecycle.
  *
  * @author Knivier
- * @version 1.4.1
+ * @version 1.4.2
  */
 public class Activerse {
     private static World currentWorld;
@@ -45,7 +45,7 @@ public class Activerse {
         currentWorld = world;
         SwingUtilities.invokeLater(() -> {
             try {
-                frame = new JFrame("Activerse Instance v1.4.1");
+                frame = new JFrame("Activerse Instance v1.4.2");
                 frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
                 frame.addWindowListener(new WindowAdapter() {
                     @Override

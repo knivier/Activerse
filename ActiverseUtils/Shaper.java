@@ -8,7 +8,7 @@ import java.awt.*;
  * without requiring images.
  *
  * @author Knivier
- * @version 1.4.1
+ * @version 1.4.2
  */
 public class Shaper {
     

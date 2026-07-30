@@ -13,7 +13,7 @@ import java.util.WeakHashMap;
  * This class provides a method to check if two actors intersect.
  *
  * @author Knivier
- * @version 1.4.1
+ * @version 1.4.2
  */
 public class CollisionManager {
 

@@ -10,7 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * ParticleSystem - System for creating and managing visual particle effects
  * 
  * @author Knivier
- * @version 1.4.1
+ * @version 1.4.2
  */
 public class ParticleSystem extends Actor {
     private List<Particle> particles;

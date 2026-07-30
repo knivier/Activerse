@@ -8,7 +8,7 @@ import ActiverseEngine.Actor;
  * between two Actor objects.
  *
  * @author Knivier
- * @version 1.4.1
+ * @version 1.4.2
  */
 public class ActorVector {
     // X and Y components of the vector

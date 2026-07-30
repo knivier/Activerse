@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * The world has a fixed size and a black border, and can display a background image.
  *
  * @author Knivier
- * @version 1.4.1
+ * @version 1.4.2
  */
 public class World extends JPanel implements ActionListener, KeyListener {
     /**

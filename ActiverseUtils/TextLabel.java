@@ -7,7 +7,7 @@ import java.awt.*;
  * Allows drawing text without using Graphics2D directly in game code
  * 
  * @author Knivier
- * @version 1.4.1
+ * @version 1.4.2
  */
 public class TextLabel {
     private String text;
