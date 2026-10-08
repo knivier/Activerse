@@ -1,4 +1,6 @@
-# Activerse
+# Activerse Origin
+
+*As of 02/10/26, Activerse (the 2D framework) is now Activerse Origin; this paves the way for Activerse Frontier, the upcoming 3D framework being released this November (01/11/26)
 
 **Activerse** is a **Java Game/Simulation/Physics Engine** designed to simplify the game-making experience for 2D games. With Activerse, you have access to basic yet powerful methods that allow you to create your game from the ground up. The possibilities are endless—design and develop games that match your vision.
 
